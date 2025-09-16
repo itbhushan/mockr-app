@@ -1,0 +1,86 @@
+  [build]
+    publish = ".next"
+    command = "npm run build"
+
+  [build.environment]
+    NODE_VERSION = "18"
+    NPM_VERSION = "9"
+
+  # Production branch settings
+  [context.production]
+    command = "npm run build"
+
+  # Feature branch settings for testing
+  [context.branch-deploy]
+    command = "npm run build"
+
+  # Dev branch settings
+  [context.dev]
+    command = "npm run build"
+
+  # Headers for performance and security
+  [[headers]]
+    for = "/*"
+    [headers.values]
+      X-Frame-Options = "DENY"
+      X-XSS-Protection = "1; mode=block"
+      X-Content-Type-Options = "nosniff"
+      Referrer-Policy = "strict-origin-when-cross-origin"
+      Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+  # Cache static assets
+  [[headers]]
+    for = "/static/*"
+    [headers.values]
+      Cache-Control = "public, max-age=31536000, immutable"
+
+  # Cache images
+  [[headers]]
+    for = "/*.jpg"
+    [headers.values]
+      Cache-Control = "public, max-age=31536000"
+
+  [[headers]]
+    for = "/*.png"
+    [headers.values]
+      Cache-Control = "public, max-age=31536000"
+
+  [[headers]]
+    for = "/*.svg"
+    [headers.values]
+      Cache-Control = "public, max-age=31536000"
+
+  # Redirects for SPA behavior
+  [[redirects]]
+    from = "/*"
+    to = "/index.html"
+    status = 200
+    conditions = {Role = ["admin"], Country = ["US"]}
+
+  # API proxy to avoid CORS issues (if needed)
+  [[redirects]]
+    from = "/api/*"
+    to = "https://your-api-domain.com/api/:splat"
+    status = 200
+    force = false
+
+  # Environment variables (will be set in Netlify dashboard)
+  [build.processing.css]
+    bundle = true
+    minify = true
+
+  [build.processing.js]
+    bundle = true
+    minify = true
+
+  [build.processing.html]
+    pretty_urls = true
+
+  # Functions settings for future serverless functions
+  [functions]
+    directory = "netlify/functions"
+    node_bundler = "esbuild"
+
+  # Form handling (for contact forms if needed)
+  [forms]
+    spam_protection = true
