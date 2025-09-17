@@ -244,7 +244,7 @@
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.15 }}
-                  className="card-hover p-8 lg:p-12 text-center group relative overflow-hidden"
+                  className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden hover:shadow-md transform hover:-translate-y-1 transition-all duration-300 p-8 lg:p-12 text-center group relative overflow-hidden"
                 >
                   <div className="absolute inset-0 mockr-gradient-surface opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative z-10">
@@ -289,7 +289,7 @@
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.15 }}
-                  className="card-hover group cursor-pointer relative overflow-hidden"
+                  className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden hover:shadow-md transform hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden"
                 >
                   <div className="absolute inset-0 mockr-gradient-surface opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative z-10">

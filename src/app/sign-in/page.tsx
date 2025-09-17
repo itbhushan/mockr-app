@@ -41,7 +41,7 @@ export default function SignInPage() {
           </p>
         </div>
 
-        <div className="card-primary p-8 shadow-md">
+        <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden p-8 shadow-md">
           {isClerkLoaded ? (
             <div className="text-center py-8">
               <p className="text-neutral-600 mb-4">Clerk authentication will be available when API keys are configured.</p>

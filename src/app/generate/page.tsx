@@ -65,7 +65,7 @@ export default function GeneratePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="card-primary p-8 lg:p-10">
+            <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden p-8 lg:p-10">
               <div className="mb-8">
                 <h1 className="text-display-sm text-neutral-900 mb-4">
                   Create Your Comic
@@ -190,7 +190,7 @@ export default function GeneratePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="card-primary p-8 lg:p-10 sticky top-32">
+            <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden p-8 lg:p-10 sticky top-32">
               <h2 className="text-heading-md text-neutral-900 mb-6">
                 Preview
               </h2>
