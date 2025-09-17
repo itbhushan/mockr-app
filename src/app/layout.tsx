@@ -73,23 +73,32 @@
   }: {
     children: React.ReactNode
   }) {
-    return (
-      <ClerkProvider>
-        <html lang="en" className={inter.variable}>
-          <head>
-            <link rel="icon" href="/favicon.ico" sizes="any" />
-            <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-            <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-            <meta name="theme-color" content="#1e40af" />
-          </head>
-          <body className={`${inter.className} antialiased bg-neutral-50 text-neutral-900`}>
-            <div className="min-h-screen flex flex-col">
-              <main className="flex-1">
-                {children}
-              </main>
-            </div>
-          </body>
-        </html>
-      </ClerkProvider>
+    const isDev = process.env.NODE_ENV === 'development'
+    const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
+                       !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes('dummy')
+
+    const content = (
+      <html lang="en" className={inter.variable}>
+        <head>
+          <link rel="icon" href="/favicon.ico" sizes="any" />
+          <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+          <meta name="theme-color" content="#1e40af" />
+        </head>
+        <body className={`${inter.className} antialiased bg-neutral-50 text-neutral-900`}>
+          <div className="min-h-screen flex flex-col">
+            <main className="flex-1">
+              {children}
+            </main>
+          </div>
+        </body>
+      </html>
     )
+
+    // Only use ClerkProvider when we have proper keys
+    if (hasClerkKey) {
+      return <ClerkProvider>{content}</ClerkProvider>
+    }
+
+    return content
   }
