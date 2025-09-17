@@ -31,7 +31,7 @@ export default function SignInPage() {
             <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-sm">
               <span className="text-white font-bold text-2xl">M</span>
             </div>
-            <span className="text-3xl font-bold text-gradient">Mockr</span>
+            <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">Mockr</span>
           </div>
           <h1 className="text-4xl lg:text-6xl font-bold leading-tight tracking-tight text-neutral-900 mb-4">
             Welcome Back

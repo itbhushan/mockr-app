@@ -45,7 +45,7 @@ export default function GeneratePage() {
               <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-sm">
                 <span className="text-white font-bold text-xl lg:text-2xl">M</span>
               </div>
-              <span className="text-2xl lg:text-3xl font-bold text-gradient">Mockr</span>
+              <span className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">Mockr</span>
             </div>
           </Link>
 
