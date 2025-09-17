@@ -19,7 +19,7 @@
       ],
     },
     // Optimize for Netlify deployment
-    output: 'standalone',
+    // output: 'export', // Disabled for Netlify plugin compatibility
     trailingSlash: false,
     poweredByHeader: false,
     compress: true,

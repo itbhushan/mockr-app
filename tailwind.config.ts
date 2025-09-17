@@ -146,6 +146,18 @@
         screens: {
           'xs': '475px',
         },
+        // Custom shadow utilities
+        utilities: {
+          '.mockr-shadow-soft': {
+            'box-shadow': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)'
+          },
+          '.mockr-shadow-medium': {
+            'box-shadow': '0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          },
+          '.mockr-shadow-strong': {
+            'box-shadow': '0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 2px 10px -2px rgba(0, 0, 0, 0.04)'
+          },
+        },
       },
     },
     plugins: [],

@@ -1,11 +1,11 @@
   'use client'
 
   import { useState } from 'react'
-  import { motion } from 'framer-motion'
   import { Sparkles, Zap, Users, ArrowRight, Play, Star } from 'lucide-react'
+  import { motion } from 'framer-motion'
 
   export default function HomePage() {
-    const [isVideoPlaying, setIsVideoPlaying] = useState(false)
+    const [, setIsVideoPlaying] = useState(false)
 
     const features = [
       {
