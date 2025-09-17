@@ -20,11 +20,30 @@ export default function GeneratePage() {
     e.preventDefault()
     setIsGenerating(true)
 
-    // Simulate AI generation delay
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/generate-comic', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setGeneratedComic(data.comic.imageUrl)
+        console.log('Comic generated:', data.comic)
+      } else {
+        console.error('Generation failed:', data.error)
+        alert('Failed to generate comic. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error calling API:', error)
+      alert('Something went wrong. Please try again.')
+    } finally {
       setIsGenerating(false)
-      setGeneratedComic('/placeholder-comic.jpg') // Placeholder for generated comic
-    }, 3000)
+    }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
