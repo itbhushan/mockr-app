@@ -48,7 +48,7 @@
     ]
 
     return (
-      <div className="min-h-screen mockr-gradient-subtle">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
         {/* Navigation */}
         <nav className="w-full px-6 py-4 lg:py-6 bg-white/95 backdrop-blur-md border-b border-neutral-200/60 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -57,7 +57,7 @@
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center space-x-3"
             >
-              <div className="w-10 h-10 lg:w-12 lg:h-12 mockr-gradient-hero rounded-xl flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-sm">
                 <span className="text-white font-bold text-xl lg:text-2xl">M</span>
               </div>
               <span className="text-2xl lg:text-3xl font-bold text-gradient">Mockr</span>
@@ -75,12 +75,12 @@
                 About
               </button>
               <Link href="/sign-in">
-                <button className="btn-secondary text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3">
+                <button className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3">
                   Sign In
                 </button>
               </Link>
               <Link href="/sign-up">
-                <button className="btn-primary text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3">
+                <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3">
                   Get Started
                 </button>
               </Link>
@@ -109,13 +109,13 @@
                     <span>AI-Powered Political Satire</span>
                   </motion.div>
 
-                  <h1 className="text-display-md text-neutral-900">
+                  <h1 className="text-5xl lg:text-7xl font-bold leading-tight tracking-tight text-neutral-900">
                     Create{' '}
                     <span className="text-gradient">Intelligent</span>{' '}
                     Political Cartoons
                   </h1>
 
-                  <p className="text-body-lg text-neutral-600 max-w-2xl">
+                  <p className="text-xl lg:text-2xl leading-relaxed text-neutral-600 max-w-2xl">
                     Generate witty, shareable satirical content inspired by R.K. Laxman's legendary style.
                     Turn political commentary into viral-worthy cartoons with AI.
                   </p>
@@ -128,7 +128,7 @@
                   className="flex flex-col sm:flex-row gap-6"
                 >
                   <Link href="/generate">
-                    <button className="btn-primary group text-lg lg:text-xl px-10 py-5 lg:px-12 lg:py-6 shadow-md hover:shadow-lg">
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group text-lg lg:text-xl px-10 py-5 lg:px-12 lg:py-6 shadow-md hover:shadow-lg">
                       Generate Your First Comic
                       <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
                     </button>
@@ -136,7 +136,7 @@
 
                   <button
                     onClick={() => setIsVideoPlaying(true)}
-                    className="btn-secondary group text-lg lg:text-xl px-10 py-5 lg:px-12 lg:py-6"
+                    className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group text-lg lg:text-xl px-10 py-5 lg:px-12 lg:py-6"
                   >
                     <Play className="w-5 h-5 mr-3" />
                     Watch Demo
@@ -188,7 +188,7 @@
                       <div className="flex justify-center">
                         <div className="w-48 h-32 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-lg flex items-center justify-center">
                           <div className="text-center">
-                            <div className="w-16 h-16 mockr-gradient-hero rounded-full mx-auto mb-2 flex items-center justify-center">
+                            <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mx-auto mb-2 flex items-center justify-center">
                               <Sparkles className="w-8 h-8 text-white" />
                             </div>
                             <p className="text-xs text-neutral-500">AI Generation in Progress...</p>
@@ -219,7 +219,7 @@
         </section>
 
         {/* Features Section */}
-        <section className="px-6 py-32 lg:py-40 mockr-gradient-surface">
+        <section className="px-6 py-32 lg:py-40 bg-gradient-to-br from-white to-slate-50">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -227,10 +227,10 @@
               viewport={{ once: true }}
               className="text-center mb-20"
             >
-              <h2 className="text-display-sm text-neutral-900 mb-8">
+              <h2 className="text-4xl lg:text-6xl font-bold leading-tight tracking-tight text-neutral-900 mb-8">
                 Why Choose Mockr?
               </h2>
-              <p className="text-body-lg text-neutral-600 max-w-4xl mx-auto">
+              <p className="text-xl lg:text-2xl leading-relaxed text-neutral-600 max-w-4xl mx-auto">
                 Professional-quality political satire made accessible to everyone.
                 Create, share, and go viral with intelligent humor.
               </p>
@@ -246,15 +246,15 @@
                   transition={{ delay: index * 0.15 }}
                   className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden hover:shadow-md transform hover:-translate-y-1 transition-all duration-300 p-8 lg:p-12 text-center group relative overflow-hidden"
                 >
-                  <div className="absolute inset-0 mockr-gradient-surface opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative z-10">
-                    <div className="w-20 h-20 lg:w-24 lg:h-24 mockr-gradient-feature rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300 shadow-md group-hover:shadow-lg">
+                    <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-600 to-blue-700 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300 shadow-md group-hover:shadow-lg">
                       <feature.icon className="w-10 h-10 lg:w-12 lg:h-12 text-white" />
                     </div>
-                    <h3 className="text-heading-md text-neutral-900 mb-6">
+                    <h3 className="text-2xl lg:text-3xl font-semibold leading-tight tracking-tight text-neutral-900 mb-6">
                       {feature.title}
                     </h3>
-                    <p className="text-body-md text-neutral-600">
+                    <p className="text-lg lg:text-xl leading-relaxed text-neutral-600">
                       {feature.description}
                     </p>
                   </div>
@@ -273,10 +273,10 @@
               viewport={{ once: true }}
               className="text-center mb-20"
             >
-              <h2 className="text-display-sm text-neutral-900 mb-8">
+              <h2 className="text-4xl lg:text-6xl font-bold leading-tight tracking-tight text-neutral-900 mb-8">
                 Trending Comics
               </h2>
-              <p className="text-body-lg text-neutral-600 max-w-3xl mx-auto">
+              <p className="text-xl lg:text-2xl leading-relaxed text-neutral-600 max-w-3xl mx-auto">
                 See what the community is creating with Mockr's AI-powered comic generator
               </p>
             </motion.div>
@@ -291,21 +291,21 @@
                   transition={{ delay: index * 0.15 }}
                   className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden hover:shadow-md transform hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden"
                 >
-                  <div className="absolute inset-0 mockr-gradient-surface opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white to-slate-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="relative z-10">
-                    <div className="aspect-[4/3] mockr-gradient-subtle rounded-t-2xl flex items-center justify-center">
+                    <div className="aspect-[4/3] bg-gradient-to-br from-slate-50 via-white to-slate-100 rounded-t-2xl flex items-center justify-center">
                       <div className="text-center">
-                        <div className="w-20 h-20 lg:w-24 lg:h-24 mockr-gradient-hero rounded-full mx-auto mb-4 flex items-center justify-center shadow-md">
+                        <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-md">
                           <Sparkles className="w-10 h-10 lg:w-12 lg:h-12 text-white" />
                         </div>
                         <p className="text-neutral-500 font-medium text-sm lg:text-base">Sample Comic Placeholder</p>
                       </div>
                     </div>
                     <div className="p-8">
-                    <h3 className="text-heading-sm text-neutral-900 mb-4 group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-neutral-900 mb-4 group-hover:text-blue-600 transition-colors">
                       {comic.title}
                     </h3>
-                    <p className="text-body-sm text-neutral-600 mb-6">
+                    <p className="text-base lg:text-lg leading-relaxed text-neutral-600 mb-6">
                       {comic.description}
                     </p>
                       <div className="flex items-center justify-between">
@@ -326,7 +326,7 @@
         </section>
 
         {/* CTA Section */}
-        <section className="px-6 py-36 lg:py-48 mockr-gradient-hero">
+        <section className="px-6 py-36 lg:py-48 bg-gradient-to-r from-blue-600 to-blue-500">
           <div className="max-w-6xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -334,10 +334,10 @@
               viewport={{ once: true }}
               className="space-y-10"
             >
-              <h2 className="text-display-md text-white mb-8">
+              <h2 className="text-5xl lg:text-7xl font-bold leading-tight tracking-tight text-white mb-8">
                 Ready to Create Viral Political Satire?
               </h2>
-              <p className="text-body-lg text-blue-100 max-w-4xl mx-auto mb-10">
+              <p className="text-xl lg:text-2xl leading-relaxed text-blue-100 max-w-4xl mx-auto mb-10">
                 Join thousands of creators using Mockr to make intelligent political commentary.
                 Your next viral cartoon is just one click away.
               </p>
@@ -357,7 +357,7 @@
             <div className="grid md:grid-cols-4 gap-8">
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 mockr-gradient-hero rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold text-lg">M</span>
                   </div>
                   <span className="text-xl font-bold text-white">Mockr</span>

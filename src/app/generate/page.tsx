@@ -35,14 +35,14 @@ export default function GeneratePage() {
   }
 
   return (
-    <div className="min-h-screen mockr-gradient-subtle">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
       {/* Navigation */}
       <nav className="w-full px-6 py-4 lg:py-6 bg-white/95 backdrop-blur-md border-b border-neutral-200/60 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
             <ArrowLeft className="w-5 h-5 text-neutral-600 hover:text-blue-600 transition-colors" />
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 mockr-gradient-hero rounded-xl flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-sm">
                 <span className="text-white font-bold text-xl lg:text-2xl">M</span>
               </div>
               <span className="text-2xl lg:text-3xl font-bold text-gradient">Mockr</span>
@@ -50,7 +50,7 @@ export default function GeneratePage() {
           </Link>
 
           <div className="flex items-center space-x-4">
-            <button className="btn-secondary text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3">
+            <button className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3">
               Save Draft
             </button>
           </div>
@@ -67,10 +67,10 @@ export default function GeneratePage() {
           >
             <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden p-8 lg:p-10">
               <div className="mb-8">
-                <h1 className="text-display-sm text-neutral-900 mb-4">
+                <h1 className="text-4xl lg:text-6xl font-bold leading-tight tracking-tight text-neutral-900 mb-4">
                   Create Your Comic
                 </h1>
-                <p className="text-body-md text-neutral-600">
+                <p className="text-lg lg:text-xl leading-relaxed text-neutral-600">
                   Describe your political satire idea and watch AI bring it to life in R.K. Laxman's iconic style.
                 </p>
               </div>
@@ -78,7 +78,7 @@ export default function GeneratePage() {
               <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Situation Input */}
                 <div>
-                  <label htmlFor="situation" className="block text-heading-sm text-neutral-900 mb-3">
+                  <label htmlFor="situation" className="block text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-neutral-900 mb-3">
                     Political Situation *
                   </label>
                   <textarea
@@ -94,7 +94,7 @@ export default function GeneratePage() {
 
                 {/* Characters Input */}
                 <div>
-                  <label htmlFor="characters" className="block text-heading-sm text-neutral-900 mb-3">
+                  <label htmlFor="characters" className="block text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-neutral-900 mb-3">
                     Characters
                   </label>
                   <input
@@ -110,7 +110,7 @@ export default function GeneratePage() {
 
                 {/* Setting Input */}
                 <div>
-                  <label htmlFor="setting" className="block text-heading-sm text-neutral-900 mb-3">
+                  <label htmlFor="setting" className="block text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-neutral-900 mb-3">
                     Setting
                   </label>
                   <input
@@ -126,7 +126,7 @@ export default function GeneratePage() {
 
                 {/* Tone Selection */}
                 <div>
-                  <label htmlFor="tone" className="block text-heading-sm text-neutral-900 mb-3">
+                  <label htmlFor="tone" className="block text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-neutral-900 mb-3">
                     Tone
                   </label>
                   <select
@@ -145,7 +145,7 @@ export default function GeneratePage() {
 
                 {/* Style Selection */}
                 <div>
-                  <label htmlFor="style" className="block text-heading-sm text-neutral-900 mb-3">
+                  <label htmlFor="style" className="block text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-neutral-900 mb-3">
                     Art Style
                   </label>
                   <select
@@ -166,7 +166,7 @@ export default function GeneratePage() {
                 <button
                   type="submit"
                   disabled={isGenerating || !formData.situation}
-                  className="btn-primary w-full text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed group"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
                   {isGenerating ? (
                     <>
@@ -191,30 +191,30 @@ export default function GeneratePage() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden p-8 lg:p-10 sticky top-32">
-              <h2 className="text-heading-md text-neutral-900 mb-6">
+              <h2 className="text-2xl lg:text-3xl font-semibold leading-tight tracking-tight text-neutral-900 mb-6">
                 Preview
               </h2>
 
               {!generatedComic && !isGenerating && (
-                <div className="aspect-[4/3] mockr-gradient-subtle rounded-2xl flex items-center justify-center">
+                <div className="aspect-[4/3] bg-gradient-to-br from-slate-50 via-white to-slate-100 rounded-2xl flex items-center justify-center">
                   <div className="text-center">
-                    <div className="w-20 h-20 lg:w-24 lg:h-24 mockr-gradient-hero rounded-full mx-auto mb-4 flex items-center justify-center shadow-md">
+                    <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-md">
                       <Sparkles className="w-10 h-10 lg:w-12 lg:h-12 text-white" />
                     </div>
                     <p className="text-neutral-500 font-medium mb-2">Your Comic Will Appear Here</p>
-                    <p className="text-caption text-neutral-400">Fill out the form to generate your satirical masterpiece</p>
+                    <p className="text-sm lg:text-base leading-relaxed text-neutral-400">Fill out the form to generate your satirical masterpiece</p>
                   </div>
                 </div>
               )}
 
               {isGenerating && (
-                <div className="aspect-[4/3] mockr-gradient-subtle rounded-2xl flex items-center justify-center">
+                <div className="aspect-[4/3] bg-gradient-to-br from-slate-50 via-white to-slate-100 rounded-2xl flex items-center justify-center">
                   <div className="text-center">
-                    <div className="w-20 h-20 lg:w-24 lg:h-24 mockr-gradient-hero rounded-full mx-auto mb-4 flex items-center justify-center shadow-md animate-pulse">
+                    <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-md animate-pulse">
                       <RefreshCw className="w-10 h-10 lg:w-12 lg:h-12 text-white animate-spin" />
                     </div>
                     <p className="text-neutral-600 font-medium mb-2">AI is Creating Your Comic...</p>
-                    <p className="text-caption text-neutral-400">This may take a few moments</p>
+                    <p className="text-sm lg:text-base leading-relaxed text-neutral-400">This may take a few moments</p>
                   </div>
                 </div>
               )}
@@ -223,7 +223,7 @@ export default function GeneratePage() {
                 <div className="space-y-6">
                   <div className="aspect-[4/3] bg-neutral-100 rounded-2xl flex items-center justify-center shadow-md">
                     <div className="text-center">
-                      <div className="w-20 h-20 lg:w-24 lg:h-24 mockr-gradient-hero rounded-full mx-auto mb-4 flex items-center justify-center shadow-md">
+                      <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-md">
                         <Sparkles className="w-10 h-10 lg:w-12 lg:h-12 text-white" />
                       </div>
                       <p className="text-neutral-600 font-medium">Generated Comic Preview</p>
@@ -232,11 +232,11 @@ export default function GeneratePage() {
 
                   {/* Action Buttons */}
                   <div className="grid grid-cols-2 gap-4">
-                    <button className="btn-secondary group py-3">
+                    <button className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group py-3">
                       <Download className="w-4 h-4 mr-2" />
                       Download
                     </button>
-                    <button className="btn-accent group py-3">
+                    <button className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group py-3">
                       <Share2 className="w-4 h-4 mr-2" />
                       Share
                     </button>
@@ -253,10 +253,10 @@ export default function GeneratePage() {
 
               {/* Quick Tips */}
               <div className="mt-8 p-6 bg-blue-50 rounded-2xl">
-                <h3 className="text-heading-sm text-blue-900 mb-3">
+                <h3 className="text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-blue-900 mb-3">
                   💡 Pro Tips
                 </h3>
-                <ul className="space-y-2 text-caption text-blue-700">
+                <ul className="space-y-2 text-sm lg:text-base leading-relaxed text-blue-700">
                   <li>• Be specific about the political situation</li>
                   <li>• Include contradictions for better satire</li>
                   <li>• Mention visual elements you want to see</li>
