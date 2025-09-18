@@ -24,11 +24,11 @@ export async function POST(request: NextRequest) {
     const dialogue = await generateDialogue(situation, characters, tone)
 
     // Try to generate with Hugging Face API, fallback to placeholder
-    let imageUrl = '/api/placeholder-comic'
+    let imageUrl = `/api/placeholder-comic?dialogue=${encodeURIComponent(dialogue)}`
     let aiGenerated = false
 
     try {
-      const enhancedPrompt = `${prompt} Speech bubble contains: ${dialogue}`
+      const enhancedPrompt = `${prompt} IMPORTANT: Include a speech bubble with the text: "${dialogue}". The speech bubble should be clearly visible, positioned near the speaking character, with readable text inside. The speech bubble must contain exactly this text: ${dialogue}`
       const generatedImageUrl = await generateComicWithHuggingFace(enhancedPrompt)
       if (generatedImageUrl) {
         imageUrl = generatedImageUrl
@@ -68,81 +68,251 @@ export async function POST(request: NextRequest) {
 }
 
 async function generateDialogue(situation: string, characters: string, tone: string): Promise<string> {
-  const apiToken = process.env.HUGGINGFACE_API_TOKEN
-
-  if (!apiToken || apiToken === 'your_huggingface_api_token_here') {
-    // Fallback to predefined dialogue patterns
-    const toneDialogue = {
-      'satirical': `"Everything is under control!"`,
-      'witty': `"Trust me, I'm an expert!"`,
-      'observational': `"This is how we've always done it."`,
-      'critical': `"The situation is completely normal."`
-    }
-    return toneDialogue[tone as keyof typeof toneDialogue] || `"No comment!"`
+  // Create dynamic, tone-specific dialogue with variety
+  const dialogueTemplates = {
+    'satirical': [
+      generateSatiricalDialogue(situation, characters),
+      generateSituationBasedSatirical(situation),
+      generateIronicStatement(situation)
+    ],
+    'witty': [
+      generateWittyDialogue(situation, characters),
+      generateCleverObservation(situation),
+      generatePlayfulQuip(situation)
+    ],
+    'observational': [
+      generateObservationalDialogue(situation, characters),
+      generateRealisticComment(situation),
+      generateEverydayAbsurdity(situation)
+    ],
+    'critical': [
+      generateCriticalDialogue(situation, characters),
+      generateHardHittingStatement(situation),
+      generateSeriousCritique(situation)
+    ]
   }
 
-  try {
-    const dialoguePrompt = `Generate a short, witty dialogue (1-2 sentences max) for a political cartoon.
+  // Select random template from the tone category
+  const templates = dialogueTemplates[tone as keyof typeof dialogueTemplates] || dialogueTemplates['satirical']
+  const randomTemplate = templates[Math.floor(Math.random() * templates.length)]
 
-    Situation: ${situation}
-    Characters: ${characters}
-    Tone: ${tone}
+  return randomTemplate
+}
 
-    The dialogue should be:
-    - Ironic and satirical
-    - Show contradiction between words and actions
-    - Keep it under 15 words
-    - Suitable for speech bubble in cartoon
-    - Political but not offensive
-
-    Return only the dialogue in quotes, nothing else.`
-
-    const response = await fetch(
-      'https://api-inference.huggingface.co/models/microsoft/DialoGPT-large',
-      {
-        headers: {
-          'Authorization': `Bearer ${apiToken}`,
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify({
-          inputs: dialoguePrompt,
-          parameters: {
-            max_length: 50,
-            temperature: 0.8,
-            do_sample: true
-          }
-        }),
-      }
-    )
-
-    if (response.ok) {
-      const result = await response.json()
-      if (result && result[0] && result[0].generated_text) {
-        // Extract just the dialogue part
-        const dialogue = result[0].generated_text.replace(dialoguePrompt, '').trim()
-        return dialogue || `"No comment!"`
-      }
-    }
-  } catch (error) {
-    console.warn('Dialogue generation failed:', error)
-  }
-
-  // Enhanced fallback based on situation keywords
+function generateSatiricalDialogue(situation: string, characters: string): string {
   const situationLower = situation.toLowerCase()
+  const timestamp = Date.now() % 1000 // Add variety
+
   if (situationLower.includes('inflation') || situationLower.includes('price')) {
-    return `"Prices are completely under control!"`
+    const options = [
+      `"Don't worry, inflation is just temporary... like my promises!"`,
+      `"Rising prices? That's just economic growth in disguise!"`,
+      `"I shop here too, see how affordable everything is!"`,
+      `"Inflation? More like economic enthusiasm!"`
+    ]
+    return options[timestamp % options.length]
   } else if (situationLower.includes('climate') || situationLower.includes('environment')) {
-    return `"We're leading the green revolution!"`
+    const options = [
+      `"We're saving the planet, one private jet at a time!"`,
+      `"Carbon neutral? We're carbon positive thinkers!"`,
+      `"My emissions offset includes positive vibes!"`,
+      `"Green energy starts with green money!"`
+    ]
+    return options[timestamp % options.length]
   } else if (situationLower.includes('healthcare') || situationLower.includes('hospital')) {
-    return `"World-class healthcare for everyone!"`
+    const options = [
+      `"World-class facilities... in a world-class queue!"`,
+      `"See? Even the waiting room has AC!"`,
+      `"Quality healthcare takes quality time!"`,
+      `"Our hospitals are so advanced, they're booked solid!"`
+    ]
+    return options[timestamp % options.length]
   } else if (situationLower.includes('education') || situationLower.includes('school')) {
-    return `"Our education system is the best!"`
-  } else if (situationLower.includes('traffic') || situationLower.includes('transport')) {
-    return `"Traffic will be solved very soon!"`
+    const options = [
+      `"Our schools are so good, even I send my kids abroad!"`,
+      `"Local education builds local character... elsewhere!"`,
+      `"Why study abroad when you can dream locally?"`,
+      `"Our education system is internationally recognized... for its challenges!"`
+    ]
+    return options[timestamp % options.length]
   } else {
-    return `"Everything is going according to plan!"`
+    const options = [
+      `"Everything is under control... mostly!"`,
+      `"Situation normal, all fouled up!"`,
+      `"Trust the process... whatever that means!"`,
+      `"We're handling this like true professionals!"`
+    ]
+    return options[timestamp % options.length]
   }
+}
+
+function generateSituationBasedSatirical(situation: string): string {
+  const timestamp = Date.now() % 100
+  const situationWords = situation.toLowerCase().split(' ')
+
+  if (situationWords.includes('promising')) {
+    return timestamp % 2 === 0 ? `"I promise to promise better promises!"` : `"My promises come with a satisfaction guarantee!"`
+  } else if (situationWords.includes('visiting')) {
+    return timestamp % 2 === 0 ? `"Just visiting... don't mind the cameras!"` : `"Surprise inspection! Hope you didn't clean up!"`
+  } else if (situationWords.includes('promoting')) {
+    return timestamp % 2 === 0 ? `"Promotion is 90% of the solution!"` : `"If you can't fix it, promote it!"`
+  }
+
+  return `"This is exactly what I had in mind!"`
+}
+
+function generateIronicStatement(situation: string): string {
+  const timestamp = Date.now() % 1000
+  const options = [
+    `"Couldn't have planned it better myself!"`,
+    `"This is what success looks like!"`,
+    `"Everything according to the master plan!"`,
+    `"Exactly as we rehearsed it!"`
+  ]
+  return options[timestamp % options.length]
+}
+
+function generateWittyDialogue(situation: string, characters: string): string {
+  const situationLower = situation.toLowerCase()
+  const timestamp = Date.now() % 1000
+
+  if (situationLower.includes('traffic') || situationLower.includes('transport')) {
+    const options = [
+      `"The metro will solve this... in 2035!"`,
+      `"Traffic builds character... and patience!"`,
+      `"This jam session isn't what I ordered!"`,
+      `"Rush hour? More like crush hour!"`
+    ]
+    return options[timestamp % options.length]
+  } else if (situationLower.includes('digital') || situationLower.includes('tech')) {
+    const options = [
+      `"Like and subscribe to democracy!"`,
+      `"Going viral with good governance!"`,
+      `"Democracy 2.0: Now with fewer bugs!"`,
+      `"Have you tried turning the government off and on again?"`
+    ]
+    return options[timestamp % options.length]
+  } else {
+    const options = [
+      `"Trust me, I'm a professional politician!"`,
+      `"This wasn't in the job description!"`,
+      `"I have a PhD in problem-solving!"`,
+      `"Experience is the best teacher... apparently!"`
+    ]
+    return options[timestamp % options.length]
+  }
+}
+
+function generateCleverObservation(situation: string): string {
+  const timestamp = Date.now() % 1000
+  const options = [
+    `"Interesting interpretation of 'improvement'!"`,
+    `"That's one way to look at it!"`,
+    `"Creative problem-solving at its finest!"`,
+    `"Innovation in action, clearly!"`
+  ]
+  return options[timestamp % options.length]
+}
+
+function generatePlayfulQuip(situation: string): string {
+  const timestamp = Date.now() % 1000
+  const options = [
+    `"Plot twist nobody saw coming!"`,
+    `"And for my next trick..."`,
+    `"Ta-da! Modern governance!"`,
+    `"Surprise! It's exactly what you expected!"`
+  ]
+  return options[timestamp % options.length]
+}
+
+function generateObservationalDialogue(situation: string, characters: string): string {
+  const situationLower = situation.toLowerCase()
+  const timestamp = Date.now() % 1000
+
+  if (situationLower.includes('meeting') || situationLower.includes('conference')) {
+    const options = [
+      `"Another productive meeting about having meetings."`,
+      `"The solution is more committees."`,
+      `"Let's circle back on this agenda item."`,
+      `"We'll form a task force to study the problem."`
+    ]
+    return options[timestamp % options.length]
+  } else {
+    const options = [
+      `"This is how we've always done it."`,
+      `"Standard operating procedure."`,
+      `"Just following the established protocol."`,
+      `"The system is working as intended."`
+    ]
+    return options[timestamp % options.length]
+  }
+}
+
+function generateRealisticComment(situation: string): string {
+  const timestamp = Date.now() % 1000
+  const options = [
+    `"Welcome to the real world."`,
+    `"This is what bureaucracy looks like."`,
+    `"Par for the course."`,
+    `"Same old, same old."`
+  ]
+  return options[timestamp % options.length]
+}
+
+function generateEverydayAbsurdity(situation: string): string {
+  const timestamp = Date.now() % 1000
+  const options = [
+    `"Just another day at the office."`,
+    `"Normal Tuesday activities."`,
+    `"Business as usual."`,
+    `"Keep calm and carry on."`
+  ]
+  return options[timestamp % options.length]
+}
+
+function generateCriticalDialogue(situation: string, characters: string): string {
+  const situationLower = situation.toLowerCase()
+  const timestamp = Date.now() % 1000
+
+  if (situationLower.includes('corruption') || situationLower.includes('scandal')) {
+    const options = [
+      `"Transparency was never our strong suit."`,
+      `"What you don't know can't hurt... me."`,
+      `"Ethics are more like guidelines anyway."`,
+      `"The rules don't apply to rule-makers."`
+    ]
+    return options[timestamp % options.length]
+  } else {
+    const options = [
+      `"The people deserve better."`,
+      `"This is not what we signed up for."`,
+      `"Accountability went out the window."`,
+      `"Someone needs to answer for this."`
+    ]
+    return options[timestamp % options.length]
+  }
+}
+
+function generateHardHittingStatement(situation: string): string {
+  const timestamp = Date.now() % 1000
+  const options = [
+    `"Actions speak louder than promises."`,
+    `"The emperor's new governance."`,
+    `"Power corrupts, absolutely."`,
+    `"The system is rigged."`
+  ]
+  return options[timestamp % options.length]
+}
+
+function generateSeriousCritique(situation: string): string {
+  const timestamp = Date.now() % 1000
+  const options = [
+    `"This is what failure looks like."`,
+    `"Unacceptable by any standard."`,
+    `"The people deserve answers."`,
+    `"This cannot continue."`
+  ]
+  return options[timestamp % options.length]
 }
 
 async function generateComicWithHuggingFace(prompt: string): Promise<string | null> {
@@ -248,8 +418,8 @@ function createComicPrompt(
 
   prompt += `Visual mood: ${toneMap[tone] || 'clear expressive faces'}. `
 
-  // Strong technical specifications
-  prompt += `Art style: clean black ink lines on white background, no shading, no gradients, no textures, simple geometric shapes, bold clear outlines, minimalist design, professional editorial cartoon quality, similar to newspaper comics, single color (black), vector-style illustration. Include a speech bubble with text for dialogue.`
+  // Strong technical specifications with speech bubble emphasis
+  prompt += `Art style: clean black ink lines on white background, no shading, no gradients, no textures, simple geometric shapes, bold clear outlines, minimalist design, professional editorial cartoon quality, similar to newspaper comics, single color (black), vector-style illustration. MUST include a prominent speech bubble with clear, readable text positioned near the main character's mouth. The speech bubble should be a standard oval/round shape with a pointer tail pointing to the speaking character.`
 
   return prompt
 }

@@ -1,8 +1,27 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET() {
-  // For now, we'll return a simple SVG placeholder
-  // Later this will be replaced with actual generated comic images
+export async function GET(request: NextRequest) {
+  // Get dialogue from query parameters if available
+  const { searchParams } = new URL(request.url)
+  const dialogue = searchParams.get('dialogue') || '"Sample dialogue text"'
+
+  // Split dialogue into lines for better display (max 20 characters per line)
+  const words = dialogue.replace(/"/g, '').split(' ')
+  const lines = []
+  let currentLine = ''
+
+  for (const word of words) {
+    if ((currentLine + word).length <= 20) {
+      currentLine += (currentLine ? ' ' : '') + word
+    } else {
+      if (currentLine) lines.push(currentLine)
+      currentLine = word
+    }
+  }
+  if (currentLine) lines.push(currentLine)
+
+  // Limit to 3 lines max
+  const displayLines = lines.slice(0, 3)
 
   const svgContent = `
     <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
@@ -13,7 +32,7 @@ export async function GET() {
 
       <!-- Title -->
       <text x="200" y="50" text-anchor="middle" font-family="serif" font-size="16" font-weight="bold" fill="#1e293b">
-        GENERATED COMIC
+        MOCKR POLITICAL CARTOON
       </text>
 
       <!-- Simple character (politician) -->
@@ -25,17 +44,14 @@ export async function GET() {
       <!-- Body -->
       <rect x="100" y="180" width="40" height="60" fill="none" stroke="#1e293b" stroke-width="2"/>
 
-      <!-- Speech bubble -->
-      <ellipse cx="280" cy="120" rx="80" ry="40" fill="white" stroke="#1e293b" stroke-width="2"/>
-      <polygon points="220,140 200,160 230,150" fill="white" stroke="#1e293b" stroke-width="2"/>
+      <!-- Enhanced Speech bubble -->
+      <ellipse cx="280" cy="120" rx="90" ry="50" fill="white" stroke="#1e293b" stroke-width="2"/>
+      <polygon points="210,140 180,160 220,155" fill="white" stroke="#1e293b" stroke-width="2"/>
 
-      <!-- Speech text -->
-      <text x="280" y="115" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1e293b">
-        "Promising"
-      </text>
-      <text x="280" y="130" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#1e293b">
-        "Healthcare..."
-      </text>
+      <!-- Dynamic Speech text -->
+      ${displayLines.map((line, index) =>
+        `<text x="280" y="${105 + (index * 15)}" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1e293b">"${line}"</text>`
+      ).join('')}
 
       <!-- Ground line -->
       <line x1="40" y1="250" x2="360" y2="250" stroke="#1e293b" stroke-width="1"/>
