@@ -372,11 +372,12 @@ export default function GeneratePage() {
                     </div>
                   </div>
 
-                  {/* Generated Dialogue Display */}
+                  {/* Comic Info Display */}
                   {generatedComic.dialogue && (
                     <div className="mt-4 p-4 bg-neutral-50 rounded-xl border border-neutral-200">
-                      <h4 className="text-sm font-semibold text-neutral-700 mb-2">💬 Generated Dialogue:</h4>
-                      <p className="text-neutral-600 italic">"{generatedComic.dialogue}"</p>
+                      <h4 className="text-sm font-semibold text-neutral-700 mb-2">📝 Comic Details:</h4>
+                      <p className="text-xs text-neutral-500 mb-1"><strong>Dialogue:</strong> {generatedComic.dialogue}</p>
+                      <p className="text-xs text-neutral-500"><strong>Style:</strong> {generatedComic.aiGenerated ? 'AI Generated with speech bubble' : 'Placeholder with embedded text'}</p>
                     </div>
                   )}
 

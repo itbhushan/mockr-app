@@ -24,11 +24,22 @@ export async function POST(request: NextRequest) {
     const dialogue = await generateDialogue(situation, characters, tone)
 
     // Try to generate with Hugging Face API, fallback to placeholder
-    let imageUrl = `/api/placeholder-comic?dialogue=${encodeURIComponent(dialogue)}`
+    let imageUrl = `/api/placeholder-comic?dialogue=${encodeURIComponent(dialogue)}&situation=${encodeURIComponent(situation)}`
     let aiGenerated = false
 
     try {
-      const enhancedPrompt = `${prompt} IMPORTANT: Include a speech bubble with the text: "${dialogue}". The speech bubble should be clearly visible, positioned near the speaking character, with readable text inside. The speech bubble must contain exactly this text: ${dialogue}`
+      const enhancedPrompt = `${prompt}
+
+CRITICAL REQUIREMENTS:
+1. MUST include a speech bubble with readable text: "${dialogue}"
+2. Speech bubble should be oval/circular shape with pointer tail
+3. Text must be clearly legible inside the bubble
+4. Position speech bubble near character's mouth
+5. Include political situation context: "${situation}" at bottom of image
+6. Speech bubble text should be in quotes: ${dialogue}
+
+The final image MUST show the dialogue text inside a proper speech bubble as part of the cartoon image itself.`
+
       const generatedImageUrl = await generateComicWithHuggingFace(enhancedPrompt)
       if (generatedImageUrl) {
         imageUrl = generatedImageUrl

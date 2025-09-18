@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  // Get dialogue from query parameters if available
+  // Get dialogue and situation from query parameters
   const { searchParams } = new URL(request.url)
-  const dialogue = searchParams.get('dialogue') || '"Sample dialogue text"'
+  const dialogue = searchParams.get('dialogue') || '"Everything is under control!"'
+  const situation = searchParams.get('situation') || 'Political scenario'
 
-  // Split dialogue into lines for better display (max 20 characters per line)
+  // Split dialogue into lines for speech bubble (max 15 characters per line)
   const words = dialogue.replace(/"/g, '').split(' ')
   const lines = []
   let currentLine = ''
 
   for (const word of words) {
-    if ((currentLine + word).length <= 20) {
+    if ((currentLine + word).length <= 15) {
       currentLine += (currentLine ? ' ' : '') + word
     } else {
       if (currentLine) lines.push(currentLine)
@@ -20,22 +21,40 @@ export async function GET(request: NextRequest) {
   }
   if (currentLine) lines.push(currentLine)
 
-  // Limit to 3 lines max
-  const displayLines = lines.slice(0, 3)
+  // Limit to 2 lines max for speech bubble
+  const speechLines = lines.slice(0, 2)
+
+  // Split situation into lines for bottom context (max 45 characters per line)
+  const situationWords = situation.split(' ')
+  const situationLines = []
+  let currentSituationLine = ''
+
+  for (const word of situationWords) {
+    if ((currentSituationLine + word).length <= 45) {
+      currentSituationLine += (currentSituationLine ? ' ' : '') + word
+    } else {
+      if (currentSituationLine) situationLines.push(currentSituationLine)
+      currentSituationLine = word
+    }
+  }
+  if (currentSituationLine) situationLines.push(currentSituationLine)
+
+  // Limit to 2 lines max for situation
+  const displaySituation = situationLines.slice(0, 2)
 
   const svgContent = `
-    <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
-      <rect width="400" height="300" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+    <svg width="400" height="350" xmlns="http://www.w3.org/2000/svg">
+      <rect width="400" height="350" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
 
       <!-- Comic panel border -->
-      <rect x="20" y="20" width="360" height="260" fill="white" stroke="#1e293b" stroke-width="3"/>
+      <rect x="20" y="20" width="360" height="280" fill="white" stroke="#1e293b" stroke-width="3"/>
 
       <!-- Title -->
       <text x="200" y="50" text-anchor="middle" font-family="serif" font-size="16" font-weight="bold" fill="#1e293b">
         MOCKR POLITICAL CARTOON
       </text>
 
-      <!-- Simple character (politician) -->
+      <!-- Simple character (politician) with more detail -->
       <circle cx="120" cy="150" r="30" fill="none" stroke="#1e293b" stroke-width="2"/>
       <circle cx="115" cy="145" r="2" fill="#1e293b"/>
       <circle cx="125" cy="145" r="2" fill="#1e293b"/>
@@ -44,20 +63,33 @@ export async function GET(request: NextRequest) {
       <!-- Body -->
       <rect x="100" y="180" width="40" height="60" fill="none" stroke="#1e293b" stroke-width="2"/>
 
-      <!-- Enhanced Speech bubble -->
-      <ellipse cx="280" cy="120" rx="90" ry="50" fill="white" stroke="#1e293b" stroke-width="2"/>
-      <polygon points="210,140 180,160 220,155" fill="white" stroke="#1e293b" stroke-width="2"/>
+      <!-- Arms -->
+      <line x1="100" y1="195" x2="85" y2="210" stroke="#1e293b" stroke-width="2"/>
+      <line x1="140" y1="195" x2="155" y2="210" stroke="#1e293b" stroke-width="2"/>
 
-      <!-- Dynamic Speech text -->
-      ${displayLines.map((line, index) =>
-        `<text x="280" y="${105 + (index * 15)}" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1e293b">"${line}"</text>`
+      <!-- Speech bubble with proper positioning -->
+      <ellipse cx="280" cy="120" rx="80" ry="35" fill="white" stroke="#1e293b" stroke-width="2"/>
+      <polygon points="200,135 175,155 205,145" fill="white" stroke="#1e293b" stroke-width="2"/>
+
+      <!-- Speech text properly centered in bubble -->
+      ${speechLines.map((line, index) =>
+        `<text x="280" y="${115 + (index * 12)}" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#1e293b">"${line}"</text>`
       ).join('')}
 
       <!-- Ground line -->
       <line x1="40" y1="250" x2="360" y2="250" stroke="#1e293b" stroke-width="1"/>
 
+      <!-- Political situation context at bottom -->
+      <rect x="30" y="260" width="340" height="30" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" rx="5"/>
+      <text x="35" y="275" font-family="sans-serif" font-size="9" font-weight="bold" fill="#475569">
+        CONTEXT:
+      </text>
+      ${displaySituation.map((line, index) =>
+        `<text x="35" y="${285 + (index * 10)}" font-family="sans-serif" font-size="8" fill="#64748b">${line}</text>`
+      ).join('')}
+
       <!-- Watermark -->
-      <text x="350" y="290" text-anchor="end" font-family="sans-serif" font-size="10" fill="#64748b">
+      <text x="365" y="340" text-anchor="end" font-family="sans-serif" font-size="10" fill="#64748b">
         Generated by Mockr AI
       </text>
     </svg>
