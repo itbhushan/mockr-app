@@ -20,12 +20,16 @@ export async function POST(request: NextRequest) {
     // Create a detailed prompt for AI image generation
     const prompt = createComicPrompt(situation, characters, setting, tone, style)
 
+    // Generate dialogue for the comic
+    const dialogue = await generateDialogue(situation, characters, tone)
+
     // Try to generate with Hugging Face API, fallback to placeholder
     let imageUrl = '/api/placeholder-comic'
     let aiGenerated = false
 
     try {
-      const generatedImageUrl = await generateComicWithHuggingFace(prompt)
+      const enhancedPrompt = `${prompt} Speech bubble contains: ${dialogue}`
+      const generatedImageUrl = await generateComicWithHuggingFace(enhancedPrompt)
       if (generatedImageUrl) {
         imageUrl = generatedImageUrl
         aiGenerated = true
@@ -41,6 +45,7 @@ export async function POST(request: NextRequest) {
         prompt: prompt,
         imageUrl: imageUrl,
         aiGenerated: aiGenerated,
+        dialogue: dialogue, // Include generated dialogue
         situation,
         characters,
         setting,
@@ -59,6 +64,84 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to generate comic' },
       { status: 500 }
     )
+  }
+}
+
+async function generateDialogue(situation: string, characters: string, tone: string): Promise<string> {
+  const apiToken = process.env.HUGGINGFACE_API_TOKEN
+
+  if (!apiToken || apiToken === 'your_huggingface_api_token_here') {
+    // Fallback to predefined dialogue patterns
+    const toneDialogue = {
+      'satirical': `"Everything is under control!"`,
+      'witty': `"Trust me, I'm an expert!"`,
+      'observational': `"This is how we've always done it."`,
+      'critical': `"The situation is completely normal."`
+    }
+    return toneDialogue[tone as keyof typeof toneDialogue] || `"No comment!"`
+  }
+
+  try {
+    const dialoguePrompt = `Generate a short, witty dialogue (1-2 sentences max) for a political cartoon.
+
+    Situation: ${situation}
+    Characters: ${characters}
+    Tone: ${tone}
+
+    The dialogue should be:
+    - Ironic and satirical
+    - Show contradiction between words and actions
+    - Keep it under 15 words
+    - Suitable for speech bubble in cartoon
+    - Political but not offensive
+
+    Return only the dialogue in quotes, nothing else.`
+
+    const response = await fetch(
+      'https://api-inference.huggingface.co/models/microsoft/DialoGPT-large',
+      {
+        headers: {
+          'Authorization': `Bearer ${apiToken}`,
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify({
+          inputs: dialoguePrompt,
+          parameters: {
+            max_length: 50,
+            temperature: 0.8,
+            do_sample: true
+          }
+        }),
+      }
+    )
+
+    if (response.ok) {
+      const result = await response.json()
+      if (result && result[0] && result[0].generated_text) {
+        // Extract just the dialogue part
+        const dialogue = result[0].generated_text.replace(dialoguePrompt, '').trim()
+        return dialogue || `"No comment!"`
+      }
+    }
+  } catch (error) {
+    console.warn('Dialogue generation failed:', error)
+  }
+
+  // Enhanced fallback based on situation keywords
+  const situationLower = situation.toLowerCase()
+  if (situationLower.includes('inflation') || situationLower.includes('price')) {
+    return `"Prices are completely under control!"`
+  } else if (situationLower.includes('climate') || situationLower.includes('environment')) {
+    return `"We're leading the green revolution!"`
+  } else if (situationLower.includes('healthcare') || situationLower.includes('hospital')) {
+    return `"World-class healthcare for everyone!"`
+  } else if (situationLower.includes('education') || situationLower.includes('school')) {
+    return `"Our education system is the best!"`
+  } else if (situationLower.includes('traffic') || situationLower.includes('transport')) {
+    return `"Traffic will be solved very soon!"`
+  } else {
+    return `"Everything is going according to plan!"`
   }
 }
 
@@ -166,7 +249,7 @@ function createComicPrompt(
   prompt += `Visual mood: ${toneMap[tone] || 'clear expressive faces'}. `
 
   // Strong technical specifications
-  prompt += `Art style: clean black ink lines on white background, no shading, no gradients, no textures, simple geometric shapes, bold clear outlines, minimalist design, professional editorial cartoon quality, similar to newspaper comics, single color (black), vector-style illustration.`
+  prompt += `Art style: clean black ink lines on white background, no shading, no gradients, no textures, simple geometric shapes, bold clear outlines, minimalist design, professional editorial cartoon quality, similar to newspaper comics, single color (black), vector-style illustration. Include a speech bubble with text for dialogue.`
 
   return prompt
 }
