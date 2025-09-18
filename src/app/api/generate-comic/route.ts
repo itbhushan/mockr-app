@@ -78,11 +78,12 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
         body: JSON.stringify({
           inputs: prompt,
           parameters: {
-            negative_prompt: "color, colorful, vibrant colors, realistic photo, 3d render, blurry, low quality",
-            num_inference_steps: 20,
-            guidance_scale: 7.5,
+            negative_prompt: "realistic photo, 3d render, photorealistic, blurry, low quality, distorted faces, extra limbs, multiple heads, deformed hands, extra fingers, missing fingers, weird anatomy, malformed faces, ugly faces, bad proportions, duplicate, cropped, out of frame, text, watermark, signature, logo, multiple people in background, crowded, busy background, detailed background, complex background, realistic lighting, shadows, gradients",
+            num_inference_steps: 30,
+            guidance_scale: 8.5,
             width: 768,
-            height: 512
+            height: 512,
+            scheduler: "DPMSolverMultistepScheduler"
           }
         }),
       }
@@ -117,38 +118,50 @@ function createComicPrompt(
   tone: string,
   style: string
 ): string {
-  let prompt = `Black and white political cartoon, newspaper editorial style, single panel comic. `
+  // Start with strong style anchors
+  let prompt = `professional editorial cartoon, clean black and white line art, newspaper comic style, single panel illustration. `
 
-  // Add specific R.K. Laxman style elements
+  // Add style-specific elements
   if (style === 'laxman') {
-    prompt += `R.K. Laxman inspired style: simple line drawings, expressive faces, minimal backgrounds, focus on human emotions and social commentary. `
+    prompt += `R.K. Laxman artistic style: simple line drawings, round expressive character faces, clear facial expressions, minimal geometric backgrounds, focus on human emotions. `
+  } else {
+    prompt += `${style} editorial cartoon style, clean simple lines, expressive characters. `
   }
 
-  // Add situation with satirical context
-  prompt += `Satirical scene: ${situation}. `
+  // Create clear scene description
+  prompt += `Scene: ${situation}. `
 
-  // Add characters if specified
+  // Add characters with clear descriptions
   if (characters) {
-    prompt += `Main characters: ${characters}. `
+    const characterList = characters.split(',').map(char => char.trim())
+    if (characterList.length === 1) {
+      prompt += `Single character: ${characters}, standing in center, clear facial expression, simple body pose. `
+    } else {
+      prompt += `Characters: ${characters}, each with distinct clear facial features, simple poses, well-separated positions. `
+    }
+  } else {
+    prompt += `One or two main characters with clear distinct faces, simple standing poses. `
   }
 
-  // Add setting if specified
+  // Add simple setting
   if (setting) {
-    prompt += `Setting: ${setting}. `
+    prompt += `Simple background: ${setting}, minimal geometric shapes, clean environment. `
+  } else {
+    prompt += `Minimal background, simple geometric shapes, clean white space. `
   }
 
-  // Add tone-specific elements
+  // Add tone-specific visual cues
   const toneMap: { [key: string]: string } = {
-    'satirical': 'Sharp, witty, highlighting contradictions and irony',
-    'witty': 'Clever, humorous, light-hearted but insightful',
-    'observational': 'Thoughtful, realistic, everyday absurdities',
-    'critical': 'Hard-hitting, serious, exposing flaws and problems'
+    'satirical': 'exaggerated expressions, visual irony, contradictory elements',
+    'witty': 'playful expressions, clever visual metaphors, light humor',
+    'observational': 'realistic expressions, everyday objects, relatable situations',
+    'critical': 'serious expressions, dramatic poses, strong visual statements'
   }
 
-  prompt += `Tone: ${toneMap[tone] || tone}. `
+  prompt += `Visual mood: ${toneMap[tone] || 'clear expressive faces'}. `
 
-  // Technical specifications for black and white political cartoons
-  prompt += `Style: Black and white ink drawing, clean line art, newspaper editorial cartoon, simple but expressive character faces, minimal detailed background, clear visual metaphors, political satire, hand-drawn appearance, no colors, no shading, just black lines on white background.`
+  // Strong technical specifications
+  prompt += `Art style: clean black ink lines on white background, no shading, no gradients, no textures, simple geometric shapes, bold clear outlines, minimalist design, professional editorial cartoon quality, similar to newspaper comics, single color (black), vector-style illustration.`
 
   return prompt
 }
