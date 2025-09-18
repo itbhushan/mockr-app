@@ -20,6 +20,7 @@ export default function GeneratePage() {
     aiGenerated: boolean;
     prompt: string;
     dialogue: string;
+    situation: string;
     id: string;
   } | null>(null)
   const [isLoadingSample, setIsLoadingSample] = useState(false)
@@ -45,6 +46,7 @@ export default function GeneratePage() {
           aiGenerated: data.comic.aiGenerated,
           prompt: data.comic.prompt,
           dialogue: data.comic.dialogue,
+          situation: data.comic.situation,
           id: data.comic.id
         })
         console.log('Comic generated:', data.comic)
@@ -342,7 +344,7 @@ export default function GeneratePage() {
 
               {generatedComic && (
                 <div className="space-y-6">
-                  <div className="relative aspect-[4/3] bg-white rounded-2xl shadow-md overflow-hidden border border-neutral-200">
+                  <div className="relative aspect-[8/7] bg-white rounded-2xl shadow-md overflow-hidden border border-neutral-200">
                     {generatedComic.imageUrl.startsWith('data:') ? (
                       // Display AI-generated image
                       <Image
@@ -352,9 +354,9 @@ export default function GeneratePage() {
                         className="object-contain"
                       />
                     ) : (
-                      // Display SVG placeholder
+                      // Display SVG placeholder with dialogue and situation
                       <iframe
-                        src={generatedComic.imageUrl}
+                        src={`/api/placeholder-comic?dialogue=${encodeURIComponent(generatedComic.dialogue)}&situation=${encodeURIComponent(generatedComic.situation)}`}
                         className="w-full h-full border-0"
                         title="Generated comic placeholder"
                       />

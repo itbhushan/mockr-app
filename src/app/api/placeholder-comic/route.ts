@@ -6,6 +6,9 @@ export async function GET(request: NextRequest) {
   const dialogue = searchParams.get('dialogue') || '"Everything is under control!"'
   const situation = searchParams.get('situation') || 'Political scenario'
 
+  // Debug logging
+  console.log('Placeholder Comic API called with:', { dialogue, situation })
+
   // Split dialogue into lines for speech bubble (max 15 characters per line)
   const words = dialogue.replace(/"/g, '').split(' ')
   const lines = []
@@ -72,9 +75,12 @@ export async function GET(request: NextRequest) {
       <polygon points="200,135 175,155 205,145" fill="white" stroke="#1e293b" stroke-width="2"/>
 
       <!-- Speech text properly centered in bubble -->
-      ${speechLines.map((line, index) =>
-        `<text x="280" y="${115 + (index * 12)}" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#1e293b">"${line}"</text>`
-      ).join('')}
+      ${speechLines.length === 1 ?
+        `<text x="280" y="120" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="bold" fill="#1e293b">"${speechLines[0]}"</text>` :
+        speechLines.map((line, index) =>
+          `<text x="280" y="${112 + (index * 14)}" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="bold" fill="#1e293b">"${line}"</text>`
+        ).join('')
+      }
 
       <!-- Ground line -->
       <line x1="40" y1="250" x2="360" y2="250" stroke="#1e293b" stroke-width="1"/>
