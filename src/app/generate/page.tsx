@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { ArrowLeft, Sparkles, Upload, Zap, RefreshCw, Download, Share2 } from 'lucide-react'
-import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { ArrowLeft, Sparkles, RefreshCw, Download, Share2 } from 'lucide-react'
 
 export default function GeneratePage() {
   const [formData, setFormData] = useState({
@@ -14,7 +15,12 @@ export default function GeneratePage() {
     style: 'laxman'
   })
   const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedComic, setGeneratedComic] = useState<string | null>(null)
+  const [generatedComic, setGeneratedComic] = useState<{
+    imageUrl: string;
+    aiGenerated: boolean;
+    prompt: string;
+    id: string;
+  } | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,7 +38,12 @@ export default function GeneratePage() {
       const data = await response.json()
 
       if (data.success) {
-        setGeneratedComic(data.comic.imageUrl)
+        setGeneratedComic({
+          imageUrl: data.comic.imageUrl,
+          aiGenerated: data.comic.aiGenerated,
+          prompt: data.comic.prompt,
+          id: data.comic.id
+        })
         console.log('Comic generated:', data.comic)
       } else {
         console.error('Generation failed:', data.error)
@@ -51,6 +62,39 @@ export default function GeneratePage() {
       ...formData,
       [e.target.name]: e.target.value
     })
+  }
+
+  const handleDownload = () => {
+    if (!generatedComic) return
+
+    if (generatedComic.imageUrl.startsWith('data:')) {
+      // Download AI-generated image
+      const link = document.createElement('a')
+      link.href = generatedComic.imageUrl
+      link.download = `mockr-comic-${generatedComic.id}.jpg`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } else {
+      // For SVG placeholder, we need to convert it first
+      fetch(generatedComic.imageUrl)
+        .then(response => response.text())
+        .then(svgText => {
+          const blob = new Blob([svgText], { type: 'image/svg+xml' })
+          const url = URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.href = url
+          link.download = `mockr-comic-${generatedComic.id}.svg`
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          URL.revokeObjectURL(url)
+        })
+        .catch(error => {
+          console.error('Download failed:', error)
+          alert('Download failed. Please try again.')
+        })
+    }
   }
 
   return (
@@ -240,18 +284,42 @@ export default function GeneratePage() {
 
               {generatedComic && (
                 <div className="space-y-6">
-                  <div className="aspect-[4/3] bg-neutral-100 rounded-2xl flex items-center justify-center shadow-md">
-                    <div className="text-center">
-                      <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-md">
-                        <Sparkles className="w-10 h-10 lg:w-12 lg:h-12 text-white" />
+                  <div className="relative aspect-[4/3] bg-white rounded-2xl shadow-md overflow-hidden border border-neutral-200">
+                    {generatedComic.imageUrl.startsWith('data:') ? (
+                      // Display AI-generated image
+                      <Image
+                        src={generatedComic.imageUrl}
+                        alt="Generated political cartoon"
+                        fill
+                        className="object-contain"
+                      />
+                    ) : (
+                      // Display SVG placeholder
+                      <iframe
+                        src={generatedComic.imageUrl}
+                        className="w-full h-full border-0"
+                        title="Generated comic placeholder"
+                      />
+                    )}
+
+                    {/* AI Status Badge */}
+                    <div className="absolute top-3 right-3">
+                      <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        generatedComic.aiGenerated
+                          ? 'bg-green-100 text-green-700 border border-green-200'
+                          : 'bg-amber-100 text-amber-700 border border-amber-200'
+                      }`}>
+                        {generatedComic.aiGenerated ? '🤖 AI Generated' : '📝 Placeholder'}
                       </div>
-                      <p className="text-neutral-600 font-medium">Generated Comic Preview</p>
                     </div>
                   </div>
 
                   {/* Action Buttons */}
                   <div className="grid grid-cols-2 gap-4">
-                    <button className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group py-3">
+                    <button
+                      onClick={handleDownload}
+                      className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group py-3 flex items-center justify-center"
+                    >
                       <Download className="w-4 h-4 mr-2" />
                       Download
                     </button>
