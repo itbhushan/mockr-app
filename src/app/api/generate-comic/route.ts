@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@clerk/nextjs/server'
 
 export async function POST(request: NextRequest) {
   try {
+    // Get user authentication status
+    const { userId } = await auth()
+
     const body = await request.json()
     const { situation, characters, setting, tone, style } = body
 
@@ -42,6 +46,7 @@ export async function POST(request: NextRequest) {
         setting,
         tone,
         style,
+        userId: userId || null, // Track which user created this comic
         createdAt: new Date().toISOString()
       }
     }

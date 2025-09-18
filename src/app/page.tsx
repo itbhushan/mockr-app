@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { useUser, UserButton, SignInButton } from '@clerk/nextjs'
 import { Sparkles, Zap, Users, ArrowRight } from 'lucide-react'
 
 export default function SimpleHomePage() {
+  const { isSignedIn, user } = useUser()
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Navigation */}
@@ -18,16 +20,40 @@ export default function SimpleHomePage() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Link href="/sign-in">
-                <button className="px-4 py-2 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
-                  Sign In
-                </button>
-              </Link>
-              <Link href="/sign-up">
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  Get Started
-                </button>
-              </Link>
+              {isSignedIn ? (
+                <>
+                  <Link href="/dashboard">
+                    <button className="px-4 py-2 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
+                      Dashboard
+                    </button>
+                  </Link>
+                  <Link href="/generate">
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                      Create Comic
+                    </button>
+                  </Link>
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-8 h-8"
+                      }
+                    }}
+                  />
+                </>
+              ) : (
+                <>
+                  <SignInButton mode="modal">
+                    <button className="px-4 py-2 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
+                      Sign In
+                    </button>
+                  </SignInButton>
+                  <Link href="/sign-up">
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                      Get Started
+                    </button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -42,27 +68,56 @@ export default function SimpleHomePage() {
           </div>
 
           <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 mb-6">
-            Create{' '}
-            <span className="text-blue-600">Intelligent</span>{' '}
-            Political Cartoons
+            {isSignedIn && user?.firstName ? (
+              <>
+                Welcome back, {user.firstName}! 👋<br />
+                <span className="text-blue-600">Create</span> Amazing Cartoons
+              </>
+            ) : (
+              <>
+                Create{' '}
+                <span className="text-blue-600">Intelligent</span>{' '}
+                Political Cartoons
+              </>
+            )}
           </h1>
 
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed">
-            Generate witty, shareable satirical content inspired by R.K. Laxman's legendary style.
-            Turn political commentary into viral-worthy cartoons with AI.
+            {isSignedIn ? (
+              "Ready to create your next satirical masterpiece? Generate AI-powered political cartoons and share your unique perspective with the world."
+            ) : (
+              "Generate witty, shareable satirical content inspired by R.K. Laxman's legendary style. Turn political commentary into viral-worthy cartoons with AI."
+            )}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link href="/generate">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
-                Generate Your First Comic
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </button>
-            </Link>
-
-            <button className="bg-white hover:bg-gray-50 text-blue-600 font-semibold px-8 py-4 rounded-lg border border-blue-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
-              Watch Demo
-            </button>
+            {isSignedIn ? (
+              <>
+                <Link href="/generate">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
+                    Create New Comic
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </button>
+                </Link>
+                <Link href="/dashboard">
+                  <button className="bg-white hover:bg-gray-50 text-blue-600 font-semibold px-8 py-4 rounded-lg border border-blue-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
+                    View Dashboard
+                  </button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/generate">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
+                    Generate Your First Comic
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </button>
+                </Link>
+                <button className="bg-white hover:bg-gray-50 text-blue-600 font-semibold px-8 py-4 rounded-lg border border-blue-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
+                  Watch Demo
+                </button>
+              </>
+            )}
           </div>
         </div>
       </section>

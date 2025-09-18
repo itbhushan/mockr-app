@@ -1,19 +1,8 @@
-'use client'
-
-import { useState, useEffect } from 'react'
+import { SignUp } from '@clerk/nextjs'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 export default function SignUpPage() {
-  const [isClerkLoaded, setIsClerkLoaded] = useState(false)
-
-  useEffect(() => {
-    // Check if Clerk is available
-    const hasClerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
-                       !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes('dummy')
-    setIsClerkLoaded(typeof window !== 'undefined' && Boolean(hasClerkKey))
-  }, [])
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center py-12 px-6">
       {/* Navigation */}
@@ -33,51 +22,48 @@ export default function SignUpPage() {
             </div>
             <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">Mockr</span>
           </div>
-          <h1 className="text-4xl lg:text-6xl font-bold leading-tight tracking-tight text-neutral-900 mb-4">
-            Create Your Account
+          <h1 className="text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-neutral-900 mb-4">
+            Join Mockr
           </h1>
-          <p className="text-lg lg:text-xl leading-relaxed text-neutral-600">
-            Join thousands of creators making viral political satire
+          <p className="text-lg leading-relaxed text-neutral-600 mb-8">
+            Create your account to save comics and build your satirical portfolio
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden p-8 shadow-md">
-          {isClerkLoaded ? (
-            <div className="text-center py-8">
-              <p className="text-neutral-600 mb-4">Clerk authentication will be available when API keys are configured.</p>
-              <Link href="/generate" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
-                Start Creating Comics
-              </Link>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-neutral-600 mb-4">Authentication system loading...</p>
-              <Link href="/generate" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
-                Start Creating Comics
-              </Link>
-            </div>
-          )}
+        {/* Clerk SignUp Component */}
+        <div className="flex justify-center">
+          <SignUp
+            routing="path"
+            path="/sign-up"
+            redirectUrl="/dashboard"
+            appearance={{
+              elements: {
+                formButtonPrimary:
+                  "bg-blue-600 hover:bg-blue-700 text-sm normal-case",
+                card: "shadow-none",
+                headerTitle: "text-neutral-900",
+                headerSubtitle: "text-neutral-600",
+                socialButtonsBlockButton:
+                  "border-neutral-200 hover:border-neutral-300 text-neutral-700",
+                socialButtonsBlockButtonText: "font-medium",
+                formFieldInput:
+                  "border-neutral-200 focus:border-blue-500 focus:ring-blue-500/20",
+                footerActionLink: "text-blue-600 hover:text-blue-700"
+              }
+            }}
+          />
         </div>
 
-        <div className="text-center mt-6">
-          <p className="text-sm lg:text-base leading-relaxed text-neutral-500">
-            Already have an account?{' '}
-            <Link href="/sign-in" className="text-blue-600 hover:text-blue-700 font-medium">
-              Sign in
-            </Link>
-          </p>
-        </div>
-
+        {/* Benefits Section */}
         <div className="mt-8 p-6 bg-blue-50 rounded-2xl">
-          <h3 className="text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-blue-900 mb-3">
+          <h3 className="text-lg font-semibold text-blue-900 mb-3">
             🎨 What you'll get:
           </h3>
-          <ul className="space-y-2 text-sm lg:text-base leading-relaxed text-blue-700">
-            <li>• Unlimited comic generation</li>
-            <li>• High-resolution downloads</li>
-            <li>• Custom character creation</li>
-            <li>• Priority AI processing</li>
-            <li>• Community gallery access</li>
+          <ul className="space-y-1 text-sm text-blue-700">
+            <li>• Save and organize your comics</li>
+            <li>• Personal gallery with sharing options</li>
+            <li>• Download in multiple formats</li>
+            <li>• Access to comic history</li>
           </ul>
         </div>
       </div>
