@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
+import { generateEnhancedDialogue, generateEnhancedPrompt } from '@/lib/gemini'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,36 +18,34 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create a detailed prompt for AI image generation
-    const prompt = createComicPrompt(situation, characters, setting, tone, style)
+    // Generate enhanced dialogue using Gemini AI (with fallback to local system)
+    const dialogue = await generateEnhancedDialogue(situation, characters, tone)
 
-    // Generate dialogue for the comic
-    const dialogue = await generateDialogue(situation, characters, tone)
+    // Create enhanced prompt using Gemini AI (with fallback to local system)
+    const prompt = await generateEnhancedPrompt(situation, characters, setting, tone, style)
 
-    // Try to generate with Hugging Face API, fallback to placeholder
+    // Try to generate with Hugging Face Pro API
     let imageUrl = `/api/placeholder-comic?dialogue=${encodeURIComponent(dialogue)}&situation=${encodeURIComponent(situation)}`
     let aiGenerated = false
 
-    try {
-      const enhancedPrompt = `${prompt}
+    console.log('🚀 Attempting AI image generation with Hugging Face Pro API...')
+    console.log('💬 Generated dialogue:', dialogue)
+    console.log('🎭 Applied tone:', tone)
 
-CRITICAL REQUIREMENTS:
-1. MUST include a speech bubble with readable text: "${dialogue}"
-2. Speech bubble should be oval/circular shape with pointer tail
-3. Text must be clearly legible inside the bubble
-4. Position speech bubble near character's mouth
-5. Include political situation context: "${situation}" at bottom of image
-6. Speech bubble text should be in quotes: ${dialogue}
+    // Try Hugging Face AI generation first (Pro API)
+    const aiImageUrl = await generateComicWithHuggingFace(prompt)
 
-The final image MUST show the dialogue text inside a proper speech bubble as part of the cartoon image itself.`
-
-      const generatedImageUrl = await generateComicWithHuggingFace(enhancedPrompt)
-      if (generatedImageUrl) {
-        imageUrl = generatedImageUrl
-        aiGenerated = true
-      }
-    } catch (aiError) {
-      console.warn('AI generation failed, using placeholder:', aiError)
+    if (aiImageUrl) {
+      console.log('✅ AI image generation successful!')
+      imageUrl = aiImageUrl
+      aiGenerated = true
+    } else {
+      console.log('⚠️ AI image generation failed, using enhanced placeholder system')
+      // Fallback to enhanced SVG placeholder with full functionality:
+      // - Dynamic dialogue generation with Gemini AI
+      // - Speech bubble integration
+      // - Context box display
+      // - Complete character visualization
     }
 
     const response = {
@@ -329,12 +328,18 @@ function generateSeriousCritique(situation: string): string {
 async function generateComicWithHuggingFace(prompt: string): Promise<string | null> {
   const apiToken = process.env.HUGGINGFACE_API_TOKEN
 
+  console.log('🔑 Checking Hugging Face API token...')
+  console.log('🔑 Token exists:', !!apiToken)
+  console.log('🔑 Token starts with:', apiToken?.substring(0, 5) || 'N/A')
+
   if (!apiToken || apiToken === 'your_huggingface_api_token_here') {
-    console.warn('Hugging Face API token not configured')
+    console.warn('❌ Hugging Face API token not configured')
     return null
   }
 
   try {
+    console.log('🌐 Making request to Hugging Face API...')
+
     // Use Stable Diffusion XL for better quality
     const response = await fetch(
       'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0',
@@ -357,6 +362,9 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
         }),
       }
     )
+
+    console.log('📡 API Response status:', response.status)
+    console.log('📡 API Response ok:', response.ok)
 
     if (!response.ok) {
       const errorText = await response.text()

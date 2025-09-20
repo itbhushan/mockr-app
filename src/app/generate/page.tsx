@@ -23,6 +23,7 @@ export default function GeneratePage() {
     situation: string;
     id: string;
   } | null>(null)
+  const [svgContent, setSvgContent] = useState<string | null>(null)
   const [isLoadingSample, setIsLoadingSample] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,6 +50,21 @@ export default function GeneratePage() {
           situation: data.comic.situation,
           id: data.comic.id
         })
+
+        // If it's a placeholder comic, fetch the SVG content
+        if (!data.comic.aiGenerated) {
+          try {
+            const apiUrl = `/api/placeholder-comic?dialogue=${encodeURIComponent(data.comic.dialogue)}&situation=${encodeURIComponent(data.comic.situation)}&t=${Date.now()}`
+            const svgResponse = await fetch(apiUrl)
+            const svgText = await svgResponse.text()
+            setSvgContent(svgText)
+          } catch (error) {
+            console.error('Error fetching SVG:', error)
+          }
+        } else {
+          setSvgContent(null)
+        }
+
         console.log('Comic generated:', data.comic)
       } else {
         console.error('Generation failed:', data.error)
@@ -344,44 +360,69 @@ export default function GeneratePage() {
 
               {generatedComic && (
                 <div className="space-y-6">
-                  <div className="relative aspect-[8/7] bg-white rounded-2xl shadow-md overflow-hidden border border-neutral-200">
+                  <div className="relative bg-white rounded-2xl shadow-md overflow-hidden border border-neutral-200" style={{ minHeight: '400px' }}>
                     {generatedComic.imageUrl.startsWith('data:') ? (
-                      // Display AI-generated image
-                      <Image
-                        src={generatedComic.imageUrl}
-                        alt="Generated political cartoon"
-                        fill
-                        className="object-contain"
-                      />
+                      // Display AI-generated image with speech bubble and context overlay
+                      <div className="relative w-full h-full min-h-[400px]">
+                        <Image
+                          src={generatedComic.imageUrl}
+                          alt="Generated political cartoon"
+                          fill
+                          className="object-cover rounded-2xl"
+                        />
+
+                        {/* Speech Bubble Overlay for AI Image - Transparent Background */}
+                        <div className="absolute top-4 left-4 max-w-xs">
+                          <div className="bg-white/20 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-white/60 px-4 py-3 relative">
+                            <p className="text-sm font-bold text-white drop-shadow-lg leading-relaxed animate-pulse" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)', fontFamily: 'Comic Sans MS, cursive'}}>
+                              {generatedComic.dialogue}
+                            </p>
+                            {/* Speech bubble tail - transparent */}
+                            <div className="absolute -bottom-2 left-6 w-4 h-4 bg-white/20 backdrop-blur-sm border-r-2 border-b-2 border-white/60 transform rotate-45"></div>
+                          </div>
+                        </div>
+
+                        {/* Mockr Watermark - Inside Comic at Bottom Right */}
+                        <div className="absolute bottom-4 right-4">
+                          <p className="text-xs font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent drop-shadow-lg animate-bounce" style={{textShadow: '1px 1px 2px rgba(255,255,255,0.8)', fontFamily: 'Comic Sans MS, cursive'}}>
+                            Created by Mockr
+                          </p>
+                        </div>
+                      </div>
                     ) : (
                       // Display SVG placeholder with dialogue and situation
-                      <iframe
-                        src={`/api/placeholder-comic?dialogue=${encodeURIComponent(generatedComic.dialogue)}&situation=${encodeURIComponent(generatedComic.situation)}`}
-                        className="w-full h-full border-0"
-                        title="Generated comic placeholder"
-                      />
+                      <div
+                        className="w-full h-full flex items-center justify-center p-4"
+                        style={{backgroundColor: '#f8fafc', minHeight: '400px'}}
+                      >
+                        {svgContent ? (
+                          <div
+                            dangerouslySetInnerHTML={{ __html: svgContent }}
+                            className="flex-shrink-0 mx-auto"
+                            style={{
+                              width: '400px',
+                              height: '350px',
+                              maxWidth: '100%'
+                            }}
+                          />
+                        ) : (
+                          <div className="text-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                            <p className="text-sm text-gray-500">Loading comic...</p>
+                          </div>
+                        )}
+                      </div>
                     )}
 
-                    {/* AI Status Badge */}
-                    <div className="absolute top-3 right-3">
-                      <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        generatedComic.aiGenerated
-                          ? 'bg-green-100 text-green-700 border border-green-200'
-                          : 'bg-amber-100 text-amber-700 border border-amber-200'
-                      }`}>
-                        {generatedComic.aiGenerated ? '🤖 AI Generated' : '📝 Placeholder'}
-                      </div>
-                    </div>
                   </div>
 
-                  {/* Comic Info Display */}
-                  {generatedComic.dialogue && (
-                    <div className="mt-4 p-4 bg-neutral-50 rounded-xl border border-neutral-200">
-                      <h4 className="text-sm font-semibold text-neutral-700 mb-2">📝 Comic Details:</h4>
-                      <p className="text-xs text-neutral-500 mb-1"><strong>Dialogue:</strong> {generatedComic.dialogue}</p>
-                      <p className="text-xs text-neutral-500"><strong>Style:</strong> {generatedComic.aiGenerated ? 'AI Generated with speech bubble' : 'Placeholder with embedded text'}</p>
-                    </div>
-                  )}
+                  {/* Political Situation Context - Visible Below Comic */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 shadow-sm">
+                    <p className="text-sm font-semibold text-blue-800 mb-2">Political Situation:</p>
+                    <p className="text-sm text-blue-700 leading-relaxed">
+                      {generatedComic.situation}
+                    </p>
+                  </div>
 
                   {/* Action Buttons */}
                   <div className="grid grid-cols-2 gap-4">
@@ -418,6 +459,12 @@ export default function GeneratePage() {
                   <li>• Mention visual elements you want to see</li>
                   <li>• Keep it timely and relatable</li>
                 </ul>
+
+                <div className="mt-4 p-3 bg-white rounded-lg border border-blue-200">
+                  <p className="text-sm text-blue-600">
+                    <strong>🎨 Smart Comics:</strong> Currently using enhanced placeholder system with dynamic dialogue, speech bubbles, and context display. AI image generation coming soon!
+                  </p>
+                </div>
               </div>
             </div>
           </motion.div>
