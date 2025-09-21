@@ -31,6 +31,8 @@ export async function POST(request: NextRequest) {
     console.log('🚀 Attempting AI image generation with Hugging Face Pro API...')
     console.log('💬 Generated dialogue:', dialogue)
     console.log('🎭 Applied tone:', tone)
+    console.log('📝 Enhanced prompt with Common Man mandate:', prompt.substring(0, 200) + '...')
+    console.log('🔗 Placeholder URL:', imageUrl)
 
     // Try Hugging Face AI generation first (Pro API)
     const aiImageUrl = await generateComicWithHuggingFace(prompt)
@@ -40,7 +42,7 @@ export async function POST(request: NextRequest) {
       imageUrl = aiImageUrl
       aiGenerated = true
     } else {
-      console.log('⚠️ AI image generation failed, using enhanced placeholder system')
+      console.log('⚠️ AI image generation failed, using enhanced SVG placeholder system')
       // Fallback to enhanced SVG placeholder with full functionality:
       // - Dynamic dialogue generation with Gemini AI
       // - Speech bubble integration
@@ -340,7 +342,7 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
   try {
     console.log('🌐 Making request to Hugging Face API...')
 
-    // Use Stable Diffusion XL for better quality
+    // Use Stable Diffusion XL with stronger cartoon prompting
     const response = await fetch(
       'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0',
       {
@@ -350,13 +352,13 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
         },
         method: 'POST',
         body: JSON.stringify({
-          inputs: prompt,
+          inputs: `black and white line art, editorial cartoon, simple drawing, cartoon illustration, hand-drawn style, newspaper comic, line drawing, pen and ink drawing, sketch style, caricature, ${prompt}. CRITICAL: This must be a black and white line art cartoon illustration, NOT a realistic photo. DRAWING STYLE: Simple line drawing, editorial cartoon style like R.K. Laxman, hand-drawn cartoon, pen and ink illustration. MANDATORY: The Common Man character (balding Indian man with spectacles) MUST be clearly visible in the foreground as a cartoon character.`,
           parameters: {
-            negative_prompt: "realistic photo, 3d render, photorealistic, blurry, low quality, distorted faces, extra limbs, multiple heads, deformed hands, extra fingers, missing fingers, weird anatomy, malformed faces, ugly faces, bad proportions, duplicate, cropped, out of frame, text, watermark, signature, logo, multiple people in background, crowded, busy background, detailed background, complex background, realistic lighting, shadows, gradients",
-            num_inference_steps: 30,
-            guidance_scale: 8.5,
-            width: 768,
-            height: 512,
+            negative_prompt: "realistic photo, photorealistic, real people, actual people, photography, realistic faces, realistic humans, detailed realistic features, realistic skin, realistic hair, realistic clothing, 3d render, 3d model, cgi, digital art, detailed shading, realistic lighting, shadows, textures, patterns, photographic, colored, colors, gradients, detailed backgrounds, complex backgrounds, busy backgrounds, crowded scenes, blurry, low quality, distorted faces, extra limbs, multiple heads, deformed hands, extra fingers, missing fingers, weird anatomy, malformed faces, ugly faces, bad proportions, duplicate, cropped, out of frame, text, watermark, signature, logo, anime style, manga style, cartoon network style, disney style, pixar style, detailed clothing, fabric textures, detailed environments, modern art style, abstract art, surreal art, no Common Man character, missing Common Man, obscured Common Man, hidden Common Man, no spectacles character, no balding character",
+            num_inference_steps: 35,
+            guidance_scale: 9.0,
+            width: 1024,
+            height: 576,
             scheduler: "DPMSolverMultistepScheduler"
           }
         }),

@@ -14,6 +14,10 @@ export default function GeneratePage() {
     tone: 'satirical',
     style: 'laxman'
   })
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false)
+  const [generatedDescription, setGeneratedDescription] = useState<string | null>(null)
+  const [editableDescription, setEditableDescription] = useState<string>('')
+  const [isEditingDescription, setIsEditingDescription] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedComic, setGeneratedComic] = useState<{
     imageUrl: string;
@@ -25,10 +29,85 @@ export default function GeneratePage() {
   } | null>(null)
   const [svgContent, setSvgContent] = useState<string | null>(null)
   const [isLoadingSample, setIsLoadingSample] = useState(false)
+  const [currentStep, setCurrentStep] = useState<'form' | 'preview' | 'generate'>('form')
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleGenerateDescription = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsGeneratingDescription(true)
+
+    // Auto-fill empty fields based on the political situation
+    const enhancedFormData = {
+      ...formData,
+      characters: formData.characters || autoFillCharacters(formData.situation),
+      setting: formData.setting || autoFillSetting(formData.situation)
+    }
+
+    try {
+      const response = await fetch('/api/generate-description', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(enhancedFormData),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setGeneratedDescription(data.description)
+        setCurrentStep('preview')
+        console.log('Description generated:', data.description)
+      } else {
+        console.error('Description generation failed:', data.error)
+        alert('Failed to generate description. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error calling API:', error)
+      alert('Something went wrong. Please try again.')
+    } finally {
+      setIsGeneratingDescription(false)
+    }
+  }
+
+  const autoFillCharacters = (situation: string): string => {
+    const situationLower = situation.toLowerCase()
+
+    if (situationLower.includes('healthcare') || situationLower.includes('hospital')) {
+      return 'Politician, Common Man, Doctor'
+    } else if (situationLower.includes('education') || situationLower.includes('school')) {
+      return 'Education Minister, Common Man, Student'
+    } else if (situationLower.includes('climate') || situationLower.includes('environment')) {
+      return 'Politician, Common Man, Environmental Activist'
+    } else if (situationLower.includes('corruption') || situationLower.includes('money')) {
+      return 'Politician, Common Man, Businessman'
+    } else if (situationLower.includes('traffic') || situationLower.includes('transport')) {
+      return 'Transport Minister, Common Man, Driver'
+    } else {
+      return 'Politician, Common Man'
+    }
+  }
+
+  const autoFillSetting = (situation: string): string => {
+    const situationLower = situation.toLowerCase()
+
+    if (situationLower.includes('healthcare') || situationLower.includes('hospital')) {
+      return 'Hospital or Government Office'
+    } else if (situationLower.includes('education') || situationLower.includes('school')) {
+      return 'School or Education Ministry'
+    } else if (situationLower.includes('climate') || situationLower.includes('environment')) {
+      return 'Conference Hall or Outdoor Setting'
+    } else if (situationLower.includes('corruption') || situationLower.includes('money')) {
+      return 'Government Office'
+    } else if (situationLower.includes('traffic') || situationLower.includes('transport')) {
+      return 'Traffic Jam or Transport Office'
+    } else {
+      return 'Government Office or Public Setting'
+    }
+  }
+
+  const handleGenerateComic = async () => {
     setIsGenerating(true)
+    setCurrentStep('generate')
 
     try {
       const response = await fetch('/api/generate-comic', {
@@ -76,6 +155,13 @@ export default function GeneratePage() {
     } finally {
       setIsGenerating(false)
     }
+  }
+
+  const handleBackToForm = () => {
+    setCurrentStep('form')
+    setGeneratedDescription(null)
+    setGeneratedComic(null)
+    setSvgContent(null)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -214,10 +300,10 @@ export default function GeneratePage() {
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Situation Input */}
+              <form onSubmit={handleGenerateDescription} className="space-y-8">
+                {/* Political Situation Input - Full Width */}
                 <div>
-                  <label htmlFor="situation" className="block text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-neutral-900 mb-3">
+                  <label htmlFor="situation" className="block text-lg font-semibold leading-tight tracking-tight text-neutral-900 mb-2">
                     Political Situation *
                   </label>
                   <textarea
@@ -226,99 +312,161 @@ export default function GeneratePage() {
                     value={formData.situation}
                     onChange={handleInputChange}
                     placeholder="Describe the political scenario you want to satirize... (e.g., Politicians promising free healthcare while holding pharma stocks)"
-                    className="textarea-primary h-32 resize-none"
+                    className="textarea-primary h-24 resize-none"
                     required
                   />
                 </div>
 
-                {/* Characters Input */}
-                <div>
-                  <label htmlFor="characters" className="block text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-neutral-900 mb-3">
-                    Characters
-                  </label>
-                  <input
-                    type="text"
-                    id="characters"
-                    name="characters"
-                    value={formData.characters}
-                    onChange={handleInputChange}
-                    placeholder="Who should be in the comic? (e.g., Politician, Common Man, Journalist)"
-                    className="input-primary"
-                  />
+                {/* Compact Grid Layout for Other Inputs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Characters Input */}
+                  <div>
+                    <label htmlFor="characters" className="block text-sm font-semibold leading-tight tracking-tight text-neutral-900 mb-2">
+                      Characters
+                    </label>
+                    <input
+                      type="text"
+                      id="characters"
+                      name="characters"
+                      value={formData.characters}
+                      onChange={handleInputChange}
+                      placeholder="Auto-filled if empty"
+                      className="input-primary text-sm"
+                    />
+                  </div>
+
+                  {/* Background Input */}
+                  <div>
+                    <label htmlFor="setting" className="block text-sm font-semibold leading-tight tracking-tight text-neutral-900 mb-2">
+                      Background
+                    </label>
+                    <input
+                      type="text"
+                      id="setting"
+                      name="setting"
+                      value={formData.setting}
+                      onChange={handleInputChange}
+                      placeholder="Auto-filled if empty"
+                      className="input-primary text-sm"
+                    />
+                  </div>
+
+                  {/* Tone Selection */}
+                  <div>
+                    <label htmlFor="tone" className="block text-sm font-semibold leading-tight tracking-tight text-neutral-900 mb-2">
+                      Tone
+                    </label>
+                    <select
+                      id="tone"
+                      name="tone"
+                      value={formData.tone}
+                      onChange={handleInputChange}
+                      className="input-primary text-sm"
+                    >
+                      <option value="satirical">Satirical</option>
+                      <option value="witty">Witty</option>
+                      <option value="observational">Observational</option>
+                      <option value="critical">Critical</option>
+                    </select>
+                  </div>
+
+                  {/* Art Style Selection */}
+                  <div>
+                    <label htmlFor="style" className="block text-sm font-semibold leading-tight tracking-tight text-neutral-900 mb-2">
+                      Art Style
+                    </label>
+                    <select
+                      id="style"
+                      name="style"
+                      value={formData.style}
+                      onChange={handleInputChange}
+                      className="input-primary text-sm"
+                    >
+                      <option value="laxman">R.K. Laxman Classic</option>
+                      <option value="modern">Modern Satirical</option>
+                      <option value="minimalist">Minimalist</option>
+                      <option value="detailed">Detailed Editorial</option>
+                    </select>
+                  </div>
                 </div>
 
-                {/* Setting Input */}
-                <div>
-                  <label htmlFor="setting" className="block text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-neutral-900 mb-3">
-                    Setting
-                  </label>
-                  <input
-                    type="text"
-                    id="setting"
-                    name="setting"
-                    value={formData.setting}
-                    onChange={handleInputChange}
-                    placeholder="Where does this take place? (e.g., Parliament, Street, Office)"
-                    className="input-primary"
-                  />
-                </div>
-
-                {/* Tone Selection */}
-                <div>
-                  <label htmlFor="tone" className="block text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-neutral-900 mb-3">
-                    Tone
-                  </label>
-                  <select
-                    id="tone"
-                    name="tone"
-                    value={formData.tone}
-                    onChange={handleInputChange}
-                    className="input-primary"
-                  >
-                    <option value="satirical">Satirical</option>
-                    <option value="witty">Witty</option>
-                    <option value="observational">Observational</option>
-                    <option value="critical">Critical</option>
-                  </select>
-                </div>
-
-                {/* Style Selection */}
-                <div>
-                  <label htmlFor="style" className="block text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-neutral-900 mb-3">
-                    Art Style
-                  </label>
-                  <select
-                    id="style"
-                    name="style"
-                    value={formData.style}
-                    onChange={handleInputChange}
-                    className="input-primary"
-                  >
-                    <option value="laxman">R.K. Laxman Classic</option>
-                    <option value="modern">Modern Satirical</option>
-                    <option value="minimalist">Minimalist</option>
-                    <option value="detailed">Detailed Editorial</option>
-                  </select>
-                </div>
-
-                {/* Submit Button */}
+                {/* Generate Comic Description Button - Always Available */}
                 <button
                   type="submit"
-                  disabled={isGenerating || !formData.situation}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed group"
+                  disabled={isGeneratingDescription || !formData.situation}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full text-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
-                  {isGenerating ? (
+                  {isGeneratingDescription ? (
                     <>
                       <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
-                      Generating Your Comic...
+                      Generating Description...
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-5 h-5 mr-3" />
-                      Generate Comic
+                      {generatedDescription ? 'Regenerate Comic Description' : 'Generate Comic Description'}
                     </>
                   )}
                 </button>
+
+                {/* Description Preview and Edit */}
+                {generatedDescription && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-lg font-semibold text-blue-900">Comic Description:</h3>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isEditingDescription) {
+                              setEditableDescription(generatedDescription)
+                              setIsEditingDescription(true)
+                            } else {
+                              setGeneratedDescription(editableDescription)
+                              setIsEditingDescription(false)
+                            }
+                          }}
+                          className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg transition-colors"
+                        >
+                          {isEditingDescription ? 'Save Changes' : 'Edit Description'}
+                        </button>
+                      </div>
+
+                      {isEditingDescription ? (
+                        <textarea
+                          value={editableDescription}
+                          onChange={(e) => setEditableDescription(e.target.value)}
+                          className="w-full h-32 p-3 text-sm text-blue-800 bg-white border border-blue-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Edit the comic description..."
+                        />
+                      ) : (
+                        <p className="text-sm text-blue-800 leading-relaxed whitespace-pre-wrap">
+                          {generatedDescription}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Generate Comic Button - Always Available When Description Exists */}
+                    <button
+                      type="button"
+                      onClick={handleGenerateComic}
+                      disabled={isGenerating || isEditingDescription}
+                      className="bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
+                          Generating Comic...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-5 h-5 mr-3" />
+                          {generatedComic ? 'Generate Another Comic Version' : 'Generate Comic'}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
               </form>
             </div>
           </motion.div>
@@ -341,7 +489,9 @@ export default function GeneratePage() {
                       <Sparkles className="w-10 h-10 lg:w-12 lg:h-12 text-white" />
                     </div>
                     <p className="text-neutral-500 font-medium mb-2">Your Comic Will Appear Here</p>
-                    <p className="text-sm lg:text-base leading-relaxed text-neutral-400">Fill out the form to generate your satirical masterpiece</p>
+                    <p className="text-sm lg:text-base leading-relaxed text-neutral-400">
+                      {generatedDescription ? 'Click "Generate Comic" to create your image' : 'Enter political situation and generate description first'}
+                    </p>
                   </div>
                 </div>
               )}
@@ -360,55 +510,78 @@ export default function GeneratePage() {
 
               {generatedComic && (
                 <div className="space-y-6">
-                  <div className="relative bg-white rounded-2xl shadow-md overflow-hidden border border-neutral-200" style={{ minHeight: '400px' }}>
+                  <div className="relative bg-white rounded-2xl shadow-md overflow-hidden border border-neutral-200" style={{ minHeight: '500px' }}>
                     {generatedComic.imageUrl.startsWith('data:') ? (
-                      // Display AI-generated image with speech bubble and context overlay
-                      <div className="relative w-full h-full min-h-[400px]">
+                      // Display AI-generated image with speech bubble and context overlay - FULL WIDTH
+                      <div className="relative w-full h-full min-h-[500px]">
                         <Image
                           src={generatedComic.imageUrl}
                           alt="Generated political cartoon"
                           fill
-                          className="object-cover rounded-2xl"
+                          className="object-contain rounded-2xl w-full h-full"
+                          style={{ objectFit: 'contain' }}
                         />
 
-                        {/* Speech Bubble Overlay for AI Image - Transparent Background */}
-                        <div className="absolute top-4 left-4 max-w-xs">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-white/60 px-4 py-3 relative">
-                            <p className="text-sm font-bold text-white drop-shadow-lg leading-relaxed animate-pulse" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)', fontFamily: 'Comic Sans MS, cursive'}}>
-                              {generatedComic.dialogue}
-                            </p>
-                            {/* Speech bubble tail - transparent */}
-                            <div className="absolute -bottom-2 left-6 w-4 h-4 bg-white/20 backdrop-blur-sm border-r-2 border-b-2 border-white/60 transform rotate-45"></div>
+                        {/* Speech Bubble - Enhanced positioning for better AI composition */}
+                        <div className="absolute top-8 left-4 sm:top-12 sm:left-16 z-10">
+                          <div className="relative">
+                            {/* Speech bubble with enhanced visibility */}
+                            <div className="relative bg-white/95 border-2 border-black rounded-full px-4 py-2 sm:px-6 sm:py-3 min-w-[120px] max-w-[240px] sm:min-w-[140px] sm:max-w-[280px] shadow-lg">
+                              <p className="text-xs sm:text-sm font-semibold text-black leading-tight text-center">
+                                {generatedComic.dialogue}
+                              </p>
+                              {/* Speech bubble pointer - positioned for better readability */}
+                              <div className="absolute bottom-0 left-6 sm:left-8 transform translate-y-1/2">
+                                <div className="w-0 h-0 border-l-[6px] sm:border-l-[8px] border-l-transparent border-r-[6px] sm:border-r-[8px] border-r-transparent border-t-[8px] sm:border-t-[12px] border-t-black"></div>
+                                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-[6px] sm:-translate-y-[10px] w-0 h-0 border-l-[4px] sm:border-l-[6px] border-l-transparent border-r-[4px] sm:border-r-[6px] border-r-transparent border-t-[6px] sm:border-t-[10px] border-t-white"></div>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
-                        {/* Mockr Watermark - Inside Comic at Bottom Right */}
-                        <div className="absolute bottom-4 right-4">
-                          <p className="text-xs font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent drop-shadow-lg animate-bounce" style={{textShadow: '1px 1px 2px rgba(255,255,255,0.8)', fontFamily: 'Comic Sans MS, cursive'}}>
+                        {/* Situation Context - Enhanced visibility */}
+                        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-11/12 max-w-lg">
+                          <p className="text-xs sm:text-sm font-medium text-black bg-white/95 px-2 py-1 sm:px-3 sm:py-1 rounded border border-black text-center shadow-lg leading-tight">
+                            {generatedComic.situation.length > 80
+                              ? `${generatedComic.situation.substring(0, 80)}...`
+                              : generatedComic.situation}
+                          </p>
+                        </div>
+
+                        {/* Mockr Watermark - Enhanced visibility */}
+                        <div className="absolute bottom-2 right-2 sm:right-4">
+                          <p className="text-xs font-medium text-black bg-white/80 px-2 py-1 rounded">
                             Created by Mockr
                           </p>
                         </div>
                       </div>
                     ) : (
-                      // Display SVG placeholder with dialogue and situation
+                      // Display SVG placeholder - FULL SIZE
                       <div
-                        className="w-full h-full flex items-center justify-center p-4"
-                        style={{backgroundColor: '#f8fafc', minHeight: '400px'}}
+                        className="w-full h-full"
+                        style={{backgroundColor: 'white', minHeight: '500px', padding: '10px'}}
                       >
                         {svgContent ? (
                           <div
-                            dangerouslySetInnerHTML={{ __html: svgContent }}
-                            className="flex-shrink-0 mx-auto"
+                            dangerouslySetInnerHTML={{
+                              __html: svgContent.replace(
+                                /<svg[^>]*>/,
+                                '<svg width="100%" height="100%" style="width: 100%; height: 100%; min-height: 480px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet">'
+                              )
+                            }}
+                            className="w-full h-full"
                             style={{
-                              width: '400px',
-                              height: '350px',
-                              maxWidth: '100%'
+                              width: '100%',
+                              height: '100%',
+                              minHeight: '480px'
                             }}
                           />
                         ) : (
-                          <div className="text-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                            <p className="text-sm text-gray-500">Loading comic...</p>
+                          <div className="text-center flex items-center justify-center h-full">
+                            <div>
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                              <p className="text-sm text-gray-500">Loading comic...</p>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -441,9 +614,9 @@ export default function GeneratePage() {
 
                   <button
                     onClick={() => setGeneratedComic(null)}
-                    className="w-full text-blue-600 hover:text-blue-700 transition-colors text-center py-2"
+                    className="w-full text-blue-600 hover:text-blue-700 transition-colors text-center py-2 border border-blue-200 rounded-lg"
                   >
-                    Generate Another Version
+                    ← Back to Description (Generate Another Version)
                   </button>
                 </div>
               )}
