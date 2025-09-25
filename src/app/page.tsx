@@ -22,9 +22,9 @@ export default function SimpleHomePage() {
             <div className="flex items-center space-x-4">
               {isSignedIn ? (
                 <>
-                  <Link href="/dashboard">
+                  <Link href="/gallery">
                     <button className="px-4 py-2 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
-                      Dashboard
+                      Gallery
                     </button>
                   </Link>
                   <Link href="/generate">
@@ -99,9 +99,9 @@ export default function SimpleHomePage() {
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </button>
                 </Link>
-                <Link href="/dashboard">
+                <Link href="/gallery">
                   <button className="bg-white hover:bg-gray-50 text-blue-600 font-semibold px-8 py-4 rounded-lg border border-blue-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
-                    View Dashboard
+                    View Gallery
                   </button>
                 </Link>
               </>
@@ -113,9 +113,11 @@ export default function SimpleHomePage() {
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </button>
                 </Link>
-                <button className="bg-white hover:bg-gray-50 text-blue-600 font-semibold px-8 py-4 rounded-lg border border-blue-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
-                  Watch Demo
-                </button>
+                <Link href="/gallery">
+                  <button className="bg-white hover:bg-gray-50 text-blue-600 font-semibold px-8 py-4 rounded-lg border border-blue-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
+                    Browse Gallery
+                  </button>
+                </Link>
               </>
             )}
           </div>

@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const { userId } = await auth()
 
     const body = await request.json()
-    const { situation, characters, setting, tone, style } = body
+    const { situation, quote, description, characters, setting, tone, style } = body
 
     // Validate required fields
     if (!situation) {
@@ -18,11 +18,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate enhanced dialogue using Gemini AI (with fallback to local system)
-    const dialogue = await generateEnhancedDialogue(situation, characters, tone)
+    // Use our streamlined approach: if we have quote and description, use them directly
+    let dialogue: string
+    let prompt: string
 
-    // Create enhanced prompt using Gemini AI (with fallback to local system)
-    const prompt = await generateEnhancedPrompt(situation, characters, setting, tone, style)
+    if (quote && description) {
+      // Use the satirical quote as dialogue and the simple description as prompt
+      dialogue = quote
+      prompt = description
+      console.log('🎯 Using streamlined flow: quote as dialogue, description as prompt')
+    } else {
+      // Fallback to legacy system if needed
+      dialogue = quote || await generateEnhancedDialogue(situation, characters, tone)
+      prompt = description || await generateEnhancedPrompt(situation, quote, characters, setting, tone, style)
+      console.log('⚠️ Using fallback flow: generating dialogue and/or prompt')
+    }
 
     // Try to generate with Hugging Face Pro API
     let imageUrl = `/api/placeholder-comic?dialogue=${encodeURIComponent(dialogue)}&situation=${encodeURIComponent(situation)}`
@@ -341,8 +351,15 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
 
   try {
     console.log('🌐 Making request to Hugging Face API...')
+    console.log('📝 Original prompt from Gemini:', prompt.substring(0, 200) + '...')
 
-    // Use Stable Diffusion XL with stronger cartoon prompting
+    // Transform Gemini description into optimized Stable Diffusion prompt
+    const optimizedPrompt = optimizePromptForStableDiffusion(prompt)
+
+    console.log('📝 Optimized prompt for Stable Diffusion:', optimizedPrompt.substring(0, 200) + '...')
+    console.log('📝 Full optimized prompt length:', optimizedPrompt.length)
+
+    // Use Stable Diffusion XL with enhanced character-focused prompting
     const response = await fetch(
       'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0',
       {
@@ -352,11 +369,11 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
         },
         method: 'POST',
         body: JSON.stringify({
-          inputs: `black and white line art, editorial cartoon, simple drawing, cartoon illustration, hand-drawn style, newspaper comic, line drawing, pen and ink drawing, sketch style, caricature, ${prompt}. CRITICAL: This must be a black and white line art cartoon illustration, NOT a realistic photo. DRAWING STYLE: Simple line drawing, editorial cartoon style like R.K. Laxman, hand-drawn cartoon, pen and ink illustration. MANDATORY: The Common Man character (balding Indian man with spectacles) MUST be clearly visible in the foreground as a cartoon character.`,
+          inputs: optimizedPrompt,
           parameters: {
-            negative_prompt: "realistic photo, photorealistic, real people, actual people, photography, realistic faces, realistic humans, detailed realistic features, realistic skin, realistic hair, realistic clothing, 3d render, 3d model, cgi, digital art, detailed shading, realistic lighting, shadows, textures, patterns, photographic, colored, colors, gradients, detailed backgrounds, complex backgrounds, busy backgrounds, crowded scenes, blurry, low quality, distorted faces, extra limbs, multiple heads, deformed hands, extra fingers, missing fingers, weird anatomy, malformed faces, ugly faces, bad proportions, duplicate, cropped, out of frame, text, watermark, signature, logo, anime style, manga style, cartoon network style, disney style, pixar style, detailed clothing, fabric textures, detailed environments, modern art style, abstract art, surreal art, no Common Man character, missing Common Man, obscured Common Man, hidden Common Man, no spectacles character, no balding character",
-            num_inference_steps: 35,
-            guidance_scale: 9.0,
+            negative_prompt: "realistic photo, photorealistic, real people, photography, realistic faces, realistic humans, 3d render, cgi, digital art, colored, colors, gradients, anime style, manga style, complex backgrounds, blurry, low quality, distorted faces, extra limbs, multiple heads, deformed hands, extra fingers, missing fingers, weird anatomy, malformed faces, ugly faces, bad proportions, duplicate, cropped, out of frame, text, watermark, signature, logo, missing characters, incomplete scene",
+            num_inference_steps: 50,
+            guidance_scale: 9.5,
             width: 1024,
             height: 576,
             scheduler: "DPMSolverMultistepScheduler"
@@ -388,6 +405,208 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
     console.error('Error calling Hugging Face API:', error)
     return null
   }
+}
+
+function optimizePromptForStableDiffusion(description: string): string {
+  console.log('🔧 REDESIGNED: Ensuring 100% description-to-image fidelity...')
+
+  // STRATEGY: Break down description into MANDATORY visual elements
+  // Each element MUST appear in the generated image
+
+  const cleanDescription = description.replace(/R\.K\. Laxman cartoon:?/gi, '').replace(/Common Man looks bewildered at?/gi, '').trim()
+
+  // Step 1: Extract EVERY visual element from description
+  const visualElements = extractAllVisualElements(cleanDescription)
+
+  console.log('📋 Extracted visual elements:', visualElements)
+
+  // Step 2: Build prompt with strict hierarchy
+  let optimizedPrompt = ""
+
+  // LEVEL 1: Artistic style (HIGHEST priority)
+  optimizedPrompt += "(((R.K. Laxman editorial cartoon style))), (((black and white line art))), (((newspaper comic illustration))), "
+
+  // LEVEL 2: MANDATORY characters (each gets double emphasis)
+  visualElements.characters.forEach(char => {
+    optimizedPrompt += `((${char})), `
+  })
+
+  // LEVEL 3: MANDATORY objects (each gets double emphasis)
+  visualElements.objects.forEach(obj => {
+    optimizedPrompt += `((${obj})), `
+  })
+
+  // LEVEL 4: MANDATORY actions/expressions (each gets double emphasis)
+  visualElements.actions.forEach(action => {
+    optimizedPrompt += `((${action})), `
+  })
+
+  // LEVEL 5: MANDATORY text/numbers (each gets triple emphasis)
+  visualElements.textNumbers.forEach(text => {
+    optimizedPrompt += `(((${text}))), `
+  })
+
+  // LEVEL 6: Setting (single emphasis)
+  if (visualElements.setting) {
+    optimizedPrompt += `(${visualElements.setting}), `
+  }
+
+  // LEVEL 7: Technical specifications
+  optimizedPrompt += "single panel cartoon, clean composition, high contrast black and white, professional editorial cartoon quality"
+
+  console.log('🔧 100% FIDELITY prompt built')
+  console.log('📝 Total elements to render:',
+    visualElements.characters.length + visualElements.objects.length +
+    visualElements.actions.length + visualElements.textNumbers.length)
+  console.log('📝 Final prompt length:', optimizedPrompt.length)
+
+  return optimizedPrompt
+}
+
+function extractAllVisualElements(description: string) {
+  const elements = {
+    characters: [],
+    objects: [],
+    actions: [],
+    textNumbers: [],
+    setting: null
+  }
+
+  const desc = description.toLowerCase()
+
+  // Extract CHARACTERS (people in the scene)
+  if (desc.includes('common man')) elements.characters.push('Common Man with round spectacles and checkered shirt')
+  if (desc.includes('politician') && !desc.includes('politician\'s')) elements.characters.push('politician character')
+  if (desc.includes('politician\'s wife') || desc.includes('minister\'s wife')) elements.characters.push('politician\'s wife character')
+  if (desc.includes('trump')) elements.characters.push('Trump character with distinctive appearance')
+  if (desc.includes('job seekers')) elements.characters.push('job seeker characters')
+  if (desc.includes('patients')) elements.characters.push('patient characters')
+
+  // Extract OBJECTS (physical items that must be visible)
+  if (desc.includes('computer screen')) elements.objects.push('computer screen')
+  if (desc.includes('computer')) elements.objects.push('computer')
+  if (desc.includes('screen')) elements.objects.push('screen')
+  if (desc.includes('price tag')) elements.objects.push('price tag')
+  if (desc.includes('sign')) elements.objects.push('sign')
+  if (desc.includes('ribbon')) elements.objects.push('ribbon')
+  if (desc.includes('papers')) elements.objects.push('papers')
+  if (desc.includes('desk')) elements.objects.push('desk')
+  if (desc.includes('flag')) elements.objects.push('flag')
+
+  // Extract ACTIONS/EXPRESSIONS (emotions and poses that must be visible)
+  if (desc.includes('shocked')) elements.actions.push('shocked facial expression')
+  if (desc.includes('looking shocked')) elements.actions.push('looking shocked')
+  if (desc.includes('bewildered')) elements.actions.push('bewildered expression')
+  if (desc.includes('tries to explain')) elements.actions.push('explaining gesture')
+  if (desc.includes('counting money')) elements.actions.push('counting money action')
+  if (desc.includes('cutting ribbon')) elements.actions.push('ribbon cutting ceremony')
+  if (desc.includes('walk away')) elements.actions.push('people walking away')
+
+  // Extract TEXT/NUMBERS (must be readable in image)
+  const textMatches = desc.match(/['""][^'""]*['""]|[\$\d,]+/g)
+  if (textMatches) {
+    textMatches.forEach(match => {
+      const cleanMatch = match.replace(/['"]/g, '')
+      elements.textNumbers.push(`text displaying "${cleanMatch}"`)
+    })
+  }
+
+  // Extract specific dollar amounts
+  const dollarMatches = desc.match(/\$[\d,]+/g)
+  if (dollarMatches) {
+    dollarMatches.forEach(amount => {
+      elements.textNumbers.push(`${amount} text visible on screen or sign`)
+    })
+  }
+
+  // Extract SETTING (background/location)
+  if (desc.includes('office setting')) elements.setting = 'office interior background'
+  if (desc.includes('hospital setting')) elements.setting = 'hospital background'
+  if (desc.includes('immigration office')) elements.setting = 'immigration office background'
+  if (desc.includes('home office')) elements.setting = 'home office background'
+  if (desc.includes('job fair')) elements.setting = 'job fair background'
+
+  return elements
+}
+
+function extractMainScenario(prompt: string): string {
+  // Extract the main political scenario from the Gemini description
+  const scenarioKeywords = ['politician', 'Trump', 'job fair', 'government', 'election', 'policy', 'political', 'office', 'campaign', 'speech', 'rally', 'conference', 'meeting', 'announcement']
+  let scenario = "political situation"
+
+  // Look for descriptive phrases about the main scenario
+  const lines = prompt.toLowerCase().split('\n')
+  for (const line of lines) {
+    // Check if line contains scenario description
+    if (line.includes('trump') || line.includes('politician') || line.includes('scenario') || line.includes('situation')) {
+      // Extract key scenario elements
+      if (line.includes('job fair') || line.includes('employment')) {
+        scenario = "Trump at job fair with no vacancy signs"
+      } else if (line.includes('healthcare') || line.includes('hospital')) {
+        scenario = "politician visiting healthcare facility"
+      } else if (line.includes('campaign') || line.includes('rally')) {
+        scenario = "political campaign or rally"
+      } else if (line.includes('office') || line.includes('government building')) {
+        scenario = "government office or official building"
+      } else if (line.includes('speech') || line.includes('podium')) {
+        scenario = "politician giving speech or presentation"
+      }
+      break
+    }
+  }
+
+  return scenario
+}
+
+function extractOtherCharacters(prompt: string): string {
+  // Extract other characters besides Common Man with proper emphasis
+  const characters = []
+  const lowerPrompt = prompt.toLowerCase()
+
+  // Main political figures
+  if (lowerPrompt.includes('trump') || lowerPrompt.includes('donald')) {
+    characters.push('((Donald Trump caricature with distinctive hair and suit))')
+  } else if (lowerPrompt.includes('politician') || lowerPrompt.includes('minister') || lowerPrompt.includes('official')) {
+    characters.push('((generic politician character in formal attire))')
+  }
+
+  // Supporting characters
+  if (lowerPrompt.includes('citizen') || lowerPrompt.includes('people') || lowerPrompt.includes('crowd')) {
+    characters.push('citizens in background')
+  }
+  if (lowerPrompt.includes('worker') || lowerPrompt.includes('employee') || lowerPrompt.includes('job seeker')) {
+    characters.push('workers or job seekers')
+  }
+  if (lowerPrompt.includes('reporter') || lowerPrompt.includes('media')) {
+    characters.push('media representatives')
+  }
+
+  return characters.join(', ')
+}
+
+function extractSetting(prompt: string): string {
+  // Extract setting information with appropriate detail level
+  let setting = "minimal background with simple geometric shapes"
+  const lowerPrompt = prompt.toLowerCase()
+
+  // Identify specific settings mentioned in the prompt
+  if (lowerPrompt.includes('job fair') || lowerPrompt.includes('employment center')) {
+    setting = "job fair setting with booths, tables, \"No Vacancy\" signs"
+  } else if (lowerPrompt.includes('office') || lowerPrompt.includes('workplace')) {
+    setting = "office interior with desk, papers, minimal furniture"
+  } else if (lowerPrompt.includes('podium') || lowerPrompt.includes('stage') || lowerPrompt.includes('platform')) {
+    setting = "speaking platform with podium or microphone"
+  } else if (lowerPrompt.includes('government building') || lowerPrompt.includes('capitol') || lowerPrompt.includes('official building')) {
+    setting = "government building exterior or interior"
+  } else if (lowerPrompt.includes('hospital') || lowerPrompt.includes('healthcare') || lowerPrompt.includes('medical')) {
+    setting = "healthcare facility or hospital setting"
+  } else if (lowerPrompt.includes('campaign') || lowerPrompt.includes('rally') || lowerPrompt.includes('crowd')) {
+    setting = "campaign event or rally venue"
+  } else if (lowerPrompt.includes('street') || lowerPrompt.includes('public') || lowerPrompt.includes('outdoor')) {
+    setting = "public outdoor setting or street scene"
+  }
+
+  return setting
 }
 
 function createComicPrompt(

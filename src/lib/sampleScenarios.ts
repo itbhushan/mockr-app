@@ -103,6 +103,86 @@ export const sampleScenarios: ComicScenario[] = [
     tone: "satirical",
     style: "laxman",
     dialogue: "Sports infrastructure for world-class athletes!"
+  },
+  {
+    situation: "Anti-corruption leader caught accepting briefcase full of money",
+    characters: "Anti-corruption activist, Businessman with briefcase, Common man",
+    setting: "Government office with transparency slogans on wall",
+    tone: "critical",
+    style: "laxman",
+    dialogue: "This is for the greater good of society!"
+  },
+  {
+    situation: "Tax minister explaining tax benefits while hiding money in offshore accounts",
+    characters: "Tax minister, Accountant, Taxpayer",
+    setting: "Tax office with paradise papers visible",
+    tone: "satirical",
+    style: "laxman",
+    dialogue: "Everyone must pay their fair share!"
+  },
+  {
+    situation: "Defense minister promoting peace while selling weapons to both sides",
+    characters: "Defense minister, Arms dealer, Peace activist",
+    setting: "Arms exhibition with peace dove logo",
+    tone: "critical",
+    style: "laxman",
+    dialogue: "We believe in peace through strength!"
+  },
+  {
+    situation: "Internet freedom advocate proposing internet censorship laws",
+    characters: "Digital rights lawyer, Censorship board, Tech user",
+    setting: "Parliament with internet freedom posters",
+    tone: "observational",
+    style: "modern",
+    dialogue: "We need to protect freedom by limiting it!"
+  },
+  {
+    situation: "Housing minister living in mansion while promoting affordable housing",
+    characters: "Housing minister, Homeless family, Real estate agent",
+    setting: "Luxury mansion with affordable housing billboard",
+    tone: "satirical",
+    style: "laxman",
+    dialogue: "Housing for all is our top priority!"
+  },
+  {
+    situation: "Employment minister at job fair where all booths show 'No Vacancies'",
+    characters: "Employment minister, Job seekers, HR recruiters",
+    setting: "Job fair with empty booths and 'No Vacancy' signs",
+    tone: "witty",
+    style: "laxman",
+    dialogue: "Unlimited opportunities for everyone!"
+  },
+  {
+    situation: "Transport minister stuck in pothole while inaugurating road development project",
+    characters: "Transport minister, Road contractor, Frustrated driver",
+    setting: "Road with vehicle stuck in large pothole",
+    tone: "witty",
+    style: "laxman",
+    dialogue: "World-class infrastructure is our commitment!"
+  },
+  {
+    situation: "Food minister at feast while farmers protest outside for fair prices",
+    characters: "Food minister, Protesting farmers, Restaurant owner",
+    setting: "5-star restaurant with farmer protests visible outside",
+    tone: "critical",
+    style: "laxman",
+    dialogue: "We fully support our hardworking farmers!"
+  },
+  {
+    situation: "Transparency advocate meeting in secret with corporate lobbyists",
+    characters: "Transparency advocate, Corporate lobbyist, Journalist",
+    setting: "Dark alley meeting with transparency office in background",
+    tone: "satirical",
+    style: "laxman",
+    dialogue: "Complete transparency in all our dealings!"
+  },
+  {
+    situation: "Energy minister promoting renewable energy while signing coal deals",
+    characters: "Energy minister, Coal company executive, Environmental scientist",
+    setting: "Solar panel exhibition with coal contracts on desk",
+    tone: "critical",
+    style: "laxman",
+    dialogue: "Clean energy is the future!"
   }
 ]
 

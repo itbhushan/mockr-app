@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SVG Test</title>
+    <style>
+        body { margin: 0; padding: 20px; }
+        .container { width: 100%; height: 500px; border: 2px solid red; }
+        svg { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+    <h2>Direct SVG Test</h2>
+    <div class="container">
+        <iframe src="http://localhost:3001/api/placeholder-comic?dialogue=Hello%20World&situation=Test%20Case&t=999"
+                width="100%" height="100%" frameborder="0"></iframe>
+    </div>
+
+    <h2>Expected Elements Checklist:</h2>
+    <ul>
+        <li>Politician on left side (around x=120)</li>
+        <li>Speech bubble (around x=220, y=70)</li>
+        <li>Common Man on right side (around x=350)</li>
+        <li>Speech text: "Hello World"</li>
+        <li>Situation text: "Test Case"</li>
+    </ul>
+</body>
+</html>

@@ -3,13 +3,172 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '')
 
+export async function generateSatiricalQuote(situation: string): Promise<string> {
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
+
+    const prompt = `You are R.K. Laxman, India's master political cartoonist. Create a SHARP, WITTY caption for your editorial cartoon about this political situation:
+
+SITUATION: ${situation}
+
+REQUIREMENTS for R.K. Laxman style caption:
+- Single satirical sentence (like your classic newspaper captions)
+- Should expose the SPECIFIC irony/absurdity in this exact situation
+- Dry, observational wit with biting social commentary
+- Length: 60-120 characters max (newspaper caption length)
+- No quotes needed - this is a caption, not dialogue
+- Reference specific details from the situation
+
+CLASSIC R.K. LAXMAN CAPTION EXAMPLES:
+
+Situation: "Politicians visiting hospitals while cutting healthcare budgets"
+Caption: "Find out whose birth or death anniversary it is today. Mention he was a great patriot and did much to help the poor, etc. and release the statement to the press!"
+
+Situation: "Government officials stuck in potholes after road inauguration"
+Caption: "Too many enquiry reports, sir. If you remove a few, you can sit on them more comfortably."
+
+Situation: "Ministers attending climate summits via private jets"
+Caption: "They are not coming in because they say it's going to be the same speech and so is taken as heard."
+
+Situation: "Digital arrest scam targeting minister's wife"
+Caption: "Good news, sir! The enquiry report says that no one is responsible in the entire administration for anything!"
+
+Create a satirical caption that captures the absurdity of the specific situation above in classic R.K. Laxman observational style:`
+
+    const result = await model.generateContent(prompt)
+    const response = await result.response
+    let quote = response.text().trim()
+
+    // Clean up the response - remove any formal prefixes and quotes
+    quote = quote.replace(/^["']|["']$/g, '')
+    quote = quote.replace(/^Here's a caption.*?:\s*/i, '')
+    quote = quote.replace(/^Caption:\s*/i, '')
+    quote = quote.replace(/^In the style of.*?:\s*/i, '')
+    quote = quote.replace(/^R\.K\.?\s*Laxman.*?:\s*/i, '')
+
+    // For R.K. Laxman style, we want a single satirical line
+    const lines = quote.split('\n').filter(line => line.trim()).map(line => line.trim())
+
+    // Take the first meaningful line as the caption
+    if (lines.length > 0) {
+      quote = lines[0]
+    } else {
+      quote = generateFallbackQuote(situation)
+    }
+
+    // Ensure it's not too long (max 120 characters for R.K. Laxman newspaper style)
+    if (quote.length > 120) {
+      quote = quote.substring(0, 117) + '...'
+    }
+
+    return quote
+
+  } catch (error) {
+    console.error('Gemini quote generation failed:', error)
+    // Fallback to situation-specific quote
+    return generateFallbackQuote(situation)
+  }
+}
+
+function generateFallbackQuote(situation: string): string {
+  const situationLower = situation.toLowerCase()
+
+  // R.K. Laxman style captions based on situation - single line observational wit
+
+  // H-1B/Visa/Immigration
+  if (situationLower.includes('h-1b') || situationLower.includes('visa') || situationLower.includes('immigration')) {
+    if (situationLower.includes('fee') || situationLower.includes('cost') || situationLower.includes('$')) {
+      return "The American dream now comes with a premium membership fee!"
+    }
+    return "Nothing says 'welcome to America' quite like a financial barrier!"
+  }
+
+  // Healthcare/medical with budget/cutting
+  if (situationLower.includes('healthcare') || situationLower.includes('hospital') || situationLower.includes('medical')) {
+    if (situationLower.includes('budget') || situationLower.includes('cut') || situationLower.includes('fund')) {
+      return "Cutting ribbons and cutting budgets - efficiency at its finest!"
+    }
+    return "Nothing says healthcare reform like a photo opportunity!"
+  }
+
+  // Education with abroad/private schools
+  if (situationLower.includes('education') || situationLower.includes('school')) {
+    if (situationLower.includes('abroad') || situationLower.includes('private') || situationLower.includes('international')) {
+      return "Local schools are perfect for inauguration ceremonies!"
+    }
+    return "Education investment - one photo-op at a time!"
+  }
+
+  // Climate with jets/travel
+  if (situationLower.includes('climate') || situationLower.includes('environment') || situationLower.includes('green')) {
+    if (situationLower.includes('jet') || situationLower.includes('fly') || situationLower.includes('travel')) {
+      return "Flying private to save the planet - irony is truly a renewable resource!"
+    }
+    return "Going green while burning through carbon credits!"
+  }
+
+  // Economy/Growth with contradictory policies
+  if (situationLower.includes('growth') || situationLower.includes('economy')) {
+    if (situationLower.includes('hurt') || situationLower.includes('harm') || situationLower.includes('damage')) {
+      return "Promoting economic growth through creative mathematics!"
+    }
+    return "The economy is doing great - just ask the right people!"
+  }
+
+  // Jobs/Employment
+  if (situationLower.includes('job') || situationLower.includes('employment') || situationLower.includes('work')) {
+    return "Creating employment opportunities by making them impossible to fill!"
+  }
+
+  // Transport/Infrastructure specific scenarios
+  if (situationLower.includes('pothole')) {
+    const options = [
+      "Quality roads with natural speed control features!",
+      "Every pothole is a reminder of our road-building excellence!",
+      "Testing infrastructure durability from the ground up!"
+    ]
+    return options[Math.floor(Math.random() * options.length)]
+  }
+  else if (situationLower.includes('road') && (situationLower.includes('minister') || situationLower.includes('inaugurating'))) {
+    const options = [
+      "Inaugurating today's roads, tomorrow's repair projects!",
+      "Building character-building roads for the public!",
+      "Premium road experience with adventure features!"
+    ]
+    return options[Math.floor(Math.random() * options.length)]
+  }
+  else if (situationLower.includes('transport') || situationLower.includes('traffic')) {
+    const options = [
+      "Revolutionary traffic management - making standstill the new fast!",
+      "Transport solutions that really move you... backwards!",
+      "Patience is now officially a public virtue!"
+    ]
+    return options[Math.floor(Math.random() * options.length)]
+  }
+  else if (situationLower.includes('infrastructure') || situationLower.includes('construction')) {
+    return "Building tomorrow's problems with today's budget!"
+  }
+  else if (situationLower.includes('stuck') || situationLower.includes('trapped')) {
+    return "Leadership means experiencing problems firsthand for better solutions!"
+  }
+  else if (situationLower.includes('inaugurating') || situationLower.includes('opening')) {
+    return "Grand opening ceremonies - where ribbons matter more than results!"
+  }
+  else if (situationLower.includes('scam') || situationLower.includes('fraud')) {
+    return "Digital literacy programs clearly need more funding!"
+  }
+
+  // Generic but still R.K. Laxman style fallback
+  return "Trust the process and ignore the results - democracy with a warranty!"
+}
+
 export async function generateEnhancedDialogue(
   situation: string,
   characters: string,
   tone: string
 ): Promise<string> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
 
     const prompt = `Create a satirical dialogue that DIRECTLY addresses this specific political situation:
 
@@ -61,61 +220,63 @@ Generate ONE dialogue line that DIRECTLY satirizes the exact situation described
 
 export async function generateEnhancedPrompt(
   situation: string,
-  characters: string,
-  setting: string,
-  tone: string,
-  style: string
+  quote?: string,
+  characters?: string,
+  setting?: string,
+  tone?: string,
+  style?: string
 ): Promise<string> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    console.log('[Gemini] Starting enhanced prompt generation...')
 
-    const prompt = `Create a CARTOON-STYLE R.K. Laxman editorial comic prompt for this exact scenario:
+    // Check if API key is available
+    if (!process.env.GOOGLE_GEMINI_API_KEY) {
+      console.log('[Gemini] No API key found, using fallback')
+      return generateFallbackPrompt(situation, characters, setting, tone, style)
+    }
 
-SPECIFIC SITUATION: ${situation}
-CHARACTERS: ${characters || 'politician, citizens'}
-SETTING: ${setting || 'relevant to situation'}
-TONE: ${tone}
-STYLE: ${style}
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
+    console.log('[Gemini] Model initialized successfully')
 
-CRITICAL: THIS MUST BE A CARTOON/COMIC ILLUSTRATION - NOT A REALISTIC PHOTO
+    const prompt = `Create a SIMPLE, FOCUSED visual description for an R.K. Laxman editorial cartoon:
 
-MANDATORY ELEMENTS FOR CARTOON COMIC STYLE:
+SITUATION: ${situation}
+${quote ? `QUOTE: ${quote}` : ''}
 
-1. THE COMMON MAN CHARACTER (ABSOLUTELY MANDATORY - NO EXCEPTIONS):
-   - MUST BE THE MOST VISIBLE CHARACTER after the main politician
-   - CARTOON APPEARANCE: Middle-aged Indian man cartoon character with distinctive balding head showing side hair tufts, round wire-rim spectacles, simple white shirt with vertical stripes or checkered pattern, dark plain pants, modest mustache
-   - CARTOON FACIAL EXPRESSION: Bewildered, concerned, or surprised cartoon expression with raised eyebrows showing confusion at political hypocrisy
-   - CARTOON BODY LANGUAGE: Standing prominently in the FOREGROUND, arms crossed or hands at sides, clearly observing the main political action
-   - POSITION: MUST BE in the LEFT or RIGHT FOREGROUND of the image, NEVER behind other characters, NEVER obscured
-   - SIZE: Should be approximately 1/2 the size of main political figure - LARGE ENOUGH to be clearly seen
-   - VISUAL PRIORITY: Second most important visual element after the main politician
-   - CRITICAL: If this character is not clearly visible, the image is INCOMPLETE and REJECTED
+Create a SHORT description (under 400 characters) that shows:
+1. The Common Man (R.K. Laxman character) reacting to the situation
+2. The main irony/contradiction from the quote visually represented
+3. Simple, clear scene - no complex details
 
-2. CARTOON EDITORIAL STYLE (R.K. LAXMAN AUTHENTIC - STRICT ADHERENCE):
-   - EDITORIAL CARTOON: Black and white line art cartoon, NOT realistic photography
-   - CARTOON LINE ART: Clean, bold black cartoon outlines, simple cross-hatching for minimal shadows only
-   - CARTOON COMPOSITION: Single panel editorial cartoon, newspaper comic style, minimal geometric background elements
-   - CARTOON CHARACTER STYLE: Round cartoon faces, simple expressive cartoon features, clear distinct cartoon facial expressions, medium line weight
-   - CARTOON BACKGROUND: Extremely minimal cartoon elements - only essential cartoon objects like simple buildings, basic geometric shapes, mostly white space
-   - EDITORIAL CARTOON QUALITY: Professional newspaper cartoon standard, clear cartoon visual narrative
+EXAMPLES:
 
-3. SATIRICAL COMPOSITION:
-   - Main political figures engaged in hypocritical behavior
-   - The Common Man reacting with appropriate facial expression
-   - Visual elements that expose the contradiction/irony
-   - Props that relate specifically to the situation
+Situation: "Trump's $100,000 H-1B visa fee could hurt growth"
+Quote: "Making America expensive again, one visa at a time!"
+Description: "Common Man looks bewildered. Trump character holds giant '$100,000 VISA FEE' sign while job seekers walk away disappointed. Immigration office with expensive price tags everywhere."
 
-EXAMPLE FOR HEALTHCARE + PHARMA STOCKS:
-"R.K. Laxman style editorial cartoon: Politician at podium promising free healthcare while secretly holding pharmaceutical stock certificates behind back. Hospital in background with long patient queues. The Common Man (balding, spectacles, checkered shirt, dark pants) stands to the side with bewildered expression, watching the hypocrisy. Clean black and white line art, cross-hatching shadows, minimal background, focus on satirical storytelling."
+Situation: "Minister's wife duped of $400,000 in digital arrest"
+Quote: "Expert in governance, amateur in online security!"
+Description: "Common Man looks bewildered. Minister's wife stares shocked at computer screen showing '$400,000 SCAMMED' alert. Minister tries to comfort her. Digital fraud icons floating around computer. Home office setting."
 
-Generate a detailed Stable Diffusion XL prompt that creates a CARTOON/COMIC illustration (NOT realistic photo). Start with 'EDITORIAL CARTOON: Black and white line art cartoon illustration.' Then ensure the Common Man character is visible. The Common Man MUST be the second most important visual element. Capture this EXACT political scenario in authentic R.K. Laxman cartoon style:`
+Situation: "Minister inaugurates hospital while cutting budget"
+Quote: "Cutting ribbons while cutting budgets!"
+Description: "Common Man looks bewildered. Minister cuts ribbon at hospital entrance while secretly shredding 'HEALTHCARE BUDGET' papers behind back. Patients wait in long lines."
 
+Keep it SIMPLE and VISUAL. Focus on the satirical irony, not artistic technique.
+
+Create description for the situation above:`
+
+    console.log('[Gemini] Sending request to Gemini API...')
     const result = await model.generateContent(prompt)
     const response = await result.response
-    return response.text().trim()
+    const text = response.text().trim()
+
+    console.log('[Gemini] Prompt generated successfully, length:', text.length)
+    return text
 
   } catch (error) {
-    console.error('Gemini prompt generation failed:', error)
+    console.error('[Gemini] Prompt generation failed:', error)
+    console.log('[Gemini] Using fallback prompt generation')
     // Fallback to existing prompt system
     return generateFallbackPrompt(situation, characters, setting, tone, style)
   }
@@ -163,27 +324,60 @@ function generateFallbackDialogue(situation: string, characters: string, tone: s
 
 function generateFallbackPrompt(
   situation: string,
-  characters: string,
-  setting: string,
-  tone: string,
-  style: string
+  quote?: string,
+  characters?: string,
+  setting?: string,
+  tone?: string,
+  style?: string
 ): string {
-  const situationLower = situation.toLowerCase()
+  const cleanSituation = situation.replace(/['"]/g, '').trim()
+  const cleanQuote = quote ? quote.replace(/['"]/g, '').trim() : ''
 
-  // Create situation-specific visual elements
-  let specificElements = ""
+  // Create simple, focused description based on situation keywords
+  const situationLower = cleanSituation.toLowerCase()
 
-  if (situationLower.includes('healthcare') && situationLower.includes('pharma')) {
-    specificElements = "politician at podium promising free healthcare while secretly holding pharmaceutical stock certificates behind back, hospital background with long patient queues, money symbols floating around"
-  } else if (situationLower.includes('education') && situationLower.includes('abroad')) {
-    specificElements = "politician pointing to local school while holding airplane tickets for personal use, contrast between poor local school and luxury foreign education imagery"
-  } else if (situationLower.includes('climate') && situationLower.includes('jet')) {
-    specificElements = "politician speaking about environment while private jet visible in background, carbon emission clouds ironically surrounding the scene"
-  } else if (situationLower.includes('corruption') || situationLower.includes('scandal')) {
-    specificElements = "politician giving speech about transparency while briefcase of money partially hidden, documents scattered around"
-  } else {
-    specificElements = "politician making grand promises while contradictory actions clearly visible in background"
+  let description = "R.K. Laxman cartoon: Common Man looks bewildered at "
+
+  // Extract key elements and create specific visual based on situation
+  if (situationLower.includes('scam') || situationLower.includes('fraud') || situationLower.includes('duped')) {
+    if (situationLower.includes('wife') || situationLower.includes('family')) {
+      description += "politician's wife looking shocked at computer screen showing '$400,000 SCAMMED' while politician tries to explain. Digital scam icons around. Home office setting."
+    } else {
+      description += "person looking shocked at computer screen showing scam alerts while official looks embarrassed. Digital fraud setting."
+    }
+  }
+  else if (situationLower.includes('visa') || situationLower.includes('h-1b')) {
+    if (situationLower.includes('fee') || situationLower.includes('$')) {
+      description += "giant '$100,000' price tag attached to American visa while job seekers walk away disappointed. Immigration office setting."
+    } else {
+      description += "expensive visa barriers blocking job seekers while politician waves welcome sign. Immigration setting."
+    }
+  }
+  else if (situationLower.includes('hospital') || situationLower.includes('healthcare')) {
+    description += "politician cutting ribbon at hospital entrance while patients wait in long emergency room lines. Hospital setting."
+  }
+  else if (situationLower.includes('school') || situationLower.includes('education')) {
+    description += "politician inaugurating local school while secretly holding brochures for international schools. School setting."
+  }
+  else if (situationLower.includes('climate') || situationLower.includes('environment')) {
+    description += "politician giving green speech while private jet takes off in background. Conference setting."
+  }
+  else if (situationLower.includes('job') || situationLower.includes('employment')) {
+    description += "job fair with all booths showing 'No Vacancy' signs while politician promises employment. Job fair setting."
+  }
+  else if (situationLower.includes('corruption') || situationLower.includes('money')) {
+    description += "politician counting money behind desk while citizens wait in poverty outside office. Government office setting."
+  }
+  else {
+    // Create description based on any specific nouns or actions in the situation
+    const words = cleanSituation.split(' ')
+    const keyWords = words.filter(word => word.length > 4).slice(0, 3).join(', ')
+    description += `politician dealing with situation involving ${keyWords} while citizens look concerned. Relevant setting.`
   }
 
-  return `EDITORIAL CARTOON: Black and white line art cartoon illustration, NOT realistic photography. R.K. Laxman style editorial cartoon, pure black and white cartoon line art, single panel newspaper comic illustration. CARTOON STYLE MANDATE: This must be a drawn cartoon/comic illustration with simple line art, NOT a realistic photo or 3D render. FOREGROUND CARTOON CHARACTER: The Common Man cartoon character MUST be prominently visible in the foreground. CRITICAL CARTOON CHARACTER PLACEMENT: In the FOREGROUND, position a cartoon middle-aged Indian man with distinctive balding head and side hair tufts, round wire-rim spectacles, simple white shirt with vertical stripes, dark plain pants, modest mustache. He MUST be clearly visible as a CARTOON CHARACTER in the LEFT or RIGHT foreground, showing bewildered/concerned cartoon expression while observing political hypocrisy. SIZE REQUIREMENT: The Common Man cartoon should be 1/2 the size of the main political cartoon figure - LARGE and CLEARLY VISIBLE. MAIN CARTOON SCENE: ${specificElements}. Additional cartoon characters: ${characters || 'politician cartoon with expressive face showing hypocrisy'}. Cartoon setting: ${setting || 'minimal relevant cartoon background'}. CARTOON COMPOSITION RULES: 1) Common Man cartoon in foreground - NOT obscured, 2) Main politician cartoon in center/background, 3) Simple cartoon background elements. STRICT CARTOON VISUAL STYLE: Only black ink lines on white background, no colors, no shading, no gradients, clean bold cartoon outlines, simple cross-hatching for minimal shadows, extremely minimal geometric cartoon background elements, professional newspaper editorial cartoon quality, drawn illustration style. VISUAL HIERARCHY: 1) Common Man cartoon (foreground), 2) Main politician cartoon (center), 3) Background cartoon elements. The Common Man represents public bewilderment at political absurdity and is MANDATORY for authentic R.K. Laxman cartoon style. IMPORTANT: This is a hand-drawn style cartoon illustration, not a photograph.`
+  if (cleanQuote) {
+    description += ` Speech bubble: "${cleanQuote}"`
+  }
+
+  return description
 }

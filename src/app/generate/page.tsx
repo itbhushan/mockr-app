@@ -2,18 +2,18 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Sparkles, RefreshCw, Download, Share2, Shuffle } from 'lucide-react'
+import { ArrowLeft, Sparkles, RefreshCw, Download, Share2, Shuffle, Twitter, Facebook, MessageCircle, Copy, ChevronDown, FileImage, FileText } from 'lucide-react'
 
 export default function GeneratePage() {
   const [formData, setFormData] = useState({
-    situation: '',
-    characters: '',
-    setting: '',
-    tone: 'satirical',
-    style: 'laxman'
+    situation: ''
   })
+  const [isGeneratingQuote, setIsGeneratingQuote] = useState(false)
+  const [generatedQuote, setGeneratedQuote] = useState<string | null>(null)
+  const [editableQuote, setEditableQuote] = useState<string>('')
+  const [isEditingQuote, setIsEditingQuote] = useState(false)
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false)
   const [generatedDescription, setGeneratedDescription] = useState<string | null>(null)
   const [editableDescription, setEditableDescription] = useState<string>('')
@@ -29,18 +29,68 @@ export default function GeneratePage() {
   } | null>(null)
   const [svgContent, setSvgContent] = useState<string | null>(null)
   const [isLoadingSample, setIsLoadingSample] = useState(false)
-  const [currentStep, setCurrentStep] = useState<'form' | 'preview' | 'generate'>('form')
+  // const [currentStep, setCurrentStep] = useState<'form' | 'preview' | 'generate'>('form')
+  const [showShareDropdown, setShowShareDropdown] = useState(false)
+  const [showDownloadDropdown, setShowDownloadDropdown] = useState(false)
+  const shareDropdownRef = useRef<HTMLDivElement>(null)
+  const downloadDropdownRef = useRef<HTMLDivElement>(null)
 
-  const handleGenerateDescription = async (e: React.FormEvent) => {
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareDropdownRef.current && !shareDropdownRef.current.contains(event.target as Node)) {
+        setShowShareDropdown(false)
+      }
+      if (downloadDropdownRef.current && !downloadDropdownRef.current.contains(event.target as Node)) {
+        setShowDownloadDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  const handleGenerateQuote = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsGeneratingQuote(true)
+
+    try {
+      const response = await fetch('/api/generate-quote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ situation: formData.situation }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('Quote API response:', data)
+
+      if (data.success) {
+        setGeneratedQuote(data.quote)
+        console.log('Quote generated successfully:', data.quote)
+      } else {
+        console.error('Quote generation failed:', data.error)
+        alert(`Failed to generate quote: ${data.error || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Error calling Quote API:', error)
+      alert('Something went wrong. Please try again.')
+    } finally {
+      setIsGeneratingQuote(false)
+    }
+  }
+
+  const handleGenerateDescription = async () => {
     setIsGeneratingDescription(true)
 
-    // Auto-fill empty fields based on the political situation
-    const enhancedFormData = {
-      ...formData,
-      characters: formData.characters || autoFillCharacters(formData.situation),
-      setting: formData.setting || autoFillSetting(formData.situation)
-    }
+    const quoteToUse = isEditingQuote ? editableQuote : generatedQuote
 
     try {
       const response = await fetch('/api/generate-description', {
@@ -48,21 +98,28 @@ export default function GeneratePage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(enhancedFormData),
+        body: JSON.stringify({
+          situation: formData.situation,
+          quote: quoteToUse
+        }),
       })
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
       const data = await response.json()
+      console.log('Description API response:', data)
 
       if (data.success) {
         setGeneratedDescription(data.description)
-        setCurrentStep('preview')
-        console.log('Description generated:', data.description)
+        console.log('Description generated successfully:', data.description.substring(0, 100) + '...')
       } else {
         console.error('Description generation failed:', data.error)
-        alert('Failed to generate description. Please try again.')
+        alert(`Failed to generate description: ${data.error || 'Unknown error'}`)
       }
     } catch (error) {
-      console.error('Error calling API:', error)
+      console.error('Error calling Description API:', error)
       alert('Something went wrong. Please try again.')
     } finally {
       setIsGeneratingDescription(false)
@@ -107,7 +164,20 @@ export default function GeneratePage() {
 
   const handleGenerateComic = async () => {
     setIsGenerating(true)
-    setCurrentStep('generate')
+
+    const quoteToUse = isEditingQuote ? editableQuote : generatedQuote
+    const descriptionToUse = isEditingDescription ? editableDescription : generatedDescription
+
+    // Auto-generate characters, setting, tone, and style based on the situation
+    const enhancedFormData = {
+      situation: formData.situation,
+      quote: quoteToUse,
+      description: descriptionToUse,
+      characters: autoFillCharacters(formData.situation),
+      setting: autoFillSetting(formData.situation),
+      tone: 'satirical',
+      style: 'laxman'
+    }
 
     try {
       const response = await fetch('/api/generate-comic', {
@@ -115,19 +185,33 @@ export default function GeneratePage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(enhancedFormData),
       })
 
       const data = await response.json()
 
       if (data.success) {
-        setGeneratedComic({
+        const comic = {
           imageUrl: data.comic.imageUrl,
           aiGenerated: data.comic.aiGenerated,
           prompt: data.comic.prompt,
           dialogue: data.comic.dialogue,
           situation: data.comic.situation,
           id: data.comic.id
+        }
+
+        setGeneratedComic(comic)
+
+        // Save to local storage for gallery
+        saveComicToGallery({
+          id: data.comic.id,
+          imageUrl: data.comic.imageUrl,
+          aiGenerated: data.comic.aiGenerated,
+          dialogue: data.comic.dialogue,
+          situation: data.comic.situation,
+          tone: 'satirical',
+          style: 'laxman',
+          createdAt: new Date().toISOString()
         })
 
         // If it's a placeholder comic, fetch the SVG content
@@ -157,12 +241,12 @@ export default function GeneratePage() {
     }
   }
 
-  const handleBackToForm = () => {
-    setCurrentStep('form')
-    setGeneratedDescription(null)
-    setGeneratedComic(null)
-    setSvgContent(null)
-  }
+  // const handleBackToForm = () => {
+  //   setCurrentStep('form')
+  //   setGeneratedDescription(null)
+  //   setGeneratedComic(null)
+  //   setSvgContent(null)
+  // }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
@@ -171,36 +255,360 @@ export default function GeneratePage() {
     })
   }
 
-  const handleDownload = () => {
+  const handleDownload = (format: 'jpg' | 'png' | 'svg' | 'pdf' = 'jpg') => {
     if (!generatedComic) return
 
-    if (generatedComic.imageUrl.startsWith('data:')) {
-      // Download AI-generated image
-      const link = document.createElement('a')
-      link.href = generatedComic.imageUrl
-      link.download = `mockr-comic-${generatedComic.id}.jpg`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+    const filename = `mockr-comic-${generatedComic.id}`
+
+    // Create composite image with quote and situation for all formats except SVG
+    if (format === 'svg' && !generatedComic.imageUrl.startsWith('data:')) {
+      downloadSVG(filename)
+    } else if (format === 'pdf') {
+      downloadAsPDF()
     } else {
-      // For SVG placeholder, we need to convert it first
-      fetch(generatedComic.imageUrl)
-        .then(response => response.text())
-        .then(svgText => {
-          const blob = new Blob([svgText], { type: 'image/svg+xml' })
-          const url = URL.createObjectURL(blob)
+      // Create composite image with quote, comic, and situation
+      createCompositeImage(format, filename)
+    }
+  }
+
+  const createCompositeImage = async (format: 'jpg' | 'png', filename: string) => {
+    if (!generatedComic) return
+
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // Set canvas size - taller to include quote and situation
+    canvas.width = 1200
+    canvas.height = 1000
+
+    // Fill white background
+    ctx.fillStyle = 'white'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // Draw satirical quote at top with comic font styling
+    ctx.fillStyle = '#92400e' // yellow-800
+    ctx.font = 'bold 32px Comic Sans MS, fantasy'
+    ctx.textAlign = 'center'
+
+    // Draw quote header
+    ctx.fillStyle = '#713f12' // yellow-900
+    ctx.font = 'bold 20px Arial'
+    ctx.fillText('💬 SATIRICAL QUOTE', canvas.width / 2, 50)
+
+    // Draw quote text with wrapping
+    ctx.fillStyle = '#92400e' // yellow-800
+    ctx.font = 'bold 28px Comic Sans MS, fantasy'
+    const quoteText = `"${generatedComic.dialogue}"`
+    const quoteLines = wrapText(ctx, quoteText, canvas.width - 100)
+
+    let yOffset = 100
+    quoteLines.forEach(line => {
+      ctx.fillText(line, canvas.width / 2, yOffset)
+      yOffset += 40
+    })
+
+    // Add some spacing
+    yOffset += 30
+
+    try {
+      // Load and draw the comic image
+      const comicImg = new Image()
+      await new Promise((resolve, reject) => {
+        comicImg.onload = resolve
+        comicImg.onerror = reject
+
+        if (generatedComic.imageUrl.startsWith('data:')) {
+          comicImg.src = generatedComic.imageUrl
+        } else if (svgContent) {
+          // Convert SVG to data URL
+          const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+          const svgUrl = URL.createObjectURL(svgBlob)
+          comicImg.src = svgUrl
+        }
+      })
+
+      // Calculate comic dimensions to fit in available space
+      const maxComicHeight = 600
+      const availableWidth = canvas.width - 100
+      let comicWidth = comicImg.width
+      let comicHeight = comicImg.height
+
+      // Scale to fit
+      if (comicHeight > maxComicHeight) {
+        const scale = maxComicHeight / comicHeight
+        comicWidth *= scale
+        comicHeight *= scale
+      }
+
+      if (comicWidth > availableWidth) {
+        const scale = availableWidth / comicWidth
+        comicWidth *= scale
+        comicHeight *= scale
+      }
+
+      // Center and draw comic
+      const comicX = (canvas.width - comicWidth) / 2
+      ctx.drawImage(comicImg, comicX, yOffset, comicWidth, comicHeight)
+      yOffset += comicHeight + 40
+
+    } catch (error) {
+      console.error('Error loading comic image:', error)
+      // Draw placeholder if image fails
+      ctx.fillStyle = '#e5e7eb'
+      ctx.fillRect(50, yOffset, canvas.width - 100, 400)
+      ctx.fillStyle = '#6b7280'
+      ctx.font = '20px Arial'
+      ctx.fillText('Comic Image', canvas.width / 2, yOffset + 200)
+      yOffset += 440
+    }
+
+    // Draw political situation at bottom
+    ctx.fillStyle = '#1e40af' // blue-800
+    ctx.font = 'bold 18px Arial'
+    ctx.fillText('📍 POLITICAL SITUATION', canvas.width / 2, yOffset)
+
+    ctx.fillStyle = '#1e3a8a' // blue-900
+    ctx.font = '16px Arial'
+    const situationLines = wrapText(ctx, generatedComic.situation, canvas.width - 100)
+
+    yOffset += 30
+    situationLines.forEach(line => {
+      ctx.fillText(line, canvas.width / 2, yOffset)
+      yOffset += 25
+    })
+
+    // Add Mockr branding at bottom
+    yOffset += 30
+    ctx.fillStyle = '#000000'
+    ctx.font = '14px Arial'
+    ctx.fillText('Created by', canvas.width / 2 - 40, yOffset)
+
+    ctx.fillStyle = '#1e40af'
+    ctx.font = 'bold 18px Arial'
+    ctx.fillText('Mockr', canvas.width / 2 + 20, yOffset)
+
+    // Download the composite image
+    canvas.toBlob(blob => {
+      if (blob) {
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(blob)
+        link.download = `${filename}.${format}`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(link.href)
+      }
+    }, `image/${format}`, format === 'jpg' ? 0.9 : 1.0)
+  }
+
+  const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
+    const words = text.split(' ')
+    const lines = []
+    let currentLine = words[0]
+
+    for (let i = 1; i < words.length; i++) {
+      const word = words[i]
+      const width = ctx.measureText(currentLine + ' ' + word).width
+      if (width < maxWidth) {
+        currentLine += ' ' + word
+      } else {
+        lines.push(currentLine)
+        currentLine = word
+      }
+    }
+    lines.push(currentLine)
+    return lines
+  }
+
+  const downloadSVG = (filename: string) => {
+    fetch(generatedComic!.imageUrl)
+      .then(response => response.text())
+      .then(svgText => {
+        const blob = new Blob([svgText], { type: 'image/svg+xml' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `${filename}.svg`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      })
+      .catch(error => {
+        console.error('SVG download failed:', error)
+        alert('Download failed. Please try again.')
+      })
+  }
+
+  const convertSVGToPNG = (filename: string) => {
+    if (!svgContent) return
+
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    canvas.width = 1200
+    canvas.height = 800
+
+    const img = new window.Image()
+    const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+    const svgUrl = URL.createObjectURL(svgBlob)
+
+    img.onload = () => {
+      ctx.fillStyle = 'white'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+      canvas.toBlob(blob => {
+        if (blob) {
           const link = document.createElement('a')
-          link.href = url
-          link.download = `mockr-comic-${generatedComic.id}.svg`
+          link.href = URL.createObjectURL(blob)
+          link.download = `${filename}.png`
           document.body.appendChild(link)
           link.click()
           document.body.removeChild(link)
-          URL.revokeObjectURL(url)
+        }
+      }, 'image/png')
+
+      URL.revokeObjectURL(svgUrl)
+    }
+
+    img.src = svgUrl
+  }
+
+  const convertSVGToJPG = (filename: string) => {
+    if (!svgContent) return
+
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    canvas.width = 1200
+    canvas.height = 800
+
+    const img = new window.Image()
+    const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+    const svgUrl = URL.createObjectURL(svgBlob)
+
+    img.onload = () => {
+      ctx.fillStyle = 'white'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+      canvas.toBlob(blob => {
+        if (blob) {
+          const link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = `${filename}.jpg`
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        }
+      }, 'image/jpeg', 0.9)
+
+      URL.revokeObjectURL(svgUrl)
+    }
+
+    img.src = svgUrl
+  }
+
+  const convertAndDownload = (format: 'png', filename: string) => {
+    if (!generatedComic?.imageUrl.startsWith('data:')) return
+
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const img = new window.Image()
+    img.onload = () => {
+      canvas.width = img.width
+      canvas.height = img.height
+      ctx.drawImage(img, 0, 0)
+
+      canvas.toBlob(blob => {
+        if (blob) {
+          const link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = `${filename}.${format}`
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        }
+      }, `image/${format}`)
+    }
+
+    img.src = generatedComic.imageUrl
+  }
+
+  const downloadAsPDF = () => {
+    // For PDF generation, we'll use a simple approach with jsPDF
+    alert('PDF download feature coming soon! For now, please use PNG or JPG format.')
+  }
+
+  const saveComicToGallery = (comic: {
+    id: string
+    imageUrl: string
+    aiGenerated: boolean
+    dialogue: string
+    situation: string
+    tone: string
+    style: string
+    createdAt: string
+  }) => {
+    try {
+      const existing = localStorage.getItem('mockr-saved-comics')
+      const savedComics = existing ? JSON.parse(existing) : []
+
+      // Check if comic already exists (prevent duplicates)
+      const existingIndex = savedComics.findIndex((saved: any) => saved.id === comic.id)
+      if (existingIndex >= 0) {
+        // Update existing comic
+        savedComics[existingIndex] = comic
+      } else {
+        // Add new comic to the beginning
+        savedComics.unshift(comic)
+      }
+
+      // Keep only the latest 50 comics to prevent storage overflow
+      const trimmedComics = savedComics.slice(0, 50)
+
+      localStorage.setItem('mockr-saved-comics', JSON.stringify(trimmedComics))
+      console.log('Comic saved to gallery:', comic.id)
+    } catch (error) {
+      console.error('Error saving comic to gallery:', error)
+    }
+  }
+
+  const handleShare = (platform: 'twitter' | 'facebook' | 'whatsapp' | 'copy') => {
+    if (!generatedComic) return
+
+    const comicUrl = window.location.href
+    const text = `Check out this satirical political cartoon I created with Mockr! "${generatedComic.dialogue}" - ${generatedComic.situation.substring(0, 100)}${generatedComic.situation.length > 100 ? '...' : ''}`
+
+    switch (platform) {
+      case 'twitter':
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(comicUrl)}&hashtags=MockrApp,PoliticalSatire,Cartoon`
+        window.open(twitterUrl, '_blank', 'width=550,height=400')
+        break
+
+      case 'facebook':
+        const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(comicUrl)}&quote=${encodeURIComponent(text)}`
+        window.open(fbUrl, '_blank', 'width=550,height=400')
+        break
+
+      case 'whatsapp':
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + comicUrl)}`
+        window.open(whatsappUrl, '_blank')
+        break
+
+      case 'copy':
+        navigator.clipboard.writeText(`${text}\n\n${comicUrl}`).then(() => {
+          alert('Comic link copied to clipboard!')
+        }).catch(() => {
+          alert('Failed to copy to clipboard')
         })
-        .catch(error => {
-          console.error('Download failed:', error)
-          alert('Download failed. Please try again.')
-        })
+        break
     }
   }
 
@@ -212,12 +620,15 @@ export default function GeneratePage() {
 
       if (data.success) {
         setFormData({
-          situation: data.scenario.situation,
-          characters: data.scenario.characters,
-          setting: data.scenario.setting,
-          tone: data.scenario.tone,
-          style: data.scenario.style
+          situation: data.scenario.situation
         })
+        // Reset other states when loading new sample
+        setGeneratedQuote(null)
+        setGeneratedDescription(null)
+        setGeneratedComic(null)
+        setSvgContent(null)
+        setIsEditingQuote(false)
+        setIsEditingDescription(false)
         console.log('Sample scenario loaded:', data.scenario)
       } else {
         console.error('Sample generation failed:', data.error)
@@ -247,9 +658,12 @@ export default function GeneratePage() {
           </Link>
 
           <div className="flex items-center space-x-4">
-            <button className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3">
-              Save Draft
-            </button>
+            <Link
+              href="/gallery"
+              className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3"
+            >
+              Gallery
+            </Link>
           </div>
         </div>
       </nav>
@@ -300,7 +714,7 @@ export default function GeneratePage() {
                 </div>
               </div>
 
-              <form onSubmit={handleGenerateDescription} className="space-y-8">
+              <form onSubmit={handleGenerateQuote} className="space-y-8">
                 {/* Political Situation Input - Full Width */}
                 <div>
                   <label htmlFor="situation" className="block text-lg font-semibold leading-tight tracking-tight text-neutral-900 mb-2">
@@ -311,103 +725,92 @@ export default function GeneratePage() {
                     name="situation"
                     value={formData.situation}
                     onChange={handleInputChange}
-                    placeholder="Describe the political scenario you want to satirize... (e.g., Politicians promising free healthcare while holding pharma stocks)"
+                    placeholder="Enter any political situation or current news happening in the world... (e.g., Politicians visiting hospitals to promote healthcare reforms, Ministers inaugurating new schools while sending their kids abroad, Leaders attending climate summits after taking private jets)"
                     className="textarea-primary h-24 resize-none"
                     required
                   />
+                  <p className="text-sm text-neutral-500 mt-2">
+                    Our AI will automatically handle characters, background, tone and art style based on your situation.
+                  </p>
                 </div>
 
-                {/* Compact Grid Layout for Other Inputs */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {/* Characters Input */}
-                  <div>
-                    <label htmlFor="characters" className="block text-sm font-semibold leading-tight tracking-tight text-neutral-900 mb-2">
-                      Characters
-                    </label>
-                    <input
-                      type="text"
-                      id="characters"
-                      name="characters"
-                      value={formData.characters}
-                      onChange={handleInputChange}
-                      placeholder="Auto-filled if empty"
-                      className="input-primary text-sm"
-                    />
-                  </div>
-
-                  {/* Background Input */}
-                  <div>
-                    <label htmlFor="setting" className="block text-sm font-semibold leading-tight tracking-tight text-neutral-900 mb-2">
-                      Background
-                    </label>
-                    <input
-                      type="text"
-                      id="setting"
-                      name="setting"
-                      value={formData.setting}
-                      onChange={handleInputChange}
-                      placeholder="Auto-filled if empty"
-                      className="input-primary text-sm"
-                    />
-                  </div>
-
-                  {/* Tone Selection */}
-                  <div>
-                    <label htmlFor="tone" className="block text-sm font-semibold leading-tight tracking-tight text-neutral-900 mb-2">
-                      Tone
-                    </label>
-                    <select
-                      id="tone"
-                      name="tone"
-                      value={formData.tone}
-                      onChange={handleInputChange}
-                      className="input-primary text-sm"
-                    >
-                      <option value="satirical">Satirical</option>
-                      <option value="witty">Witty</option>
-                      <option value="observational">Observational</option>
-                      <option value="critical">Critical</option>
-                    </select>
-                  </div>
-
-                  {/* Art Style Selection */}
-                  <div>
-                    <label htmlFor="style" className="block text-sm font-semibold leading-tight tracking-tight text-neutral-900 mb-2">
-                      Art Style
-                    </label>
-                    <select
-                      id="style"
-                      name="style"
-                      value={formData.style}
-                      onChange={handleInputChange}
-                      className="input-primary text-sm"
-                    >
-                      <option value="laxman">R.K. Laxman Classic</option>
-                      <option value="modern">Modern Satirical</option>
-                      <option value="minimalist">Minimalist</option>
-                      <option value="detailed">Detailed Editorial</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Generate Comic Description Button - Always Available */}
+                {/* Generate Quote Button */}
                 <button
                   type="submit"
-                  disabled={isGeneratingDescription || !formData.situation}
+                  disabled={isGeneratingQuote || !formData.situation}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full text-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
-                  {isGeneratingDescription ? (
+                  {isGeneratingQuote ? (
                     <>
                       <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
-                      Generating Description...
+                      Generating Quote...
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-5 h-5 mr-3" />
-                      {generatedDescription ? 'Regenerate Comic Description' : 'Generate Comic Description'}
+                      {generatedQuote ? 'Regenerate Quote' : 'Generate Satirical Quote'}
                     </>
                   )}
                 </button>
+
+                {/* Quote Preview and Edit */}
+                {generatedQuote && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-lg font-semibold text-green-900">Satirical Quote:</h3>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isEditingQuote) {
+                              setEditableQuote(generatedQuote)
+                              setIsEditingQuote(true)
+                            } else {
+                              setGeneratedQuote(editableQuote)
+                              setIsEditingQuote(false)
+                            }
+                          }}
+                          className="text-sm bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg transition-colors"
+                        >
+                          {isEditingQuote ? 'Save Changes' : 'Edit Quote'}
+                        </button>
+                      </div>
+
+                      {isEditingQuote ? (
+                        <textarea
+                          value={editableQuote}
+                          onChange={(e) => setEditableQuote(e.target.value)}
+                          className="w-full h-20 p-3 text-sm text-green-800 bg-white border border-green-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+                          placeholder="Edit the quote..."
+                        />
+                      ) : (
+                        <p className="text-lg text-green-800 leading-relaxed font-medium italic">
+                          {generatedQuote}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Generate Comic Description Button */}
+                    <button
+                      type="button"
+                      onClick={handleGenerateDescription}
+                      disabled={isGeneratingDescription || isEditingQuote}
+                      className="bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isGeneratingDescription ? (
+                        <>
+                          <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
+                          Generating Description...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-5 h-5 mr-3" />
+                          {generatedDescription ? 'Regenerate Comic Description' : 'Generate Comic Description'}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
 
                 {/* Description Preview and Edit */}
                 {generatedDescription && (
@@ -490,7 +893,7 @@ export default function GeneratePage() {
                     </div>
                     <p className="text-neutral-500 font-medium mb-2">Your Comic Will Appear Here</p>
                     <p className="text-sm lg:text-base leading-relaxed text-neutral-400">
-                      {generatedDescription ? 'Click "Generate Comic" to create your image' : 'Enter political situation and generate description first'}
+                      {generatedDescription ? 'Click "Generate Comic" to create your image' : generatedQuote ? 'Click "Generate Comic Description" to continue' : 'Enter political situation and generate quote first'}
                     </p>
                   </div>
                 </div>
@@ -512,7 +915,7 @@ export default function GeneratePage() {
                 <div className="space-y-6">
                   <div className="relative bg-white rounded-2xl shadow-md overflow-hidden border border-neutral-200" style={{ minHeight: '500px' }}>
                     {generatedComic.imageUrl.startsWith('data:') ? (
-                      // Display AI-generated image with speech bubble and context overlay - FULL WIDTH
+                      // Display AI-generated image - CLEAN without overlays
                       <div className="relative w-full h-full min-h-[500px]">
                         <Image
                           src={generatedComic.imageUrl}
@@ -521,39 +924,6 @@ export default function GeneratePage() {
                           className="object-contain rounded-2xl w-full h-full"
                           style={{ objectFit: 'contain' }}
                         />
-
-                        {/* Speech Bubble - Enhanced positioning for better AI composition */}
-                        <div className="absolute top-8 left-4 sm:top-12 sm:left-16 z-10">
-                          <div className="relative">
-                            {/* Speech bubble with enhanced visibility */}
-                            <div className="relative bg-white/95 border-2 border-black rounded-full px-4 py-2 sm:px-6 sm:py-3 min-w-[120px] max-w-[240px] sm:min-w-[140px] sm:max-w-[280px] shadow-lg">
-                              <p className="text-xs sm:text-sm font-semibold text-black leading-tight text-center">
-                                {generatedComic.dialogue}
-                              </p>
-                              {/* Speech bubble pointer - positioned for better readability */}
-                              <div className="absolute bottom-0 left-6 sm:left-8 transform translate-y-1/2">
-                                <div className="w-0 h-0 border-l-[6px] sm:border-l-[8px] border-l-transparent border-r-[6px] sm:border-r-[8px] border-r-transparent border-t-[8px] sm:border-t-[12px] border-t-black"></div>
-                                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-[6px] sm:-translate-y-[10px] w-0 h-0 border-l-[4px] sm:border-l-[6px] border-l-transparent border-r-[4px] sm:border-r-[6px] border-r-transparent border-t-[6px] sm:border-t-[10px] border-t-white"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Situation Context - Enhanced visibility */}
-                        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-11/12 max-w-lg">
-                          <p className="text-xs sm:text-sm font-medium text-black bg-white/95 px-2 py-1 sm:px-3 sm:py-1 rounded border border-black text-center shadow-lg leading-tight">
-                            {generatedComic.situation.length > 80
-                              ? `${generatedComic.situation.substring(0, 80)}...`
-                              : generatedComic.situation}
-                          </p>
-                        </div>
-
-                        {/* Mockr Watermark - Enhanced visibility */}
-                        <div className="absolute bottom-2 right-2 sm:right-4">
-                          <p className="text-xs font-medium text-black bg-white/80 px-2 py-1 rounded">
-                            Created by Mockr
-                          </p>
-                        </div>
                       </div>
                     ) : (
                       // Display SVG placeholder - FULL SIZE
@@ -566,14 +936,14 @@ export default function GeneratePage() {
                             dangerouslySetInnerHTML={{
                               __html: svgContent.replace(
                                 /<svg[^>]*>/,
-                                '<svg width="100%" height="100%" style="width: 100%; height: 100%; min-height: 480px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet">'
+                                '<svg width="100%" height="100%" style="width: 100%; height: 100%; min-height: 500px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" preserveAspectRatio="xMidYMid meet">'
                               )
                             }}
                             className="w-full h-full"
                             style={{
                               width: '100%',
                               height: '100%',
-                              minHeight: '480px'
+                              minHeight: '500px'
                             }}
                           />
                         ) : (
@@ -589,27 +959,98 @@ export default function GeneratePage() {
 
                   </div>
 
-                  {/* Political Situation Context - Visible Below Comic */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 shadow-sm">
-                    <p className="text-sm font-semibold text-blue-800 mb-2">Political Situation:</p>
-                    <p className="text-sm text-blue-700 leading-relaxed">
-                      {generatedComic.situation}
-                    </p>
-                  </div>
-
                   {/* Action Buttons */}
                   <div className="grid grid-cols-2 gap-4">
-                    <button
-                      onClick={handleDownload}
-                      className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group py-3 flex items-center justify-center"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Download
-                    </button>
-                    <button className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group py-3">
-                      <Share2 className="w-4 h-4 mr-2" />
-                      Share
-                    </button>
+                    {/* Enhanced Download Dropdown */}
+                    <div className="relative" ref={downloadDropdownRef}>
+                      <button
+                        onClick={() => setShowDownloadDropdown(!showDownloadDropdown)}
+                        className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group py-3 w-full flex items-center justify-center"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download
+                        <ChevronDown className={`w-4 h-4 ml-2 transition-transform ${showDownloadDropdown ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {showDownloadDropdown && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
+                          <button
+                            onClick={() => { handleDownload('jpg'); setShowDownloadDropdown(false) }}
+                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                          >
+                            <FileImage className="w-4 h-4 mr-3 text-blue-500" />
+                            Download as JPG
+                          </button>
+                          <button
+                            onClick={() => { handleDownload('png'); setShowDownloadDropdown(false) }}
+                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                          >
+                            <FileImage className="w-4 h-4 mr-3 text-green-500" />
+                            Download as PNG
+                          </button>
+                          <button
+                            onClick={() => { handleDownload('svg'); setShowDownloadDropdown(false) }}
+                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                          >
+                            <FileText className="w-4 h-4 mr-3 text-purple-500" />
+                            Download as SVG
+                          </button>
+                          <button
+                            onClick={() => { handleDownload('pdf'); setShowDownloadDropdown(false) }}
+                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-red-50 hover:text-red-600 transition-colors border-t border-neutral-100"
+                          >
+                            <FileText className="w-4 h-4 mr-3 text-red-500" />
+                            Download as PDF
+                            <span className="ml-auto text-xs text-neutral-400">(Soon)</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Enhanced Share Dropdown */}
+                    <div className="relative" ref={shareDropdownRef}>
+                      <button
+                        onClick={() => setShowShareDropdown(!showShareDropdown)}
+                        className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group py-3 w-full flex items-center justify-center"
+                      >
+                        <Share2 className="w-4 h-4 mr-2" />
+                        Share
+                        <ChevronDown className={`w-4 h-4 ml-2 transition-transform ${showShareDropdown ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {showShareDropdown && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
+                          <button
+                            onClick={() => { handleShare('twitter'); setShowShareDropdown(false) }}
+                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                          >
+                            <Twitter className="w-4 h-4 mr-3 text-blue-500" />
+                            Share on Twitter
+                          </button>
+                          <button
+                            onClick={() => { handleShare('facebook'); setShowShareDropdown(false) }}
+                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                          >
+                            <Facebook className="w-4 h-4 mr-3 text-blue-600" />
+                            Share on Facebook
+                          </button>
+                          <button
+                            onClick={() => { handleShare('whatsapp'); setShowShareDropdown(false) }}
+                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-green-50 hover:text-green-600 transition-colors"
+                          >
+                            <MessageCircle className="w-4 h-4 mr-3 text-green-500" />
+                            Share on WhatsApp
+                          </button>
+                          <button
+                            onClick={() => { handleShare('copy'); setShowShareDropdown(false) }}
+                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-neutral-800 transition-colors border-t border-neutral-100"
+                          >
+                            <Copy className="w-4 h-4 mr-3 text-neutral-500" />
+                            Copy Link
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <button
