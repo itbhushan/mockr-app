@@ -17,23 +17,47 @@ interface SavedComic {
   createdAt: string
 }
 
+interface ComicWithSVG extends SavedComic {
+  svgContent?: string
+}
+
 export default function GalleryPage() {
-  const [savedComics, setSavedComics] = useState<SavedComic[]>([])
+  const [savedComics, setSavedComics] = useState<ComicWithSVG[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     loadSavedComics()
   }, [])
 
-  const loadSavedComics = () => {
+  const loadSavedComics = async () => {
     setIsLoading(true)
     try {
       const saved = localStorage.getItem('mockr-saved-comics')
       if (saved) {
-        const comics = JSON.parse(saved)
-        setSavedComics(comics.sort((a: SavedComic, b: SavedComic) =>
+        const comics: SavedComic[] = JSON.parse(saved)
+        const sortedComics = comics.sort((a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        ))
+        )
+
+        // Fetch SVG content for placeholder comics
+        const comicsWithSVG = await Promise.all(
+          sortedComics.map(async (comic) => {
+            if (!comic.aiGenerated && !comic.imageUrl.startsWith('data:')) {
+              try {
+                const apiUrl = `/api/placeholder-comic?dialogue=${encodeURIComponent(comic.dialogue)}&situation=${encodeURIComponent(comic.situation)}&t=${Date.now()}`
+                const response = await fetch(apiUrl)
+                const svgContent = await response.text()
+                return { ...comic, svgContent }
+              } catch (error) {
+                console.error('Error fetching SVG for comic:', comic.id, error)
+                return comic
+              }
+            }
+            return comic
+          })
+        )
+
+        setSavedComics(comicsWithSVG)
       }
     } catch (error) {
       console.error('Error loading saved comics:', error)
@@ -188,11 +212,31 @@ export default function GalleryPage() {
                       fill
                       className="object-contain"
                     />
+                  ) : comic.svgContent ? (
+                    <div
+                      className="w-full h-full flex items-center justify-center"
+                      style={{ backgroundColor: 'white', aspectRatio: '4/3' }}
+                    >
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: comic.svgContent.replace(
+                            /<svg[^>]*>/,
+                            '<svg width="100%" height="100%" style="width: 100%; height: 100%; max-width: 100%; max-height: 100%;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" preserveAspectRatio="xMidYMid meet">'
+                          )
+                        }}
+                        className="w-full h-full"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          aspectRatio: '4/3'
+                        }}
+                      />
+                    </div>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <div className="text-center text-neutral-500">
-                        <ExternalLink className="w-8 h-8 mx-auto mb-2" />
-                        <p className="text-sm">SVG Comic</p>
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                        <p className="text-sm">Loading comic...</p>
                       </div>
                     </div>
                   )}

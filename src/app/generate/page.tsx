@@ -260,14 +260,15 @@ export default function GeneratePage() {
 
     const filename = `mockr-comic-${generatedComic.id}`
 
-    // Create composite image with quote and situation for all formats except SVG
-    if (format === 'svg' && !generatedComic.imageUrl.startsWith('data:')) {
-      downloadSVG(filename)
+    // Handle different download formats
+    if (format === 'svg') {
+      downloadSVGDirect(filename)
     } else if (format === 'pdf') {
       downloadAsPDF()
-    } else {
-      // Create composite image with quote, comic, and situation
-      createCompositeImage(format, filename)
+    } else if (format === 'png') {
+      downloadPNGFromSVG(filename)
+    } else if (format === 'jpg') {
+      downloadJPGFromSVG(filename)
     }
   }
 
@@ -421,24 +422,160 @@ export default function GeneratePage() {
     return lines
   }
 
-  const downloadSVG = (filename: string) => {
-    fetch(generatedComic!.imageUrl)
-      .then(response => response.text())
-      .then(svgText => {
-        const blob = new Blob([svgText], { type: 'image/svg+xml' })
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = `${filename}.svg`
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(url)
-      })
-      .catch(error => {
-        console.error('SVG download failed:', error)
-        alert('Download failed. Please try again.')
-      })
+  const downloadSVGDirect = (filename: string) => {
+    if (!svgContent) {
+      alert('SVG content not available')
+      return
+    }
+
+    try {
+      const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${filename}.svg`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('SVG download failed:', error)
+      alert('Download failed. Please try again.')
+    }
+  }
+
+  const downloadPNGFromSVG = (filename: string) => {
+    if (!svgContent) {
+      alert('Comic content not available')
+      return
+    }
+
+    try {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
+      // Set high resolution for better quality
+      canvas.width = 1200
+      canvas.height = 1000
+
+      const img = new Image()
+      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+      const svgUrl = URL.createObjectURL(svgBlob)
+
+      img.onload = () => {
+        // Fill white background
+        ctx.fillStyle = 'white'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+        // Calculate dimensions to maintain aspect ratio
+        const aspectRatio = img.width / img.height
+        let drawWidth = canvas.width - 100 // padding
+        let drawHeight = drawWidth / aspectRatio
+
+        if (drawHeight > canvas.height - 100) {
+          drawHeight = canvas.height - 100
+          drawWidth = drawHeight * aspectRatio
+        }
+
+        const x = (canvas.width - drawWidth) / 2
+        const y = (canvas.height - drawHeight) / 2
+
+        ctx.drawImage(img, x, y, drawWidth, drawHeight)
+
+        canvas.toBlob(blob => {
+          if (blob) {
+            const link = document.createElement('a')
+            link.href = URL.createObjectURL(blob)
+            link.download = `${filename}.png`
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            URL.revokeObjectURL(link.href)
+          }
+        }, 'image/png')
+
+        URL.revokeObjectURL(svgUrl)
+      }
+
+      img.onerror = () => {
+        console.error('Failed to load SVG for conversion')
+        alert('Failed to convert image. Please try SVG format.')
+        URL.revokeObjectURL(svgUrl)
+      }
+
+      img.src = svgUrl
+    } catch (error) {
+      console.error('PNG conversion failed:', error)
+      alert('Download failed. Please try again.')
+    }
+  }
+
+  const downloadJPGFromSVG = (filename: string) => {
+    if (!svgContent) {
+      alert('Comic content not available')
+      return
+    }
+
+    try {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
+      // Set high resolution for better quality
+      canvas.width = 1200
+      canvas.height = 1000
+
+      const img = new Image()
+      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+      const svgUrl = URL.createObjectURL(svgBlob)
+
+      img.onload = () => {
+        // Fill white background (important for JPG)
+        ctx.fillStyle = 'white'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+        // Calculate dimensions to maintain aspect ratio
+        const aspectRatio = img.width / img.height
+        let drawWidth = canvas.width - 100 // padding
+        let drawHeight = drawWidth / aspectRatio
+
+        if (drawHeight > canvas.height - 100) {
+          drawHeight = canvas.height - 100
+          drawWidth = drawHeight * aspectRatio
+        }
+
+        const x = (canvas.width - drawWidth) / 2
+        const y = (canvas.height - drawHeight) / 2
+
+        ctx.drawImage(img, x, y, drawWidth, drawHeight)
+
+        canvas.toBlob(blob => {
+          if (blob) {
+            const link = document.createElement('a')
+            link.href = URL.createObjectURL(blob)
+            link.download = `${filename}.jpg`
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            URL.revokeObjectURL(link.href)
+          }
+        }, 'image/jpeg', 0.95)
+
+        URL.revokeObjectURL(svgUrl)
+      }
+
+      img.onerror = () => {
+        console.error('Failed to load SVG for conversion')
+        alert('Failed to convert image. Please try SVG format.')
+        URL.revokeObjectURL(svgUrl)
+      }
+
+      img.src = svgUrl
+    } catch (error) {
+      console.error('JPG conversion failed:', error)
+      alert('Download failed. Please try again.')
+    }
   }
 
   const convertSVGToPNG = (filename: string) => {
@@ -913,50 +1050,75 @@ export default function GeneratePage() {
 
               {generatedComic && (
                 <div className="space-y-6">
-                  <div className="relative bg-white rounded-2xl shadow-md overflow-hidden border border-neutral-200" style={{ minHeight: '500px' }}>
-                    {generatedComic.imageUrl.startsWith('data:') ? (
-                      // Display AI-generated image - CLEAN without overlays
-                      <div className="relative w-full h-full min-h-[500px]">
+                  <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
+                    {/* Comic Image */}
+                    <div className="aspect-[4/3] bg-white relative">
+                      {generatedComic.imageUrl.startsWith('data:') ? (
                         <Image
                           src={generatedComic.imageUrl}
-                          alt="Generated political cartoon"
+                          alt={`Comic: ${generatedComic.situation.substring(0, 50)}...`}
                           fill
-                          className="object-contain rounded-2xl w-full h-full"
-                          style={{ objectFit: 'contain' }}
+                          className="object-contain"
                         />
-                      </div>
-                    ) : (
-                      // Display SVG placeholder - FULL SIZE
-                      <div
-                        className="w-full h-full"
-                        style={{backgroundColor: 'white', minHeight: '500px', padding: '10px'}}
-                      >
-                        {svgContent ? (
+                      ) : svgContent ? (
+                        <div
+                          className="w-full h-full flex items-center justify-center"
+                          style={{ backgroundColor: 'white', aspectRatio: '4/3' }}
+                        >
                           <div
                             dangerouslySetInnerHTML={{
                               __html: svgContent.replace(
                                 /<svg[^>]*>/,
-                                '<svg width="100%" height="100%" style="width: 100%; height: 100%; min-height: 500px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" preserveAspectRatio="xMidYMid meet">'
+                                '<svg width="100%" height="100%" style="width: 100%; height: 100%; max-width: 100%; max-height: 100%;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" preserveAspectRatio="xMidYMid meet">'
                               )
                             }}
                             className="w-full h-full"
                             style={{
                               width: '100%',
                               height: '100%',
-                              minHeight: '500px'
+                              aspectRatio: '4/3'
                             }}
                           />
-                        ) : (
-                          <div className="text-center flex items-center justify-center h-full">
-                            <div>
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                              <p className="text-sm text-gray-500">Loading comic...</p>
-                            </div>
+                        </div>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div className="text-center text-neutral-500">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                            <p className="text-sm">Loading comic...</p>
                           </div>
-                        )}
-                      </div>
-                    )}
+                        </div>
+                      )}
 
+                      {/* AI Generated Badge */}
+                      {generatedComic.aiGenerated && (
+                        <div className="absolute top-2 left-2 bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
+                          AI Generated
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Comic Details */}
+                    <div className="p-6">
+                      <div className="mb-4">
+                        <h3 className="font-semibold text-neutral-900 mb-2 line-clamp-2">
+                          "{generatedComic.dialogue}"
+                        </h3>
+                        <p className="text-sm text-neutral-600 line-clamp-3">
+                          {generatedComic.situation}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-neutral-400 mb-4">
+                        <span className="capitalize">satirical • laxman</span>
+                        <span>{new Date().toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}</span>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Action Buttons */}

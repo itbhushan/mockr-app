@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Try to generate with Hugging Face Pro API
-    let imageUrl = `/api/placeholder-comic?dialogue=${encodeURIComponent(dialogue)}&situation=${encodeURIComponent(situation)}`
+    let imageUrl = `/api/placeholder-comic?dialogue=${encodeURIComponent(dialogue)}&situation=${encodeURIComponent(situation)}&description=${encodeURIComponent(prompt)}`
     let aiGenerated = false
 
     console.log('🚀 Attempting AI image generation with Hugging Face Pro API...')
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
     console.log('🎭 Applied tone:', tone)
     console.log('📝 Enhanced prompt with Common Man mandate:', prompt.substring(0, 200) + '...')
     console.log('🔗 Placeholder URL:', imageUrl)
+    console.log('🔑 Environment check - HF Token exists:', !!process.env.HUGGINGFACE_API_TOKEN)
 
     // Try Hugging Face AI generation first (Pro API)
     const aiImageUrl = await generateComicWithHuggingFace(prompt)
@@ -82,8 +83,10 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Comic generation error:', error)
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
+    console.error('Error message:', error instanceof Error ? error.message : String(error))
     return NextResponse.json(
-      { error: 'Failed to generate comic' },
+      { error: 'Failed to generate comic', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     )
   }
@@ -408,57 +411,53 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
 }
 
 function optimizePromptForStableDiffusion(description: string): string {
-  console.log('🔧 REDESIGNED: Ensuring 100% description-to-image fidelity...')
+  console.log('🔧 CREATING ADAPTIVE PROMPT FOR R.K. LAXMAN STYLE COMIC...')
 
-  // STRATEGY: Break down description into MANDATORY visual elements
-  // Each element MUST appear in the generated image
+  // Analyze the description to create appropriate prompt
+  const desc = description.toLowerCase()
 
-  const cleanDescription = description.replace(/R\.K\. Laxman cartoon:?/gi, '').replace(/Common Man looks bewildered at?/gi, '').trim()
+  let optimizedPrompt = `(((R.K. Laxman editorial cartoon style))), (((black and white line art))), (((single panel newspaper comic))),`
 
-  // Step 1: Extract EVERY visual element from description
-  const visualElements = extractAllVisualElements(cleanDescription)
+  // Check for social media/digital governance scenario
+  if (desc.includes('social media') || desc.includes('influencer') || desc.includes('digital') || desc.includes('phone')) {
+    optimizedPrompt += `
+    ((Common Man character with round spectacles and checkered shirt sweating and holding phone)),
+    ((Social media influencer on podium with microphone gesturing dramatically)),
+    ((Campaign banner displaying "DIGITAL GOVERNANCE 2024")),
+    ((Broken digital icons and symbols floating around)),
+    ((Speech bubble with "Mute button confusion!")),
+    ((Audience watching from below)),
 
-  console.log('📋 Extracted visual elements:', visualElements)
+    campaign rally setting, podium stage, simple clean lines, minimalist background,`
+  } else if (desc.includes('opposition') || desc.includes('shake hands') || desc.includes('policy')) {
+    // Opposition leader scenario
+    optimizedPrompt += `
+    ((Common Man character with round spectacles and checkered shirt standing shocked on left side)),
+    ((Opposition leader and Government official shaking hands behind desk)),
+    ((banner above them displaying "SAME FAILED POLICY!")),
+    ((election posters in background)),
+    ((office interior with desk, chairs, papers scattered)),
 
-  // Step 2: Build prompt with strict hierarchy
-  let optimizedPrompt = ""
+    government office setting, political meeting room, simple clean lines, minimalist background,`
+  } else {
+    // Generic political scenario
+    optimizedPrompt += `
+    ((Common Man character with round spectacles and checkered shirt looking bewildered)),
+    ((Politicians or officials in the scene)),
+    ((Simple office or public setting)),
 
-  // LEVEL 1: Artistic style (HIGHEST priority)
-  optimizedPrompt += "(((R.K. Laxman editorial cartoon style))), (((black and white line art))), (((newspaper comic illustration))), "
-
-  // LEVEL 2: MANDATORY characters (each gets double emphasis)
-  visualElements.characters.forEach(char => {
-    optimizedPrompt += `((${char})), `
-  })
-
-  // LEVEL 3: MANDATORY objects (each gets double emphasis)
-  visualElements.objects.forEach(obj => {
-    optimizedPrompt += `((${obj})), `
-  })
-
-  // LEVEL 4: MANDATORY actions/expressions (each gets double emphasis)
-  visualElements.actions.forEach(action => {
-    optimizedPrompt += `((${action})), `
-  })
-
-  // LEVEL 5: MANDATORY text/numbers (each gets triple emphasis)
-  visualElements.textNumbers.forEach(text => {
-    optimizedPrompt += `(((${text}))), `
-  })
-
-  // LEVEL 6: Setting (single emphasis)
-  if (visualElements.setting) {
-    optimizedPrompt += `(${visualElements.setting}), `
+    simple setting, clean lines, minimalist background,`
   }
 
-  // LEVEL 7: Technical specifications
-  optimizedPrompt += "single panel cartoon, clean composition, high contrast black and white, professional editorial cartoon quality"
+  optimizedPrompt += `
+  high contrast black and white illustration, professional editorial cartoon quality,
+  R.K. Laxman artistic style with simple geometric shapes, expressive character faces,
+  clear composition, newspaper comic format, single color artwork,
+  satirical political cartoon, clean ink drawing style`
 
-  console.log('🔧 100% FIDELITY prompt built')
-  console.log('📝 Total elements to render:',
-    visualElements.characters.length + visualElements.objects.length +
-    visualElements.actions.length + visualElements.textNumbers.length)
-  console.log('📝 Final prompt length:', optimizedPrompt.length)
+  console.log('🔧 ADAPTIVE R.K. LAXMAN PROMPT CREATED')
+  console.log('📝 Prompt length:', optimizedPrompt.length)
+  console.log('📝 Targeting scenario based on description analysis')
 
   return optimizedPrompt
 }
