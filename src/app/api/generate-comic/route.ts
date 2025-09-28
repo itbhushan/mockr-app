@@ -374,11 +374,11 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
         body: JSON.stringify({
           inputs: optimizedPrompt,
           parameters: {
-            negative_prompt: "realistic photo, photorealistic, real people, photography, realistic faces, realistic humans, 3d render, cgi, digital art, colored, colors, gradients, anime style, manga style, complex backgrounds, blurry, low quality, distorted faces, extra limbs, multiple heads, deformed hands, extra fingers, missing fingers, weird anatomy, malformed faces, ugly faces, bad proportions, duplicate, cropped, out of frame, text, watermark, signature, logo, missing characters, incomplete scene",
-            num_inference_steps: 50,
-            guidance_scale: 9.5,
-            width: 1024,
-            height: 576,
+            negative_prompt: "realistic photo, photorealistic, photography, colored image, colors, gradients, 3d render, blurry, low quality, distorted faces, extra limbs, deformed hands, bad anatomy, watermark, signature, incomplete scene, cluttered background",
+            num_inference_steps: 35,
+            guidance_scale: 7.5,
+            width: 768,
+            height: 768,
             scheduler: "DPMSolverMultistepScheduler"
           }
         }),
@@ -411,53 +411,25 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
 }
 
 function optimizePromptForStableDiffusion(description: string): string {
-  console.log('🔧 CREATING ADAPTIVE PROMPT FOR R.K. LAXMAN STYLE COMIC...')
+  console.log('🔧 CREATING OPTIMIZED PROMPT FROM AI DESCRIPTION...')
+  console.log('📝 Original AI description:', description.substring(0, 300) + '...')
 
-  // Analyze the description to create appropriate prompt
-  const desc = description.toLowerCase()
+  // Create clean, focused prompt that includes the full scene description
+  let optimizedPrompt = `R.K. Laxman editorial cartoon style, black and white line art, single panel newspaper comic, `
 
-  let optimizedPrompt = `(((R.K. Laxman editorial cartoon style))), (((black and white line art))), (((single panel newspaper comic))),`
+  // Add the FULL SCENE DESCRIPTION directly (this is key!)
+  optimizedPrompt += description + ', '
 
-  // Check for social media/digital governance scenario
-  if (desc.includes('social media') || desc.includes('influencer') || desc.includes('digital') || desc.includes('phone')) {
-    optimizedPrompt += `
-    ((Common Man character with round spectacles and checkered shirt sweating and holding phone)),
-    ((Social media influencer on podium with microphone gesturing dramatically)),
-    ((Campaign banner displaying "DIGITAL GOVERNANCE 2024")),
-    ((Broken digital icons and symbols floating around)),
-    ((Speech bubble with "Mute button confusion!")),
-    ((Audience watching from below)),
+  // Add core style specifications (simplified)
+  optimizedPrompt += `professional editorial cartoon, clean line art, expressive faces, minimal background, high contrast black and white illustration, newspaper comic format`
 
-    campaign rally setting, podium stage, simple clean lines, minimalist background,`
-  } else if (desc.includes('opposition') || desc.includes('shake hands') || desc.includes('policy')) {
-    // Opposition leader scenario
-    optimizedPrompt += `
-    ((Common Man character with round spectacles and checkered shirt standing shocked on left side)),
-    ((Opposition leader and Government official shaking hands behind desk)),
-    ((banner above them displaying "SAME FAILED POLICY!")),
-    ((election posters in background)),
-    ((office interior with desk, chairs, papers scattered)),
-
-    government office setting, political meeting room, simple clean lines, minimalist background,`
-  } else {
-    // Generic political scenario
-    optimizedPrompt += `
-    ((Common Man character with round spectacles and checkered shirt looking bewildered)),
-    ((Politicians or officials in the scene)),
-    ((Simple office or public setting)),
-
-    simple setting, clean lines, minimalist background,`
-  }
-
-  optimizedPrompt += `
-  high contrast black and white illustration, professional editorial cartoon quality,
-  R.K. Laxman artistic style with simple geometric shapes, expressive character faces,
-  clear composition, newspaper comic format, single color artwork,
-  satirical political cartoon, clean ink drawing style`
-
-  console.log('🔧 ADAPTIVE R.K. LAXMAN PROMPT CREATED')
-  console.log('📝 Prompt length:', optimizedPrompt.length)
-  console.log('📝 Targeting scenario based on description analysis')
+  console.log('🔧 OPTIMIZED CLEAN PROMPT CREATED')
+  console.log('📝 Final prompt length:', optimizedPrompt.length)
+  console.log('📝 Reduced redundancy and improved clarity')
+  console.log('🎯 COMPLETE HUGGING FACE PROMPT:')
+  console.log('=====================================')
+  console.log(optimizedPrompt)
+  console.log('=====================================')
 
   return optimizedPrompt
 }
