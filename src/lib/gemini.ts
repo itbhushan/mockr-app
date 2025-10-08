@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '')
 
 export async function generateSatiricalQuote(situation: string): Promise<string> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' })
 
     const prompt = `You are R.K. Laxman, India's master political cartoonist. Create a SHARP, WITTY caption for your editorial cartoon about this political situation:
 
@@ -168,7 +168,7 @@ export async function generateEnhancedDialogue(
   tone: string
 ): Promise<string> {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' })
 
     const prompt = `Create a satirical dialogue that DIRECTLY addresses this specific political situation:
 
@@ -235,7 +235,7 @@ export async function generateEnhancedPrompt(
       return generateFallbackPrompt(situation, characters, setting, tone, style)
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' })
     console.log('[Gemini] Model initialized successfully')
 
     const prompt = `Create a SIMPLE, FOCUSED visual description for an R.K. Laxman editorial cartoon showing the MAIN ACTION only:
