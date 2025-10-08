@@ -474,11 +474,11 @@ function optimizePromptForFLUX(description: string): string {
 
 function extractAllVisualElements(description: string) {
   const elements = {
-    characters: [],
-    objects: [],
-    actions: [],
-    textNumbers: [],
-    setting: null
+    characters: [] as string[],
+    objects: [] as string[],
+    actions: [] as string[],
+    textNumbers: [] as string[],
+    setting: null as string | null
   }
 
   const desc = description.toLowerCase()

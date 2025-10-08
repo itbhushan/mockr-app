@@ -314,7 +314,7 @@ export default function GeneratePage() {
 
     try {
       // Load and draw the comic image
-      const comicImg = new Image()
+      const comicImg = new (Image as any)()
       await new Promise((resolve, reject) => {
         comicImg.onload = resolve
         comicImg.onerror = reject
@@ -459,7 +459,7 @@ export default function GeneratePage() {
       canvas.width = 1200
       canvas.height = 1000
 
-      const img = new Image()
+      const img = new (Image as any)()
       const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
       const svgUrl = URL.createObjectURL(svgBlob)
 
@@ -526,7 +526,7 @@ export default function GeneratePage() {
       canvas.width = 1200
       canvas.height = 1000
 
-      const img = new Image()
+      const img = new (Image as any)()
       const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
       const svgUrl = URL.createObjectURL(svgBlob)
 
