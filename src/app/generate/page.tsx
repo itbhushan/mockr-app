@@ -707,13 +707,39 @@ export default function GeneratePage() {
         savedComics.unshift(comic)
       }
 
-      // Keep only the latest 50 comics to prevent storage overflow
-      const trimmedComics = savedComics.slice(0, 50)
+      // Keep only the latest 10 comics to prevent storage overflow
+      // Note: Base64 images are large (~500KB-2MB each), so we limit to 10 to stay under localStorage quota (5-10MB)
+      const trimmedComics = savedComics.slice(0, 10)
 
       localStorage.setItem('mockr-saved-comics', JSON.stringify(trimmedComics))
       console.log('Comic saved to gallery:', comic.id)
     } catch (error) {
-      console.error('Error saving comic to gallery:', error)
+      // Handle QuotaExceededError specifically
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        console.warn('localStorage quota exceeded, reducing saved comics to 5')
+        try {
+          // Emergency fallback: keep only 5 most recent comics
+          const existing = localStorage.getItem('mockr-saved-comics')
+          const savedComics = existing ? JSON.parse(existing) : []
+          const existingIndex = savedComics.findIndex((saved: any) => saved.id === comic.id)
+
+          if (existingIndex >= 0) {
+            savedComics[existingIndex] = comic
+          } else {
+            savedComics.unshift(comic)
+          }
+
+          const reducedComics = savedComics.slice(0, 5)
+          localStorage.setItem('mockr-saved-comics', JSON.stringify(reducedComics))
+          console.log('Comic saved to gallery with reduced limit:', comic.id)
+        } catch (retryError) {
+          // If still failing, clear storage and save only current comic
+          console.error('Still exceeding quota, clearing old comics')
+          localStorage.setItem('mockr-saved-comics', JSON.stringify([comic]))
+        }
+      } else {
+        console.error('Error saving comic to gallery:', error)
+      }
     }
   }
 
@@ -805,15 +831,16 @@ export default function GeneratePage() {
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 py-12 lg:py-16">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
-          {/* Form Section */}
+      <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
+        <div className="grid lg:grid-cols-5 gap-12 lg:gap-8">
+          {/* Form Section - 2 columns */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
+            className="lg:col-span-2"
           >
-            <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden p-8 lg:p-10">
+            <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden p-6 lg:p-8">
               <div className="mb-8">
                 <h1 className="text-4xl lg:text-6xl font-bold leading-tight tracking-tight text-neutral-900 mb-4">
                   Create Your Comic
@@ -1011,13 +1038,14 @@ export default function GeneratePage() {
             </div>
           </motion.div>
 
-          {/* Preview Section */}
+          {/* Preview Section - 3 columns */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
+            className="lg:col-span-3"
           >
-            <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden p-8 lg:p-10 sticky top-32">
+            <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden p-6 lg:p-8 sticky top-32">
               <h2 className="text-2xl lg:text-3xl font-semibold leading-tight tracking-tight text-neutral-900 mb-6">
                 Preview
               </h2>
@@ -1049,10 +1077,10 @@ export default function GeneratePage() {
               )}
 
               {generatedComic && (
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
-                    {/* Comic Image */}
-                    <div className="aspect-[4/3] bg-white relative">
+                    {/* Comic Image - Larger Display */}
+                    <div className="aspect-square bg-white relative">
                       {generatedComic.imageUrl.startsWith('data:') ? (
                         <Image
                           src={generatedComic.imageUrl}
@@ -1097,21 +1125,20 @@ export default function GeneratePage() {
                       )}
                     </div>
 
-                    {/* Comic Details */}
-                    <div className="p-6">
-                      <div className="mb-4">
-                        <h3 className="font-semibold text-neutral-900 mb-2 line-clamp-2">
+                    {/* Comic Details - Compact */}
+                    <div className="p-4">
+                      <div className="mb-3">
+                        <h3 className="text-sm font-semibold text-neutral-900 mb-1 line-clamp-2">
                           "{generatedComic.dialogue}"
                         </h3>
-                        <p className="text-sm text-neutral-600 line-clamp-3">
+                        <p className="text-xs text-neutral-600 line-clamp-2">
                           {generatedComic.situation}
                         </p>
                       </div>
 
-                      <div className="flex items-center justify-between text-xs text-neutral-400 mb-4">
+                      <div className="flex items-center justify-between text-xs text-neutral-400">
                         <span className="capitalize">satirical • laxman</span>
                         <span>{new Date().toLocaleDateString('en-US', {
-                          year: 'numeric',
                           month: 'short',
                           day: 'numeric',
                           hour: '2-digit',
@@ -1121,17 +1148,17 @@ export default function GeneratePage() {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="grid grid-cols-2 gap-4">
+                  {/* Action Buttons - Compact */}
+                  <div className="grid grid-cols-2 gap-3">
                     {/* Enhanced Download Dropdown */}
                     <div className="relative" ref={downloadDropdownRef}>
                       <button
                         onClick={() => setShowDownloadDropdown(!showDownloadDropdown)}
-                        className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group py-3 w-full flex items-center justify-center"
+                        className="bg-white hover:bg-neutral-50 text-blue-600 text-sm font-medium rounded-lg border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
                       >
-                        <Download className="w-4 h-4 mr-2" />
+                        <Download className="w-3.5 h-3.5 mr-1.5" />
                         Download
-                        <ChevronDown className={`w-4 h-4 ml-2 transition-transform ${showDownloadDropdown ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`w-3.5 h-3.5 ml-1.5 transition-transform ${showDownloadDropdown ? 'rotate-180' : ''}`} />
                       </button>
 
                       {showDownloadDropdown && (
@@ -1173,11 +1200,11 @@ export default function GeneratePage() {
                     <div className="relative" ref={shareDropdownRef}>
                       <button
                         onClick={() => setShowShareDropdown(!showShareDropdown)}
-                        className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 group py-3 w-full flex items-center justify-center"
+                        className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
                       >
-                        <Share2 className="w-4 h-4 mr-2" />
+                        <Share2 className="w-3.5 h-3.5 mr-1.5" />
                         Share
-                        <ChevronDown className={`w-4 h-4 ml-2 transition-transform ${showShareDropdown ? 'rotate-180' : ''}`} />
+                        <ChevronDown className={`w-3.5 h-3.5 ml-1.5 transition-transform ${showShareDropdown ? 'rotate-180' : ''}`} />
                       </button>
 
                       {showShareDropdown && (
@@ -1224,23 +1251,17 @@ export default function GeneratePage() {
                 </div>
               )}
 
-              {/* Quick Tips */}
-              <div className="mt-8 p-6 bg-blue-50 rounded-2xl">
-                <h3 className="text-xl lg:text-2xl font-semibold leading-tight tracking-tight text-blue-900 mb-3">
+              {/* Quick Tips - Compact */}
+              <div className="mt-6 p-4 bg-blue-50 rounded-xl">
+                <h3 className="text-sm font-semibold text-blue-900 mb-2">
                   💡 Pro Tips
                 </h3>
-                <ul className="space-y-2 text-sm lg:text-base leading-relaxed text-blue-700">
+                <ul className="space-y-1 text-xs leading-relaxed text-blue-700">
                   <li>• Be specific about the political situation</li>
                   <li>• Include contradictions for better satire</li>
-                  <li>• Mention visual elements you want to see</li>
+                  <li>• Mention visual elements you want</li>
                   <li>• Keep it timely and relatable</li>
                 </ul>
-
-                <div className="mt-4 p-3 bg-white rounded-lg border border-blue-200">
-                  <p className="text-sm text-blue-600">
-                    <strong>🎨 Smart Comics:</strong> Currently using enhanced placeholder system with dynamic dialogue, speech bubbles, and context display. AI image generation coming soon!
-                  </p>
-                </div>
               </div>
             </div>
           </motion.div>

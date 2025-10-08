@@ -238,31 +238,33 @@ export async function generateEnhancedPrompt(
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
     console.log('[Gemini] Model initialized successfully')
 
-    const prompt = `Create a SIMPLE, FOCUSED visual description for an R.K. Laxman editorial cartoon:
+    const prompt = `Create a SIMPLE, FOCUSED visual description for an R.K. Laxman editorial cartoon showing the MAIN ACTION only:
 
 SITUATION: ${situation}
 ${quote ? `QUOTE: ${quote}` : ''}
 
 Create a SHORT description (under 400 characters) that shows:
-1. The Common Man (R.K. Laxman character) reacting to the situation
-2. The main irony/contradiction from the quote visually represented
-3. Simple, clear scene - no complex details
+1. The MAIN ACTION/EVENT from the situation (DO NOT mention Common Man - he will be added separately)
+2. The key irony/contradiction visually represented
+3. Simple, clear scene - focus on the main characters and their actions
+
+IMPORTANT: Do NOT include "Common Man" in your description. Only describe the main event/action.
 
 EXAMPLES:
 
 Situation: "Trump's $100,000 H-1B visa fee could hurt growth"
 Quote: "Making America expensive again, one visa at a time!"
-Description: "Common Man looks bewildered. Trump character holds giant '$100,000 VISA FEE' sign while job seekers walk away disappointed. Immigration office with expensive price tags everywhere."
+Description: "Trump character holds giant '$100,000 VISA FEE' sign while job seekers walk away disappointed. Immigration office with expensive price tags everywhere."
 
 Situation: "Minister's wife duped of $400,000 in digital arrest"
 Quote: "Expert in governance, amateur in online security!"
-Description: "Common Man looks bewildered. Minister's wife stares shocked at computer screen showing '$400,000 SCAMMED' alert. Minister tries to comfort her. Digital fraud icons floating around computer. Home office setting."
+Description: "Minister's wife stares shocked at computer screen showing '$400,000 SCAMMED' alert. Minister tries to comfort her. Digital fraud icons floating around computer. Home office setting."
 
-Situation: "Minister inaugurates hospital while cutting budget"
-Quote: "Cutting ribbons while cutting budgets!"
-Description: "Common Man looks bewildered. Minister cuts ribbon at hospital entrance while secretly shredding 'HEALTHCARE BUDGET' papers behind back. Patients wait in long lines."
+Situation: "Officer bribing minister for contract"
+Quote: "Transparency in action!"
+Description: "Officer hands money to Minister. Lamp above them shines, casting light on the bribe. Office setting with documents labeled 'CONTRACT'."
 
-Keep it SIMPLE and VISUAL. Focus on the satirical irony, not artistic technique.
+Keep it SIMPLE and VISUAL. Focus on the main action and satirical irony. DO NOT mention Common Man.
 
 Create description for the situation above:`
 
@@ -333,46 +335,49 @@ function generateFallbackPrompt(
   const cleanSituation = situation.replace(/['"]/g, '').trim()
   const cleanQuote = quote ? quote.replace(/['"]/g, '').trim() : ''
 
-  // Create simple, focused description based on situation keywords
+  // Create simple, focused description based on situation keywords (NO Common Man - added separately)
   const situationLower = cleanSituation.toLowerCase()
 
-  let description = "R.K. Laxman cartoon: Common Man looks bewildered at "
+  let description = ""
 
-  // Extract key elements and create specific visual based on situation
+  // Extract key elements and create specific visual based on situation - focus on MAIN ACTION only
   if (situationLower.includes('scam') || situationLower.includes('fraud') || situationLower.includes('duped')) {
     if (situationLower.includes('wife') || situationLower.includes('family')) {
-      description += "politician's wife looking shocked at computer screen showing '$400,000 SCAMMED' while politician tries to explain. Digital scam icons around. Home office setting."
+      description = "Politician's wife looking shocked at computer screen showing '$400,000 SCAMMED' while politician tries to explain. Digital scam icons around. Home office setting."
     } else {
-      description += "person looking shocked at computer screen showing scam alerts while official looks embarrassed. Digital fraud setting."
+      description = "Person looking shocked at computer screen showing scam alerts while official looks embarrassed. Digital fraud setting."
     }
   }
   else if (situationLower.includes('visa') || situationLower.includes('h-1b')) {
     if (situationLower.includes('fee') || situationLower.includes('$')) {
-      description += "giant '$100,000' price tag attached to American visa while job seekers walk away disappointed. Immigration office setting."
+      description = "Giant '$100,000' price tag attached to American visa while job seekers walk away disappointed. Immigration office setting."
     } else {
-      description += "expensive visa barriers blocking job seekers while politician waves welcome sign. Immigration setting."
+      description = "Expensive visa barriers blocking job seekers while politician waves welcome sign. Immigration setting."
     }
   }
   else if (situationLower.includes('hospital') || situationLower.includes('healthcare')) {
-    description += "politician cutting ribbon at hospital entrance while patients wait in long emergency room lines. Hospital setting."
+    description = "Politician cutting ribbon at hospital entrance while patients wait in long emergency room lines. Hospital setting."
   }
   else if (situationLower.includes('school') || situationLower.includes('education')) {
-    description += "politician inaugurating local school while secretly holding brochures for international schools. School setting."
+    description = "Politician inaugurating local school while secretly holding brochures for international schools. School setting."
   }
   else if (situationLower.includes('climate') || situationLower.includes('environment')) {
-    description += "politician giving green speech while private jet takes off in background. Conference setting."
+    description = "Politician giving green speech while private jet takes off in background. Conference setting."
   }
   else if (situationLower.includes('job') || situationLower.includes('employment')) {
-    description += "job fair with all booths showing 'No Vacancy' signs while politician promises employment. Job fair setting."
+    description = "Job fair with all booths showing 'No Vacancy' signs while politician promises employment. Job fair setting."
   }
   else if (situationLower.includes('corruption') || situationLower.includes('money')) {
-    description += "politician counting money behind desk while citizens wait in poverty outside office. Government office setting."
+    description = "Politician counting money behind desk while citizens wait in poverty outside office. Government office setting."
+  }
+  else if (situationLower.includes('bribe') || situationLower.includes('bribing')) {
+    description = "Officer hands money to Minister. Lamp shines above, casting light on the bribe. Office setting with documents."
   }
   else {
     // Create description based on any specific nouns or actions in the situation
     const words = cleanSituation.split(' ')
     const keyWords = words.filter(word => word.length > 4).slice(0, 3).join(', ')
-    description += `politician dealing with situation involving ${keyWords} while citizens look concerned. Relevant setting.`
+    description = `Politician dealing with situation involving ${keyWords} while citizens look concerned. Relevant setting.`
   }
 
   if (cleanQuote) {

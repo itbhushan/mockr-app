@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     console.log('🔗 Placeholder URL:', imageUrl)
     console.log('🔑 Environment check - HF Token exists:', !!process.env.HUGGINGFACE_API_TOKEN)
 
-    // Try Hugging Face AI generation first (Pro API)
+    // Try Hugging Face AI generation first (Pro API) - using official SDXL defaults
     const aiImageUrl = await generateComicWithHuggingFace(prompt)
 
     if (aiImageUrl) {
@@ -353,18 +353,25 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
   }
 
   try {
-    console.log('🌐 Making request to Hugging Face API...')
+    console.log('🌐 Making request to Hugging Face API with FLUX.1-dev model...')
     console.log('📝 Original prompt from Gemini:', prompt.substring(0, 200) + '...')
 
-    // Transform Gemini description into optimized Stable Diffusion prompt
-    const optimizedPrompt = optimizePromptForStableDiffusion(prompt)
+    // Transform Gemini description into optimized FLUX prompt
+    const optimizedPrompt = optimizePromptForFLUX(prompt)
 
-    console.log('📝 Optimized prompt for Stable Diffusion:', optimizedPrompt.substring(0, 200) + '...')
+    console.log('📝 Optimized prompt for FLUX.1-dev:', optimizedPrompt.substring(0, 200) + '...')
     console.log('📝 Full optimized prompt length:', optimizedPrompt.length)
 
-    // Use Stable Diffusion XL with enhanced character-focused prompting
+    // Log exact parameters being sent
+    console.log('⚙️ FLUX.1-dev Parameters:')
+    console.log('   - guidance_scale: 3.5 (FLUX optimal)')
+    console.log('   - num_inference_steps: 40')
+    console.log('   - resolution: 1024x1024')
+    console.log('   - model: black-forest-labs/FLUX.1-dev')
+
+    // Use FLUX.1-dev - significantly better prompt following and composition
     const response = await fetch(
-      'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0',
+      'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev',
       {
         headers: {
           'Authorization': `Bearer ${apiToken}`,
@@ -374,12 +381,10 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
         body: JSON.stringify({
           inputs: optimizedPrompt,
           parameters: {
-            negative_prompt: "realistic photo, photorealistic, photography, colored image, colors, gradients, 3d render, blurry, low quality, distorted faces, extra limbs, deformed hands, bad anatomy, watermark, signature, incomplete scene, cluttered background",
-            num_inference_steps: 35,
-            guidance_scale: 7.5,
-            width: 768,
-            height: 768,
-            scheduler: "DPMSolverMultistepScheduler"
+            num_inference_steps: 40,
+            guidance_scale: 3.5, // FLUX optimal guidance
+            width: 1024,
+            height: 1024
           }
         }),
       }
@@ -410,23 +415,56 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
   }
 }
 
-function optimizePromptForStableDiffusion(description: string): string {
-  console.log('🔧 CREATING OPTIMIZED PROMPT FROM AI DESCRIPTION...')
+function optimizePromptForFLUX(description: string): string {
+  console.log('🔧 CREATING FLUX-OPTIMIZED R.K. LAXMAN PROMPT...')
   console.log('📝 Original AI description:', description.substring(0, 300) + '...')
 
-  // Create clean, focused prompt that includes the full scene description
-  let optimizedPrompt = `R.K. Laxman editorial cartoon style, black and white line art, single panel newspaper comic, `
+  // FLUX.1-dev excels at natural language understanding - simpler, clearer prompts work better
+  // No need for complex weighting syntax - FLUX follows instructions precisely
 
-  // Add the FULL SCENE DESCRIPTION directly (this is key!)
-  optimizedPrompt += description + ', '
+  let optimizedPrompt = ``
 
-  // Add core style specifications (simplified)
-  optimizedPrompt += `professional editorial cartoon, clean line art, expressive faces, minimal background, high contrast black and white illustration, newspaper comic format`
+  // 1. CLEAR DIRECTIVE START - Tell FLUX exactly what to create
+  optimizedPrompt += `Create a single-panel black and white editorial cartoon in R.K. Laxman style. `
 
-  console.log('🔧 OPTIMIZED CLEAN PROMPT CREATED')
+  // 2. MAIN SCENE & CHARACTERS - Primary action in CENTER/LEFT area
+  optimizedPrompt += `MAIN SCENE: ${description}. `
+
+  // 3. COMPOSITION CONSTRAINT - Reserve space for Common Man overlay
+  optimizedPrompt += `IMPORTANT LAYOUT: Position all main characters and action in the CENTER and LEFT portions of the frame. Keep the FAR RIGHT EDGE and BOTTOM-LEFT CORNER areas EMPTY and CLEAR (reserve approximately 20% of right edge for observer character that will be added later). `
+
+  // 4. CHARACTER COUNT - Main scene only
+  optimizedPrompt += `Show 1-2 main characters performing the scene action in the CENTER/LEFT area of the frame. `
+
+  // 5. MAIN CHARACTER DETAILS - Describe scene participants
+  optimizedPrompt += `The main characters from the scene description should have clear, distinct cartoon faces with round simple features and expressive emotions, positioned in the center-left area doing the actions described. `
+
+  // 6. NO COMMON MAN IN THIS GENERATION - Will be added as overlay
+  optimizedPrompt += `DO NOT include any observer or bystander characters. DO NOT place any characters in the far right edge or bottom-left corner. Keep these areas clear and empty. `
+
+  // 6. BACKGROUND MANDATE - Be explicit about simplicity
+  optimizedPrompt += `Background must be minimal and simple: plain white space with basic geometric shapes only, a simple indoor setting if needed (desk, chair, door, window). NO cityscapes, NO crowds, NO complex architecture, NO multiple buildings. `
+
+  // 7. ARTISTIC TECHNIQUE - Natural language description
+  optimizedPrompt += `Drawing style: Clean black ink pen strokes on white paper, diagonal crosshatching for shadows, bold solid blacks for contrast, hand-drawn editorial cartoon quality from 1960s-1990s Indian political cartoons. `
+
+  // 8. COMPOSITION - Frame and layout
+  optimizedPrompt += `Composition: Single rectangular panel with thick black border frame around the entire image, characters in clear view with recognizable faces, main action in center or foreground. `
+
+  // 9. MOCKR WATERMARK/SIGNATURE - Brand identity
+  optimizedPrompt += `MANDATORY: Include the text "Mockr" in bottom right corner in casual handwritten cartoon font style, similar to artist signature style. `
+
+  // 10. TECHNICAL CONSTRAINTS - What to avoid
+  optimizedPrompt += `No color, no gradients, no photorealism, no speech bubbles in the main image. Pure black and white line art only.`
+
+  console.log('🔧 FLUX-OPTIMIZED PROMPT CREATED')
   console.log('📝 Final prompt length:', optimizedPrompt.length)
-  console.log('📝 Reduced redundancy and improved clarity')
-  console.log('🎯 COMPLETE HUGGING FACE PROMPT:')
+  console.log('✅ Natural language structure for FLUX')
+  console.log('✅ Clear character count directive')
+  console.log('✅ CONSISTENT Common Man character (50s, untucked shirt, pants, slippers)')
+  console.log('✅ Mockr watermark in bottom right corner')
+  console.log('✅ Explicit background simplicity mandate')
+  console.log('🎯 COMPLETE FLUX-OPTIMIZED PROMPT:')
   console.log('=====================================')
   console.log(optimizedPrompt)
   console.log('=====================================')
