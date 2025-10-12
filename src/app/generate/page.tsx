@@ -256,12 +256,34 @@ export default function GeneratePage() {
     })
   }
 
-  const handleDownload = (format: 'jpg' | 'png' | 'svg' | 'pdf' = 'jpg') => {
+  const handleDownload = async (format: 'jpg' | 'png' | 'svg' | 'pdf' = 'jpg') => {
     if (!generatedComic) return
 
     const filename = `mockr-comic-${generatedComic.id}`
 
-    // Handle different download formats
+    // For JPG and PNG, use screenshot capture for full comic with quote and situation
+    if (format === 'jpg' || format === 'png') {
+      console.log('[Download] Capturing screenshot for', format)
+      const screenshotBlob = await captureComicScreenshot()
+
+      if (screenshotBlob) {
+        const downloadUrl = URL.createObjectURL(screenshotBlob)
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.download = `${filename}.${format}`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(downloadUrl)
+        console.log('[Download] Screenshot downloaded successfully as', format)
+        return
+      } else {
+        console.error('[Download] Screenshot capture failed, falling back to original method')
+        // Fall through to original method
+      }
+    }
+
+    // Handle other formats or fallback
     if (format === 'svg') {
       downloadSVGDirect(filename)
     } else if (format === 'pdf') {
