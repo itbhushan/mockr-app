@@ -86,7 +86,7 @@ export default function SimpleHomePage() {
             {isSignedIn ? (
               "Ready to create your next satirical masterpiece? Generate AI-powered political cartoons and share your unique perspective with the world."
             ) : (
-              "Generate witty, shareable satirical content inspired by R.K. Laxman's legendary style. Turn political commentary into viral-worthy cartoons with AI."
+              "Generate witty, shareable satirical content in classic editorial cartoon style. Turn political commentary into viral-worthy cartoons with AI."
             )}
           </p>
 
@@ -146,7 +146,7 @@ export default function SimpleHomePage() {
                 AI-Powered Creativity
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Generate witty political cartoons inspired by R.K. Laxman's legendary style with cutting-edge AI technology.
+                Generate witty political cartoons in classic editorial style with cutting-edge AI technology.
               </p>
             </div>
 

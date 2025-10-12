@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { generateEnhancedDialogue, generateEnhancedPrompt } from '@/lib/gemini'
+import { addCommonManToComic } from '@/lib/imageComposite'
 
 export async function POST(request: NextRequest) {
   try {
@@ -402,12 +403,20 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
     // Get the image blob
     const imageBlob = await response.blob()
 
-    // Convert blob to base64 data URL for immediate display
+    // Convert blob to base64 data URL
     const arrayBuffer = await imageBlob.arrayBuffer()
     const base64 = Buffer.from(arrayBuffer).toString('base64')
-    const dataUrl = `data:image/jpeg;base64,${base64}`
+    const baseComicDataUrl = `data:image/jpeg;base64,${base64}`
 
-    return dataUrl
+    console.log('✅ Base comic generated successfully')
+    console.log('🎨 Now adding Common Man overlay with smart positioning...')
+
+    // Apply Common Man composite overlay with context-aware expression and position
+    const finalComicWithCommonMan = await addCommonManToComic(baseComicDataUrl, prompt)
+
+    console.log('✅ Final composite comic created successfully')
+
+    return finalComicWithCommonMan
 
   } catch (error) {
     console.error('Error calling Hugging Face API:', error)
@@ -430,8 +439,8 @@ function optimizePromptForFLUX(description: string): string {
   // 2. MAIN SCENE & CHARACTERS - Primary action in CENTER/LEFT area
   optimizedPrompt += `MAIN SCENE: ${description}. `
 
-  // 3. COMPOSITION CONSTRAINT - Reserve space for Common Man overlay
-  optimizedPrompt += `IMPORTANT LAYOUT: Position all main characters and action in the CENTER and LEFT portions of the frame. Keep the FAR RIGHT EDGE and BOTTOM-LEFT CORNER areas EMPTY and CLEAR (reserve approximately 20% of right edge for observer character that will be added later). `
+  // 3. COMPOSITION CONSTRAINT - Reserve space for Common Man overlay (top only - signature will be added below image)
+  optimizedPrompt += `IMPORTANT LAYOUT: Position all main characters and action in the LEFT and CENTER portions of the frame. Keep the TOP-RIGHT CORNER area EMPTY and CLEAR (reserve approximately 20% width and 40% height of the top-right area for an observer character that will be added later). Reserved area must be plain white/empty background. `
 
   // 4. CHARACTER COUNT - Main scene only
   optimizedPrompt += `Show 1-2 main characters performing the scene action in the CENTER/LEFT area of the frame. `
@@ -439,8 +448,11 @@ function optimizePromptForFLUX(description: string): string {
   // 5. MAIN CHARACTER DETAILS - Describe scene participants
   optimizedPrompt += `The main characters from the scene description should have clear, distinct cartoon faces with round simple features and expressive emotions, positioned in the center-left area doing the actions described. `
 
-  // 6. NO COMMON MAN IN THIS GENERATION - Will be added as overlay
-  optimizedPrompt += `DO NOT include any observer or bystander characters. DO NOT place any characters in the far right edge or bottom-left corner. Keep these areas clear and empty. `
+  // 6. NO COMMON MAN IN TOP-RIGHT - Will be added as overlay
+  optimizedPrompt += `DO NOT include any observer or bystander characters. DO NOT place any characters in the TOP-RIGHT CORNER. Keep the top-right area clear and empty with plain white background. `
+
+  // 7. NO SIGNATURES OR TEXT - Mockr branding will be added separately
+  optimizedPrompt += `CRITICAL: DO NOT add any artist signatures, watermarks, dates, or text labels anywhere in the image. ABSOLUTELY NO text in the bottom-right corner. NO signatures like "Mockr", "AI", or any artist name anywhere in the image. Do not write "Mockr" or any other text. Keep the entire image completely clean without any text overlays, signatures, or written words. The branding will be added separately after generation. `
 
   // 6. BACKGROUND MANDATE - Be explicit about simplicity
   optimizedPrompt += `Background must be minimal and simple: plain white space with basic geometric shapes only, a simple indoor setting if needed (desk, chair, door, window). NO cityscapes, NO crowds, NO complex architecture, NO multiple buildings. `

@@ -12,13 +12,13 @@
 
   export const metadata: Metadata = {
     title: 'Mockr - AI Political Cartoon Generator',
-    description: 'Create intelligent satirical political cartoons inspired by R.K. Laxman with AI. Generate shareable political commentary through witty, professional-quality cartoons.',
+    description: 'Create intelligent satirical political cartoons in classic editorial style with AI. Generate shareable political commentary through witty, professional-quality cartoons.',
     keywords: [
       'political cartoons',
       'satirical comics',
       'AI cartoon generator',
       'political satire',
-      'R.K. Laxman style',
+      'editorial cartoons',
       'social commentary',
       'political humor'
     ],

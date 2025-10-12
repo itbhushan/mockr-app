@@ -241,12 +241,7 @@ export default function GalleryPage() {
                     </div>
                   )}
 
-                  {/* AI Generated Badge */}
-                  {comic.aiGenerated && (
-                    <div className="absolute top-2 left-2 bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
-                      AI Generated
-                    </div>
-                  )}
+                  {/* AI Generated Badge - Removed as all comics are AI-generated */}
                 </div>
 
                 {/* Comic Details */}

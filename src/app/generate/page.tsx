@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Sparkles, RefreshCw, Download, Share2, Shuffle, Twitter, Facebook, MessageCircle, Copy, ChevronDown, FileImage, FileText } from 'lucide-react'
+import { ArrowLeft, Sparkles, RefreshCw, Download, Share2, Shuffle, Twitter as XIcon, Facebook, MessageCircle, Copy, ChevronDown, FileImage, FileText } from 'lucide-react'
 
 export default function GeneratePage() {
   const [formData, setFormData] = useState({
@@ -77,11 +77,11 @@ export default function GeneratePage() {
         console.log('Quote generated successfully:', data.quote)
       } else {
         console.error('Quote generation failed:', data.error)
-        alert(`Failed to generate quote: ${data.error || 'Unknown error'}`)
+        alert(`❌ Failed to generate quote from AI.\n\nPlease click "Regenerate Quote" to try again.`)
       }
     } catch (error) {
       console.error('Error calling Quote API:', error)
-      alert('Something went wrong. Please try again.')
+      alert('❌ Failed to generate quote from AI.\n\nPlease click "Regenerate Quote" to try again.')
     } finally {
       setIsGeneratingQuote(false)
     }
@@ -314,7 +314,7 @@ export default function GeneratePage() {
 
     try {
       // Load and draw the comic image
-      const comicImg = new (Image as any)()
+      const comicImg = new window.Image()
       await new Promise((resolve, reject) => {
         comicImg.onload = resolve
         comicImg.onerror = reject
@@ -444,9 +444,9 @@ export default function GeneratePage() {
     }
   }
 
-  const downloadPNGFromSVG = (filename: string) => {
-    if (!svgContent) {
-      alert('Comic content not available')
+  const downloadPNGFromSVG = async (filename: string) => {
+    if (!generatedComic) {
+      alert('❌ Comic content not available')
       return
     }
 
@@ -455,65 +455,129 @@ export default function GeneratePage() {
       const ctx = canvas.getContext('2d')
       if (!ctx) return
 
-      // Set high resolution for better quality
+      // Larger canvas to include quote and situation
       canvas.width = 1200
-      canvas.height = 1000
+      canvas.height = 1400 // Increased height for quote and situation
 
-      const img = new (Image as any)()
-      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
-      const svgUrl = URL.createObjectURL(svgBlob)
+      // Fill white background
+      ctx.fillStyle = 'white'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      img.onload = () => {
-        // Fill white background
-        ctx.fillStyle = 'white'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
+      let yOffset = 40
 
-        // Calculate dimensions to maintain aspect ratio
-        const aspectRatio = img.width / img.height
-        let drawWidth = canvas.width - 100 // padding
-        let drawHeight = drawWidth / aspectRatio
+      // Draw satirical quote at top
+      ctx.fillStyle = '#15803d' // green-700
+      ctx.font = 'bold 18px Arial'
+      ctx.textAlign = 'center'
+      ctx.fillText('💬 SATIRICAL QUOTE', canvas.width / 2, yOffset)
 
-        if (drawHeight > canvas.height - 100) {
-          drawHeight = canvas.height - 100
-          drawWidth = drawHeight * aspectRatio
+      yOffset += 35
+
+      ctx.fillStyle = '#166534' // green-800
+      ctx.font = 'bold 24px Arial'
+      const quoteText = `"${generatedComic.dialogue}"`
+      const quoteLines = wrapText(ctx, quoteText, canvas.width - 100)
+
+      quoteLines.forEach(line => {
+        ctx.fillText(line, canvas.width / 2, yOffset)
+        yOffset += 32
+      })
+
+      yOffset += 30
+
+      // Load and draw the comic image
+      const img = new window.Image()
+      let svgUrl: string | null = null
+
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => {
+          // Calculate comic dimensions to fit
+          const maxComicHeight = 800
+          const availableWidth = canvas.width - 60
+          let comicWidth = img.width
+          let comicHeight = img.height
+
+          const aspectRatio = comicWidth / comicHeight
+
+          if (comicHeight > maxComicHeight) {
+            comicHeight = maxComicHeight
+            comicWidth = maxComicHeight * aspectRatio
+          }
+
+          if (comicWidth > availableWidth) {
+            comicWidth = availableWidth
+            comicHeight = availableWidth / aspectRatio
+          }
+
+          // Center and draw comic
+          const comicX = (canvas.width - comicWidth) / 2
+          ctx.drawImage(img, comicX, yOffset, comicWidth, comicHeight)
+          yOffset += comicHeight + 30
+
+          // Clean up SVG URL if it was created
+          if (svgUrl) {
+            URL.revokeObjectURL(svgUrl)
+          }
+
+          resolve()
         }
 
-        const x = (canvas.width - drawWidth) / 2
-        const y = (canvas.height - drawHeight) / 2
-
-        ctx.drawImage(img, x, y, drawWidth, drawHeight)
-
-        canvas.toBlob(blob => {
-          if (blob) {
-            const link = document.createElement('a')
-            link.href = URL.createObjectURL(blob)
-            link.download = `${filename}.png`
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-            URL.revokeObjectURL(link.href)
+        img.onerror = () => {
+          if (svgUrl) {
+            URL.revokeObjectURL(svgUrl)
           }
-        }, 'image/png')
+          reject(new Error('Failed to load image'))
+        }
 
-        URL.revokeObjectURL(svgUrl)
-      }
+        // Handle both base64 data URLs and SVG content
+        if (generatedComic.imageUrl.startsWith('data:')) {
+          img.src = generatedComic.imageUrl
+        } else if (svgContent) {
+          const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+          svgUrl = URL.createObjectURL(svgBlob)
+          img.src = svgUrl
+        } else {
+          reject(new Error('Comic content not available'))
+        }
+      })
 
-      img.onerror = () => {
-        console.error('Failed to load SVG for conversion')
-        alert('Failed to convert image. Please try SVG format.')
-        URL.revokeObjectURL(svgUrl)
-      }
+      // Draw political situation at bottom
+      ctx.fillStyle = '#1e40af' // blue-700
+      ctx.font = 'bold 18px Arial'
+      ctx.fillText('📍 POLITICAL SITUATION', canvas.width / 2, yOffset)
 
-      img.src = svgUrl
+      yOffset += 30
+
+      ctx.fillStyle = '#1e3a8a' // blue-900
+      ctx.font = '16px Arial'
+      const situationLines = wrapText(ctx, generatedComic.situation, canvas.width - 100)
+
+      situationLines.forEach(line => {
+        ctx.fillText(line, canvas.width / 2, yOffset)
+        yOffset += 24
+      })
+
+      // Download the composite image
+      canvas.toBlob(blob => {
+        if (blob) {
+          const link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = `${filename}.png`
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          URL.revokeObjectURL(link.href)
+        }
+      }, 'image/png')
     } catch (error) {
       console.error('PNG conversion failed:', error)
       alert('Download failed. Please try again.')
     }
   }
 
-  const downloadJPGFromSVG = (filename: string) => {
-    if (!svgContent) {
-      alert('Comic content not available')
+  const downloadJPGFromSVG = async (filename: string) => {
+    if (!generatedComic) {
+      alert('❌ Comic content not available')
       return
     }
 
@@ -522,56 +586,120 @@ export default function GeneratePage() {
       const ctx = canvas.getContext('2d')
       if (!ctx) return
 
-      // Set high resolution for better quality
+      // Larger canvas to include quote and situation
       canvas.width = 1200
-      canvas.height = 1000
+      canvas.height = 1400 // Increased height for quote and situation
 
-      const img = new (Image as any)()
-      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
-      const svgUrl = URL.createObjectURL(svgBlob)
+      // Fill white background (important for JPG)
+      ctx.fillStyle = 'white'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      img.onload = () => {
-        // Fill white background (important for JPG)
-        ctx.fillStyle = 'white'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
+      let yOffset = 40
 
-        // Calculate dimensions to maintain aspect ratio
-        const aspectRatio = img.width / img.height
-        let drawWidth = canvas.width - 100 // padding
-        let drawHeight = drawWidth / aspectRatio
+      // Draw satirical quote at top
+      ctx.fillStyle = '#15803d' // green-700
+      ctx.font = 'bold 18px Arial'
+      ctx.textAlign = 'center'
+      ctx.fillText('💬 SATIRICAL QUOTE', canvas.width / 2, yOffset)
 
-        if (drawHeight > canvas.height - 100) {
-          drawHeight = canvas.height - 100
-          drawWidth = drawHeight * aspectRatio
+      yOffset += 35
+
+      ctx.fillStyle = '#166534' // green-800
+      ctx.font = 'bold 24px Arial'
+      const quoteText = `"${generatedComic.dialogue}"`
+      const quoteLines = wrapText(ctx, quoteText, canvas.width - 100)
+
+      quoteLines.forEach(line => {
+        ctx.fillText(line, canvas.width / 2, yOffset)
+        yOffset += 32
+      })
+
+      yOffset += 30
+
+      // Load and draw the comic image
+      const img = new window.Image()
+      let svgUrl: string | null = null
+
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => {
+          // Calculate comic dimensions to fit
+          const maxComicHeight = 800
+          const availableWidth = canvas.width - 60
+          let comicWidth = img.width
+          let comicHeight = img.height
+
+          const aspectRatio = comicWidth / comicHeight
+
+          if (comicHeight > maxComicHeight) {
+            comicHeight = maxComicHeight
+            comicWidth = maxComicHeight * aspectRatio
+          }
+
+          if (comicWidth > availableWidth) {
+            comicWidth = availableWidth
+            comicHeight = availableWidth / aspectRatio
+          }
+
+          // Center and draw comic
+          const comicX = (canvas.width - comicWidth) / 2
+          ctx.drawImage(img, comicX, yOffset, comicWidth, comicHeight)
+          yOffset += comicHeight + 30
+
+          // Clean up SVG URL if it was created
+          if (svgUrl) {
+            URL.revokeObjectURL(svgUrl)
+          }
+
+          resolve()
         }
 
-        const x = (canvas.width - drawWidth) / 2
-        const y = (canvas.height - drawHeight) / 2
-
-        ctx.drawImage(img, x, y, drawWidth, drawHeight)
-
-        canvas.toBlob(blob => {
-          if (blob) {
-            const link = document.createElement('a')
-            link.href = URL.createObjectURL(blob)
-            link.download = `${filename}.jpg`
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-            URL.revokeObjectURL(link.href)
+        img.onerror = () => {
+          if (svgUrl) {
+            URL.revokeObjectURL(svgUrl)
           }
-        }, 'image/jpeg', 0.95)
+          reject(new Error('Failed to load image'))
+        }
 
-        URL.revokeObjectURL(svgUrl)
-      }
+        // Handle both base64 data URLs and SVG content
+        if (generatedComic.imageUrl.startsWith('data:')) {
+          img.src = generatedComic.imageUrl
+        } else if (svgContent) {
+          const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+          svgUrl = URL.createObjectURL(svgBlob)
+          img.src = svgUrl
+        } else {
+          reject(new Error('Comic content not available'))
+        }
+      })
 
-      img.onerror = () => {
-        console.error('Failed to load SVG for conversion')
-        alert('Failed to convert image. Please try SVG format.')
-        URL.revokeObjectURL(svgUrl)
-      }
+      // Draw political situation at bottom
+      ctx.fillStyle = '#1e40af' // blue-700
+      ctx.font = 'bold 18px Arial'
+      ctx.fillText('📍 POLITICAL SITUATION', canvas.width / 2, yOffset)
 
-      img.src = svgUrl
+      yOffset += 30
+
+      ctx.fillStyle = '#1e3a8a' // blue-900
+      ctx.font = '16px Arial'
+      const situationLines = wrapText(ctx, generatedComic.situation, canvas.width - 100)
+
+      situationLines.forEach(line => {
+        ctx.fillText(line, canvas.width / 2, yOffset)
+        yOffset += 24
+      })
+
+      // Download the composite image
+      canvas.toBlob(blob => {
+        if (blob) {
+          const link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = `${filename}.jpg`
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          URL.revokeObjectURL(link.href)
+        }
+      }, 'image/jpeg', 0.95)
     } catch (error) {
       console.error('JPG conversion failed:', error)
       alert('Download failed. Please try again.')
@@ -743,34 +871,126 @@ export default function GeneratePage() {
     }
   }
 
-  const handleShare = (platform: 'twitter' | 'facebook' | 'whatsapp' | 'copy') => {
-    if (!generatedComic) return
+  const handleShare = async (platform: 'twitter' | 'facebook' | 'whatsapp' | 'copy') => {
+    if (!generatedComic || !generatedComic.imageUrl) {
+      alert('❌ Comic content not available. Please generate a comic first.')
+      return
+    }
 
-    const comicUrl = window.location.href
-    const text = `Check out this satirical political cartoon I created with Mockr! "${generatedComic.dialogue}" - ${generatedComic.situation.substring(0, 100)}${generatedComic.situation.length > 100 ? '...' : ''}`
+    const text = `Check out this satirical political cartoon I created with Mockr! "${generatedComic.dialogue}"`
 
     switch (platform) {
       case 'twitter':
-        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(comicUrl)}&hashtags=MockrApp,PoliticalSatire,Cartoon`
-        window.open(twitterUrl, '_blank', 'width=550,height=400')
+        // Download image first
+        handleDownload('jpg')
+
+        // Open X (Twitter) compose window
+        const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text + ' #MockrApp #PoliticalSatire')}`
+        setTimeout(() => {
+          window.open(xUrl, '_blank', 'width=550,height=400')
+        }, 500)
+
+        alert('✅ Comic image downloaded!\n\n📝 X (Twitter) will open - attach the downloaded image to your post.')
         break
 
       case 'facebook':
-        const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(comicUrl)}&quote=${encodeURIComponent(text)}`
-        window.open(fbUrl, '_blank', 'width=550,height=400')
+        // Download image
+        handleDownload('jpg')
+        alert('✅ Comic image downloaded!\n\n📝 Please upload it manually to Facebook.')
         break
 
       case 'whatsapp':
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + comicUrl)}`
-        window.open(whatsappUrl, '_blank')
+        // Detect if mobile or desktop
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
+        if (isMobile) {
+          // Mobile: Download and try to open WhatsApp app
+          handleDownload('jpg')
+
+          const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`
+
+          // Try to open app
+          const iframe = document.createElement('iframe')
+          iframe.style.display = 'none'
+          iframe.src = whatsappUrl
+          document.body.appendChild(iframe)
+
+          setTimeout(() => {
+            document.body.removeChild(iframe)
+            alert('✅ Comic image downloaded!\n\n📱 If WhatsApp didn\'t open, please share the downloaded image manually via WhatsApp.')
+          }, 1000)
+        } else {
+          // Desktop: Try to copy to clipboard and open WhatsApp Web
+          try {
+            // First, copy the full composite image to clipboard
+            const base64Data = generatedComic.imageUrl.split(',')[1]
+            const byteCharacters = atob(base64Data)
+            const byteNumbers = new Array(byteCharacters.length)
+
+            for (let i = 0; i < byteCharacters.length; i++) {
+              byteNumbers[i] = byteCharacters.charCodeAt(i)
+            }
+
+            const byteArray = new Uint8Array(byteNumbers)
+            const blob = new Blob([byteArray], { type: 'image/jpeg' })
+
+            await navigator.clipboard.write([
+              new ClipboardItem({
+                'image/jpeg': blob
+              })
+            ])
+
+            // Also download as backup
+            handleDownload('jpg')
+
+            // Open WhatsApp Web
+            setTimeout(() => {
+              window.open('https://web.whatsapp.com', '_blank')
+            }, 500)
+
+            alert('✅ Comic image copied to clipboard AND downloaded!\n\n📝 WhatsApp Web will open:\n\n1. Select a chat\n2. Paste (Ctrl+V / Cmd+V) the image directly in the message box\n3. Or click attach icon (📎) to upload the downloaded file\n4. Add your message and send!')
+          } catch (clipboardError) {
+            // Fallback: just download and open WhatsApp Web
+            handleDownload('jpg')
+
+            setTimeout(() => {
+              window.open('https://web.whatsapp.com', '_blank')
+            }, 500)
+
+            alert('✅ Comic image downloaded!\n\n📝 WhatsApp Web will open:\n\n1. Select a chat\n2. Click attachment icon (📎)\n3. Choose the downloaded comic image\n4. Add your message and send!')
+          }
+        }
         break
 
       case 'copy':
-        navigator.clipboard.writeText(`${text}\n\n${comicUrl}`).then(() => {
-          alert('Comic link copied to clipboard!')
-        }).catch(() => {
-          alert('Failed to copy to clipboard')
-        })
+        // Copy image to clipboard
+        try {
+          const base64Data = generatedComic.imageUrl.split(',')[1]
+          const byteCharacters = atob(base64Data)
+          const byteNumbers = new Array(byteCharacters.length)
+
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i)
+          }
+
+          const byteArray = new Uint8Array(byteNumbers)
+          const blob = new Blob([byteArray], { type: 'image/jpeg' })
+
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              'image/jpeg': blob
+            })
+          ])
+          alert('✅ Comic image copied to clipboard!\n\nYou can now paste it anywhere.')
+        } catch (err) {
+          // Fallback: copy text description
+          try {
+            await navigator.clipboard.writeText(text)
+            alert('✅ Comic description copied to clipboard!')
+          } catch {
+            alert('❌ Failed to copy to clipboard')
+          }
+        }
         break
     }
   }
@@ -846,7 +1066,7 @@ export default function GeneratePage() {
                   Create Your Comic
                 </h1>
                 <p className="text-lg lg:text-xl leading-relaxed text-neutral-600">
-                  Describe your political satire idea and watch AI bring it to life in R.K. Laxman's iconic style.
+                  Describe your political satire idea and watch AI bring it to life in classic editorial cartoon style.
                 </p>
               </div>
 
@@ -1117,12 +1337,7 @@ export default function GeneratePage() {
                         </div>
                       )}
 
-                      {/* AI Generated Badge */}
-                      {generatedComic.aiGenerated && (
-                        <div className="absolute top-2 left-2 bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
-                          AI Generated
-                        </div>
-                      )}
+                      {/* AI Generated Badge - Removed as all comics are AI-generated */}
                     </div>
 
                     {/* Comic Details - Compact */}
@@ -1134,16 +1349,6 @@ export default function GeneratePage() {
                         <p className="text-xs text-neutral-600 line-clamp-2">
                           {generatedComic.situation}
                         </p>
-                      </div>
-
-                      <div className="flex items-center justify-between text-xs text-neutral-400">
-                        <span className="capitalize">satirical • laxman</span>
-                        <span>{new Date().toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}</span>
                       </div>
                     </div>
                   </div>
@@ -1213,8 +1418,8 @@ export default function GeneratePage() {
                             onClick={() => { handleShare('twitter'); setShowShareDropdown(false) }}
                             className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                           >
-                            <Twitter className="w-4 h-4 mr-3 text-blue-500" />
-                            Share on Twitter
+                            <XIcon className="w-4 h-4 mr-3 text-neutral-900" />
+                            Share on X
                           </button>
                           <button
                             onClick={() => { handleShare('facebook'); setShowShareDropdown(false) }}
@@ -1251,17 +1456,11 @@ export default function GeneratePage() {
                 </div>
               )}
 
-              {/* Quick Tips - Compact */}
+              {/* Quick Tip - Single Simple Guidance */}
               <div className="mt-6 p-4 bg-blue-50 rounded-xl">
-                <h3 className="text-sm font-semibold text-blue-900 mb-2">
-                  💡 Pro Tips
-                </h3>
-                <ul className="space-y-1 text-xs leading-relaxed text-blue-700">
-                  <li>• Be specific about the political situation</li>
-                  <li>• Include contradictions for better satire</li>
-                  <li>• Mention visual elements you want</li>
-                  <li>• Keep it timely and relatable</li>
-                </ul>
+                <p className="text-sm text-blue-900">
+                  💡 <span className="font-semibold">Tip:</span> Describe a frustrating political or news situation - be specific about the contradiction or irony
+                </p>
               </div>
             </div>
           </motion.div>

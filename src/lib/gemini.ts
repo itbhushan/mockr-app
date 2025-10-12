@@ -65,8 +65,8 @@ Create a satirical caption that captures the absurdity of the specific situation
 
   } catch (error) {
     console.error('Gemini quote generation failed:', error)
-    // Fallback to situation-specific quote
-    return generateFallbackQuote(situation)
+    // Return error to prompt user to retry instead of showing fallback
+    throw new Error('Failed to generate quote from AI. Please try again.')
   }
 }
 
