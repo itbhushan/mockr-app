@@ -904,21 +904,26 @@ export default function GeneratePage() {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
         if (isMobile) {
-          // Mobile: Download and try to open WhatsApp app
+          // Mobile: Download full composite and open WhatsApp
           handleDownload('jpg')
 
-          const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`
+          // Show clear instructions first
+          alert('✅ Full comic image downloaded to your device!\n\n📱 Next steps:\n\n1. WhatsApp will open with pre-filled message\n2. Tap the attachment icon (📎 or +)\n3. Select "Photos & Videos"\n4. Choose the downloaded comic image\n5. Send!')
 
-          // Try to open app
-          const iframe = document.createElement('iframe')
-          iframe.style.display = 'none'
-          iframe.src = whatsappUrl
-          document.body.appendChild(iframe)
-
+          // Then open WhatsApp with text
           setTimeout(() => {
-            document.body.removeChild(iframe)
-            alert('✅ Comic image downloaded!\n\n📱 If WhatsApp didn\'t open, please share the downloaded image manually via WhatsApp.')
-          }, 1000)
+            const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`
+
+            // Try to open app
+            const iframe = document.createElement('iframe')
+            iframe.style.display = 'none'
+            iframe.src = whatsappUrl
+            document.body.appendChild(iframe)
+
+            setTimeout(() => {
+              document.body.removeChild(iframe)
+            }, 1000)
+          }, 100)
         } else {
           // Desktop: Try to copy to clipboard and open WhatsApp Web
           try {
