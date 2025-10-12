@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Sparkles, RefreshCw, Download, Share2, Shuffle, Twitter as XIcon, Facebook, MessageCircle, Copy, ChevronDown, FileImage, FileText } from 'lucide-react'
+import html2canvas from 'html2canvas'
 
 export default function GeneratePage() {
   const [formData, setFormData] = useState({
@@ -879,10 +880,27 @@ export default function GeneratePage() {
 
     const text = `Check out this satirical political cartoon I created with Mockr! "${generatedComic.dialogue}"`
 
+    // Capture screenshot of the comic preview
+    const screenshotBlob = await captureComicScreenshot()
+
+    if (!screenshotBlob) {
+      alert('❌ Failed to capture comic screenshot. Please try downloading instead.')
+      return
+    }
+
+    const file = new File([screenshotBlob], 'mockr-comic.jpg', { type: 'image/jpeg' })
+
     switch (platform) {
       case 'twitter':
-        // Download image first
-        handleDownload('jpg')
+        // Download screenshot
+        const downloadUrlX = URL.createObjectURL(screenshotBlob)
+        const linkX = document.createElement('a')
+        linkX.href = downloadUrlX
+        linkX.download = 'mockr-comic.jpg'
+        document.body.appendChild(linkX)
+        linkX.click()
+        document.body.removeChild(linkX)
+        URL.revokeObjectURL(downloadUrlX)
 
         // Open X (Twitter) compose window
         const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text + ' #MockrApp #PoliticalSatire')}`
@@ -890,13 +908,21 @@ export default function GeneratePage() {
           window.open(xUrl, '_blank', 'width=550,height=400')
         }, 500)
 
-        alert('✅ Comic image downloaded!\n\n📝 X (Twitter) will open - attach the downloaded image to your post.')
+        alert('✅ Comic screenshot downloaded!\n\n📝 X (Twitter) will open - attach the downloaded image to your post.')
         break
 
       case 'facebook':
-        // Download image
-        handleDownload('jpg')
-        alert('✅ Comic image downloaded!\n\n📝 Please upload it manually to Facebook.')
+        // Download screenshot
+        const downloadUrlFb = URL.createObjectURL(screenshotBlob)
+        const linkFb = document.createElement('a')
+        linkFb.href = downloadUrlFb
+        linkFb.download = 'mockr-comic.jpg'
+        document.body.appendChild(linkFb)
+        linkFb.click()
+        document.body.removeChild(linkFb)
+        URL.revokeObjectURL(downloadUrlFb)
+
+        alert('✅ Comic screenshot downloaded!\n\n📝 Please upload it manually to Facebook.')
         break
 
       case 'whatsapp':
@@ -904,17 +930,38 @@ export default function GeneratePage() {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
         if (isMobile) {
-          // Mobile: Download full composite and open WhatsApp
-          handleDownload('jpg')
+          // Mobile: Try native share first (works on iOS/Android)
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({
+                text: text,
+                files: [file]
+              })
+              // Successfully shared via native share sheet
+              return
+            } catch (error) {
+              // User cancelled or share failed, fall through to download method
+              console.log('Native share cancelled or failed:', error)
+            }
+          }
 
-          // Show clear instructions first
-          alert('✅ Full comic image downloaded to your device!\n\n📱 Next steps:\n\n1. WhatsApp will open with pre-filled message\n2. Tap the attachment icon (📎 or +)\n3. Select "Photos & Videos"\n4. Choose the downloaded comic image\n5. Send!')
+          // Fallback: Download and open WhatsApp
+          // Create download link from blob
+          const downloadUrl = URL.createObjectURL(screenshotBlob)
+          const link = document.createElement('a')
+          link.href = downloadUrl
+          link.download = 'mockr-comic.jpg'
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          URL.revokeObjectURL(downloadUrl)
 
-          // Then open WhatsApp with text
+          // Show instructions
+          alert('✅ Full comic screenshot downloaded!\n\n📱 Next steps:\n\n1. WhatsApp will open with pre-filled message\n2. Tap attachment icon (📎 or +)\n3. Select "Photos & Videos"\n4. Choose the downloaded comic\n5. Send!')
+
+          // Open WhatsApp with text
           setTimeout(() => {
             const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`
-
-            // Try to open app
             const iframe = document.createElement('iframe')
             iframe.style.display = 'none'
             iframe.src = whatsappUrl
@@ -925,68 +972,59 @@ export default function GeneratePage() {
             }, 1000)
           }, 100)
         } else {
-          // Desktop: Try to copy to clipboard and open WhatsApp Web
+          // Desktop: Try to copy screenshot to clipboard and open WhatsApp Web
           try {
-            // First, copy the full composite image to clipboard
-            const base64Data = generatedComic.imageUrl.split(',')[1]
-            const byteCharacters = atob(base64Data)
-            const byteNumbers = new Array(byteCharacters.length)
-
-            for (let i = 0; i < byteCharacters.length; i++) {
-              byteNumbers[i] = byteCharacters.charCodeAt(i)
-            }
-
-            const byteArray = new Uint8Array(byteNumbers)
-            const blob = new Blob([byteArray], { type: 'image/jpeg' })
-
             await navigator.clipboard.write([
               new ClipboardItem({
-                'image/jpeg': blob
+                'image/jpeg': screenshotBlob
               })
             ])
 
             // Also download as backup
-            handleDownload('jpg')
+            const downloadUrl = URL.createObjectURL(screenshotBlob)
+            const link = document.createElement('a')
+            link.href = downloadUrl
+            link.download = 'mockr-comic.jpg'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            URL.revokeObjectURL(downloadUrl)
 
             // Open WhatsApp Web
             setTimeout(() => {
               window.open('https://web.whatsapp.com', '_blank')
             }, 500)
 
-            alert('✅ Comic image copied to clipboard AND downloaded!\n\n📝 WhatsApp Web will open:\n\n1. Select a chat\n2. Paste (Ctrl+V / Cmd+V) the image directly in the message box\n3. Or click attach icon (📎) to upload the downloaded file\n4. Add your message and send!')
+            alert('✅ Comic screenshot copied to clipboard AND downloaded!\n\n📝 WhatsApp Web will open:\n\n1. Select a chat\n2. Paste (Ctrl+V / Cmd+V) the image directly\n3. Or click attach (📎) to upload downloaded file\n4. Add your message and send!')
           } catch (clipboardError) {
             // Fallback: just download and open WhatsApp Web
-            handleDownload('jpg')
+            const downloadUrl = URL.createObjectURL(screenshotBlob)
+            const link = document.createElement('a')
+            link.href = downloadUrl
+            link.download = 'mockr-comic.jpg'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            URL.revokeObjectURL(downloadUrl)
 
             setTimeout(() => {
               window.open('https://web.whatsapp.com', '_blank')
             }, 500)
 
-            alert('✅ Comic image downloaded!\n\n📝 WhatsApp Web will open:\n\n1. Select a chat\n2. Click attachment icon (📎)\n3. Choose the downloaded comic image\n4. Add your message and send!')
+            alert('✅ Comic screenshot downloaded!\n\n📝 WhatsApp Web will open:\n\n1. Select a chat\n2. Click attachment icon (📎)\n3. Choose the downloaded comic\n4. Add your message and send!')
           }
         }
         break
 
       case 'copy':
-        // Copy image to clipboard
+        // Copy screenshot to clipboard
         try {
-          const base64Data = generatedComic.imageUrl.split(',')[1]
-          const byteCharacters = atob(base64Data)
-          const byteNumbers = new Array(byteCharacters.length)
-
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i)
-          }
-
-          const byteArray = new Uint8Array(byteNumbers)
-          const blob = new Blob([byteArray], { type: 'image/jpeg' })
-
           await navigator.clipboard.write([
             new ClipboardItem({
-              'image/jpeg': blob
+              'image/jpeg': screenshotBlob
             })
           ])
-          alert('✅ Comic image copied to clipboard!\n\nYou can now paste it anywhere.')
+          alert('✅ Comic screenshot copied to clipboard!\n\nYou can now paste it anywhere.')
         } catch (err) {
           // Fallback: copy text description
           try {
@@ -1027,6 +1065,36 @@ export default function GeneratePage() {
       alert('Something went wrong. Please try again.')
     } finally {
       setIsLoadingSample(false)
+    }
+  }
+
+  // Screenshot capture function for sharing
+  const captureComicScreenshot = async (): Promise<Blob | null> => {
+    try {
+      const element = document.getElementById('comic-preview-capture')
+      if (!element) {
+        console.error('Comic preview element not found')
+        return null
+      }
+
+      // Capture the element as canvas with high quality
+      const canvas = await html2canvas(element, {
+        backgroundColor: '#ffffff',
+        scale: 2, // High resolution
+        useCORS: true, // Handle cross-origin images
+        logging: false,
+        allowTaint: true
+      })
+
+      // Convert canvas to blob
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+          resolve(blob)
+        }, 'image/jpeg', 0.95)
+      })
+    } catch (error) {
+      console.error('Screenshot capture failed:', error)
+      return null
     }
   }
 
@@ -1303,7 +1371,8 @@ export default function GeneratePage() {
 
               {generatedComic && (
                 <div className="space-y-4">
-                  <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
+                  {/* Wrapping div with ID for screenshot capture */}
+                  <div id="comic-preview-capture" className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
                     {/* Comic Image - Larger Display */}
                     <div className="aspect-square bg-white relative">
                       {generatedComic.imageUrl.startsWith('data:') ? (
