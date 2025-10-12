@@ -881,12 +881,16 @@ export default function GeneratePage() {
     const text = `Check out this satirical political cartoon I created with Mockr! "${generatedComic.dialogue}"`
 
     // Capture screenshot of the comic preview
+    console.log('[Share] Attempting to capture screenshot...')
     const screenshotBlob = await captureComicScreenshot()
 
     if (!screenshotBlob) {
-      alert('❌ Failed to capture comic screenshot. Please try downloading instead.')
+      console.error('[Share] Screenshot capture returned null')
+      alert('❌ Failed to capture comic screenshot.\n\nPlease try:\n1. Wait for comic to fully load\n2. Try downloading instead (Download button)\n3. Check browser console for errors')
       return
     }
+
+    console.log('[Share] Screenshot captured successfully, proceeding with', platform)
 
     const file = new File([screenshotBlob], 'mockr-comic.jpg', { type: 'image/jpeg' })
 
@@ -1071,11 +1075,18 @@ export default function GeneratePage() {
   // Screenshot capture function for sharing
   const captureComicScreenshot = async (): Promise<Blob | null> => {
     try {
+      console.log('[Screenshot] Starting capture...')
+
       const element = document.getElementById('comic-preview-capture')
       if (!element) {
-        console.error('Comic preview element not found')
+        console.error('[Screenshot] Element not found: comic-preview-capture')
         return null
       }
+
+      console.log('[Screenshot] Element found, capturing with html2canvas...')
+
+      // Wait a bit for images to load
+      await new Promise(resolve => setTimeout(resolve, 100))
 
       // Capture the element as canvas with high quality
       const canvas = await html2canvas(element, {
@@ -1083,17 +1094,26 @@ export default function GeneratePage() {
         scale: 2, // High resolution
         useCORS: true, // Handle cross-origin images
         logging: false,
-        allowTaint: true
+        allowTaint: true,
+        foreignObjectRendering: false, // Better compatibility
+        imageTimeout: 15000 // Wait for images to load
       })
+
+      console.log('[Screenshot] Canvas captured successfully:', canvas.width, 'x', canvas.height)
 
       // Convert canvas to blob
       return new Promise((resolve) => {
         canvas.toBlob((blob) => {
+          if (blob) {
+            console.log('[Screenshot] Blob created successfully:', blob.size, 'bytes')
+          } else {
+            console.error('[Screenshot] Failed to create blob')
+          }
           resolve(blob)
         }, 'image/jpeg', 0.95)
       })
     } catch (error) {
-      console.error('Screenshot capture failed:', error)
+      console.error('[Screenshot] Capture failed:', error)
       return null
     }
   }
