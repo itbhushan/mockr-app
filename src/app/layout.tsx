@@ -1,8 +1,8 @@
- import type { Metadata } from 'next'
- import { Inter } from 'next/font/google'
- import { ClerkProvider } from '@clerk/nextjs'
+import type { Metadata, Viewport } from 'next'
+import { Inter } from 'next/font/google'
+import { ClerkProvider } from '@clerk/nextjs'
 
-  import './globals.css'
+import './globals.css'
 
   const inter = Inter({
     subsets: ['latin'],
@@ -59,13 +59,14 @@
       images: ['/og-image.png'],
       creator: '@MockrApp',
     },
-    viewport: {
-      width: 'device-width',
-      initialScale: 1,
-      maximumScale: 1,
-    },
-    themeColor: '#1e40af',
     manifest: '/manifest.json',
+  }
+
+  export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    themeColor: '#1e40af',
   }
 
   export default function RootLayout({
@@ -83,7 +84,6 @@
           <link rel="icon" href="/favicon.ico" sizes="any" />
           <link rel="icon" href="/icon.svg" type="image/svg+xml" />
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-          <meta name="theme-color" content="#1e40af" />
         </head>
         <body className={`${inter.className} antialiased bg-neutral-50 text-neutral-900`}>
           <div className="min-h-screen flex flex-col">
