@@ -900,6 +900,9 @@ export default function GeneratePage() {
       return
     }
 
+    // Detect if mobile device
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
     // No text needed - screenshot already contains quote and situation
     // Just share the image
 
@@ -919,23 +922,56 @@ export default function GeneratePage() {
 
     switch (platform) {
       case 'twitter':
-        // Download screenshot
-        const downloadUrlX = URL.createObjectURL(screenshotBlob)
-        const linkX = document.createElement('a')
-        linkX.href = downloadUrlX
-        linkX.download = 'mockr-comic.jpg'
-        document.body.appendChild(linkX)
-        linkX.click()
-        document.body.removeChild(linkX)
-        URL.revokeObjectURL(downloadUrlX)
+        if (isMobile) {
+          // Mobile: Use native share sheet (same as WhatsApp)
+          console.log('[Share] Mobile X sharing - using native share')
 
-        // Open X (Twitter) compose window - user will attach image manually
-        const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent('#MockrApp #PoliticalSatire')}`
-        setTimeout(() => {
-          window.open(xUrl, '_blank', 'width=550,height=400')
-        }, 500)
+          if (navigator.share) {
+            try {
+              await navigator.share({
+                files: [file]
+              })
+              console.log('[Share] X share successful!')
+              return
+            } catch (error: any) {
+              if (error.name === 'AbortError') {
+                console.log('[Share] User cancelled X share')
+                return
+              }
+              console.error('[Share] X share failed:', error)
+              // Fall through to download fallback
+            }
+          }
 
-        alert('✅ Comic screenshot downloaded!\n\n📝 X (Twitter) will open - attach the downloaded image to your post.')
+          // Fallback: Download for browsers without file sharing
+          const downloadUrlX = URL.createObjectURL(screenshotBlob)
+          const linkX = document.createElement('a')
+          linkX.href = downloadUrlX
+          linkX.download = 'mockr-comic.jpg'
+          document.body.appendChild(linkX)
+          linkX.click()
+          document.body.removeChild(linkX)
+          URL.revokeObjectURL(downloadUrlX)
+          alert('✅ Comic downloaded!\n\nOpen X (Twitter) and attach the downloaded image to share.')
+        } else {
+          // Desktop: Download and open X compose window
+          const downloadUrlX = URL.createObjectURL(screenshotBlob)
+          const linkX = document.createElement('a')
+          linkX.href = downloadUrlX
+          linkX.download = 'mockr-comic.jpg'
+          document.body.appendChild(linkX)
+          linkX.click()
+          document.body.removeChild(linkX)
+          URL.revokeObjectURL(downloadUrlX)
+
+          // Open X (Twitter) compose window - user will attach image manually
+          const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent('#MockrApp #PoliticalSatire')}`
+          setTimeout(() => {
+            window.open(xUrl, '_blank', 'width=550,height=400')
+          }, 500)
+
+          alert('✅ Comic screenshot downloaded!\n\n📝 X (Twitter) will open - attach the downloaded image to your post.')
+        }
         break
 
       case 'facebook':
@@ -953,9 +989,6 @@ export default function GeneratePage() {
         break
 
       case 'whatsapp':
-        // Detect if mobile or desktop
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-
         if (isMobile) {
           // Mobile: Use native share sheet ONLY (no file downloads)
           // Try to share even if canShare reports false - some browsers support it anyway
