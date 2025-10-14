@@ -900,7 +900,8 @@ export default function GeneratePage() {
       return
     }
 
-    const text = `Check out this satirical political cartoon I created with Mockr! "${generatedComic.dialogue}"`
+    // No text needed - screenshot already contains quote and situation
+    // Just share the image
 
     // Capture screenshot of the comic preview
     console.log('[Share] Attempting to capture screenshot...')
@@ -969,9 +970,8 @@ export default function GeneratePage() {
               console.log('[Share] canShare files:', navigator.canShare ? navigator.canShare({ files: [file] }) : 'N/A')
               console.log('[Share] File details:', { name: file.name, type: file.type, size: file.size })
 
-              // Try sharing with file first
+              // Try sharing with file only (no text message)
               await navigator.share({
-                text: text,
                 files: [file]
               })
               console.log('[Share] Native share successful!')
@@ -985,20 +985,8 @@ export default function GeneratePage() {
                 return
               }
 
-              // If file sharing failed, try sharing just text (some browsers don't support files)
-              try {
-                console.log('[Share] Retrying with text only...')
-                await navigator.share({
-                  text: text + '\n\n📥 Download the comic using the Download button to share the image!'
-                })
-                alert('ℹ️ Your browser doesn\'t support sharing images directly.\n\n💡 Tip: Use the Download button to save the comic, then share it manually.')
-                return
-              } catch (textError: any) {
-                if (textError.name === 'AbortError') {
-                  return
-                }
-                console.error('[Share] Text share also failed:', textError)
-              }
+              // File sharing failed - skip text-only share (user wants image only)
+              console.log('[Share] File sharing not supported, using download fallback')
 
               // All sharing attempts failed - download as fallback
               console.log('[Share] All share attempts failed, falling back to download')
