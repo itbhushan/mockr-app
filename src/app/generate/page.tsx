@@ -929,8 +929,8 @@ export default function GeneratePage() {
         document.body.removeChild(linkX)
         URL.revokeObjectURL(downloadUrlX)
 
-        // Open X (Twitter) compose window
-        const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text + ' #MockrApp #PoliticalSatire')}`
+        // Open X (Twitter) compose window - user will attach image manually
+        const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent('#MockrApp #PoliticalSatire')}`
         setTimeout(() => {
           window.open(xUrl, '_blank', 'width=550,height=400')
         }, 500)
@@ -1039,13 +1039,8 @@ export default function GeneratePage() {
           ])
           alert('✅ Comic screenshot copied to clipboard!\n\nYou can now paste it anywhere.')
         } catch (err) {
-          // Fallback: copy text description
-          try {
-            await navigator.clipboard.writeText(text)
-            alert('✅ Comic description copied to clipboard!')
-          } catch {
-            alert('❌ Failed to copy to clipboard')
-          }
+          console.error('[Clipboard] Failed to copy screenshot:', err)
+          alert('❌ Failed to copy to clipboard')
         }
         break
     }
