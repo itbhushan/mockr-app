@@ -434,7 +434,7 @@ function optimizePromptForFLUX(description: string): string {
   let optimizedPrompt = ``
 
   // 1. CLEAR DIRECTIVE START - Tell FLUX exactly what to create
-  optimizedPrompt += `Create a single-panel black and white editorial cartoon in R.K. Laxman style. `
+  optimizedPrompt += `Create a single-panel black and white editorial cartoon in classic Indian editorial style. `
 
   // 2. MAIN SCENE & CHARACTERS - Primary action in CENTER/LEFT area
   optimizedPrompt += `MAIN SCENE: ${description}. `
@@ -642,7 +642,7 @@ function createComicPrompt(
 
   // Add style-specific elements
   if (style === 'laxman') {
-    prompt += `R.K. Laxman artistic style: simple line drawings, round expressive character faces, clear facial expressions, minimal geometric backgrounds, focus on human emotions. `
+    prompt += `Classic Indian editorial cartoon style: simple line drawings, round expressive character faces, clear facial expressions, minimal geometric backgrounds, focus on human emotions. `
   } else {
     prompt += `${style} editorial cartoon style, clean simple lines, expressive characters. `
   }

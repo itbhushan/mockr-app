@@ -7,19 +7,19 @@ export async function generateSatiricalQuote(situation: string): Promise<string>
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' })
 
-    const prompt = `You are R.K. Laxman, India's master political cartoonist. Create a SHARP, WITTY caption for your editorial cartoon about this political situation:
+    const prompt = `You are a master political cartoonist creating editorial cartoons. Create a SHARP, WITTY caption for your editorial cartoon about this political situation:
 
 SITUATION: ${situation}
 
-REQUIREMENTS for R.K. Laxman style caption:
-- Single satirical sentence (like your classic newspaper captions)
+REQUIREMENTS for editorial cartoon caption:
+- Single satirical sentence (classic newspaper cartoon caption style)
 - Should expose the SPECIFIC irony/absurdity in this exact situation
 - Dry, observational wit with biting social commentary
 - Length: 60-120 characters max (newspaper caption length)
 - No quotes needed - this is a caption, not dialogue
 - Reference specific details from the situation
 
-CLASSIC R.K. LAXMAN CAPTION EXAMPLES:
+CLASSIC EDITORIAL CARTOON CAPTION EXAMPLES:
 
 Situation: "Politicians visiting hospitals while cutting healthcare budgets"
 Caption: "Find out whose birth or death anniversary it is today. Mention he was a great patriot and did much to help the poor, etc. and release the statement to the press!"
@@ -33,7 +33,7 @@ Caption: "They are not coming in because they say it's going to be the same spee
 Situation: "Digital arrest scam targeting minister's wife"
 Caption: "Good news, sir! The enquiry report says that no one is responsible in the entire administration for anything!"
 
-Create a satirical caption that captures the absurdity of the specific situation above in classic R.K. Laxman observational style:`
+Create a satirical caption that captures the absurdity of the specific situation above in classic editorial cartoon observational style:`
 
     const result = await model.generateContent(prompt)
     const response = await result.response
@@ -44,19 +44,19 @@ Create a satirical caption that captures the absurdity of the specific situation
     quote = quote.replace(/^Here's a caption.*?:\s*/i, '')
     quote = quote.replace(/^Caption:\s*/i, '')
     quote = quote.replace(/^In the style of.*?:\s*/i, '')
-    quote = quote.replace(/^R\.K\.?\s*Laxman.*?:\s*/i, '')
 
-    // For R.K. Laxman style, we want a single satirical line
+    // We want a single satirical line
     const lines = quote.split('\n').filter(line => line.trim()).map(line => line.trim())
 
     // Take the first meaningful line as the caption
     if (lines.length > 0) {
       quote = lines[0]
     } else {
-      quote = generateFallbackQuote(situation)
+      // Return "Try Again" instead of fallback
+      return 'Try Again'
     }
 
-    // Ensure it's not too long (max 120 characters for R.K. Laxman newspaper style)
+    // Ensure it's not too long (max 120 characters for newspaper style)
     if (quote.length > 120) {
       quote = quote.substring(0, 117) + '...'
     }
@@ -65,8 +65,8 @@ Create a satirical caption that captures the absurdity of the specific situation
 
   } catch (error) {
     console.error('Gemini quote generation failed:', error)
-    // Return error to prompt user to retry instead of showing fallback
-    throw new Error('Failed to generate quote from AI. Please try again.')
+    // Return "Try Again" to prompt user to retry
+    return 'Try Again'
   }
 }
 
