@@ -953,6 +953,7 @@ export default function GeneratePage() {
           document.body.removeChild(linkX)
           URL.revokeObjectURL(downloadUrlX)
           alert('✅ Comic downloaded!\n\nOpen X (Twitter) and attach the downloaded image to share.')
+          return
         } else {
           // Desktop: Download and open X compose window
           const downloadUrlX = URL.createObjectURL(screenshotBlob)
