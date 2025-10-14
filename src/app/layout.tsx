@@ -79,13 +79,13 @@ import './globals.css'
                        !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.includes('dummy')
 
     const content = (
-      <html lang="en" className={inter.variable}>
+      <html lang="en" className={inter.variable} suppressHydrationWarning>
         <head>
           <link rel="icon" href="/favicon.ico" sizes="any" />
           <link rel="icon" href="/icon.svg" type="image/svg+xml" />
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         </head>
-        <body className={`${inter.className} antialiased bg-neutral-50 text-neutral-900`}>
+        <body className={`${inter.className} antialiased bg-neutral-50 text-neutral-900`} suppressHydrationWarning>
           <div className="min-h-screen flex flex-col">
             <main className="flex-1">
               {children}

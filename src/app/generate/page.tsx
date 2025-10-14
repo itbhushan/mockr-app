@@ -956,49 +956,56 @@ export default function GeneratePage() {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
         if (isMobile) {
-          // Mobile: Try native share first (works on iOS/Android)
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          // Mobile: Use native share sheet ONLY (no file downloads)
+          // Try to share even if canShare reports false - some browsers support it anyway
+          if (navigator.share) {
             try {
+              console.log('[Share] Attempting native share with image...')
+              console.log('[Share] canShare available:', !!navigator.canShare)
+              console.log('[Share] canShare files:', navigator.canShare ? navigator.canShare({ files: [file] }) : 'N/A')
+
+              // Try sharing with file first
               await navigator.share({
                 text: text,
                 files: [file]
               })
-              // Successfully shared via native share sheet
+              console.log('[Share] Native share successful!')
               return
-            } catch (error) {
-              // User cancelled or share failed, fall through to download method
-              console.log('Native share cancelled or failed:', error)
+            } catch (error: any) {
+              console.error('[Share] Share with file failed:', error)
+
+              // Check if user cancelled (AbortError) - this is normal, don't show error
+              if (error.name === 'AbortError') {
+                console.log('[Share] User cancelled share')
+                return
+              }
+
+              // If file sharing failed, try sharing just text (some browsers don't support files)
+              try {
+                console.log('[Share] Retrying with text only...')
+                await navigator.share({
+                  text: text + '\n\n📥 Download the comic using the Download button to share the image!'
+                })
+                alert('ℹ️ Your browser doesn\'t support sharing images directly.\n\n💡 Tip: Use the Download button to save the comic, then share it manually.')
+                return
+              } catch (textError: any) {
+                if (textError.name === 'AbortError') {
+                  return
+                }
+                console.error('[Share] Text share also failed:', textError)
+              }
+
+              // All sharing attempts failed
+              alert('❌ Sharing is not available.\n\nPlease use the Download button to save the comic first, then share it manually.')
+              return
             }
+          } else {
+            // Browser doesn't support Web Share API at all
+            alert('❌ Your browser does not support sharing.\n\nPlease try:\n1. Update your browser\n2. Use the Download button instead')
+            return
           }
-
-          // Fallback: Download and open WhatsApp
-          // Create download link from blob
-          const downloadUrl = URL.createObjectURL(screenshotBlob)
-          const link = document.createElement('a')
-          link.href = downloadUrl
-          link.download = 'mockr-comic.jpg'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          URL.revokeObjectURL(downloadUrl)
-
-          // Show instructions
-          alert('✅ Full comic screenshot downloaded!\n\n📱 Next steps:\n\n1. WhatsApp will open with pre-filled message\n2. Tap attachment icon (📎 or +)\n3. Select "Photos & Videos"\n4. Choose the downloaded comic\n5. Send!')
-
-          // Open WhatsApp with text
-          setTimeout(() => {
-            const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`
-            const iframe = document.createElement('iframe')
-            iframe.style.display = 'none'
-            iframe.src = whatsappUrl
-            document.body.appendChild(iframe)
-
-            setTimeout(() => {
-              document.body.removeChild(iframe)
-            }, 1000)
-          }, 100)
         } else {
-          // Desktop: Try to copy screenshot to clipboard and open WhatsApp Web
+          // Desktop: Copy to clipboard and open WhatsApp Web
           try {
             await navigator.clipboard.write([
               new ClipboardItem({
@@ -1006,38 +1013,15 @@ export default function GeneratePage() {
               })
             ])
 
-            // Also download as backup
-            const downloadUrl = URL.createObjectURL(screenshotBlob)
-            const link = document.createElement('a')
-            link.href = downloadUrl
-            link.download = 'mockr-comic.jpg'
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-            URL.revokeObjectURL(downloadUrl)
-
             // Open WhatsApp Web
             setTimeout(() => {
               window.open('https://web.whatsapp.com', '_blank')
             }, 500)
 
-            alert('✅ Comic screenshot copied to clipboard AND downloaded!\n\n📝 WhatsApp Web will open:\n\n1. Select a chat\n2. Paste (Ctrl+V / Cmd+V) the image directly\n3. Or click attach (📎) to upload downloaded file\n4. Add your message and send!')
+            alert('✅ Comic screenshot copied to clipboard!\n\n📝 WhatsApp Web will open:\n\n1. Select a chat\n2. Paste (Ctrl+V / Cmd+V) the image directly\n3. Add your message and send!')
           } catch (clipboardError) {
-            // Fallback: just download and open WhatsApp Web
-            const downloadUrl = URL.createObjectURL(screenshotBlob)
-            const link = document.createElement('a')
-            link.href = downloadUrl
-            link.download = 'mockr-comic.jpg'
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-            URL.revokeObjectURL(downloadUrl)
-
-            setTimeout(() => {
-              window.open('https://web.whatsapp.com', '_blank')
-            }, 500)
-
-            alert('✅ Comic screenshot downloaded!\n\n📝 WhatsApp Web will open:\n\n1. Select a chat\n2. Click attachment icon (📎)\n3. Choose the downloaded comic\n4. Add your message and send!')
+            console.error('[Share] Clipboard copy failed:', clipboardError)
+            alert('❌ Failed to copy image to clipboard.\n\nPlease use the Download button instead.')
           }
         }
         break
@@ -1107,8 +1091,8 @@ export default function GeneratePage() {
 
       console.log('[Screenshot] Element found, capturing with html2canvas...')
 
-      // Wait a bit for images to load
-      await new Promise(resolve => setTimeout(resolve, 100))
+      // Wait for images to load and layout to settle
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       // Capture the element as canvas with high quality
       const canvas = await html2canvas(element, {
@@ -1414,7 +1398,7 @@ export default function GeneratePage() {
               {generatedComic && (
                 <div className="space-y-4">
                   {/* Wrapping div with ID for screenshot capture */}
-                  <div id="comic-preview-capture" className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
+                  <div id="comic-preview-capture" className="bg-white rounded-2xl shadow-sm border border-neutral-100">
                     {/* Comic Image - Larger Display */}
                     <div className="aspect-square bg-white relative">
                       {generatedComic.imageUrl.startsWith('data:') ? (
@@ -1459,10 +1443,10 @@ export default function GeneratePage() {
                     {/* Comic Details - Compact */}
                     <div className="p-4">
                       <div className="mb-3">
-                        <h3 className="text-sm font-semibold text-neutral-900 mb-1 line-clamp-2">
+                        <h3 className="text-sm font-semibold text-neutral-900 mb-1">
                           "{generatedComic.dialogue}"
                         </h3>
-                        <p className="text-xs text-neutral-600 line-clamp-2">
+                        <p className="text-xs text-neutral-600">
                           {generatedComic.situation}
                         </p>
                       </div>
