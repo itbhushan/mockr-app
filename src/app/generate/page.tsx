@@ -958,11 +958,16 @@ export default function GeneratePage() {
         if (isMobile) {
           // Mobile: Use native share sheet ONLY (no file downloads)
           // Try to share even if canShare reports false - some browsers support it anyway
+          console.log('[Share] Mobile detected')
+          console.log('[Share] User agent:', navigator.userAgent)
+          console.log('[Share] navigator.share available:', !!navigator.share)
+
           if (navigator.share) {
             try {
               console.log('[Share] Attempting native share with image...')
               console.log('[Share] canShare available:', !!navigator.canShare)
               console.log('[Share] canShare files:', navigator.canShare ? navigator.canShare({ files: [file] }) : 'N/A')
+              console.log('[Share] File details:', { name: file.name, type: file.type, size: file.size })
 
               // Try sharing with file first
               await navigator.share({
@@ -995,8 +1000,18 @@ export default function GeneratePage() {
                 console.error('[Share] Text share also failed:', textError)
               }
 
-              // All sharing attempts failed
-              alert('❌ Sharing is not available.\n\nPlease use the Download button to save the comic first, then share it manually.')
+              // All sharing attempts failed - download as fallback
+              console.log('[Share] All share attempts failed, falling back to download')
+              const downloadUrl = URL.createObjectURL(screenshotBlob)
+              const link = document.createElement('a')
+              link.href = downloadUrl
+              link.download = 'mockr-comic.jpg'
+              document.body.appendChild(link)
+              link.click()
+              document.body.removeChild(link)
+              URL.revokeObjectURL(downloadUrl)
+
+              alert('✅ Comic downloaded to your device!\n\nYou can now:\n1. Open WhatsApp\n2. Select a chat\n3. Tap attach (📎)\n4. Choose the downloaded comic\n5. Send!')
               return
             }
           } else {
