@@ -1515,13 +1515,6 @@ export default function GeneratePage() {
                             Download as PNG
                           </button>
                           <button
-                            onClick={() => { handleDownload('svg'); setShowDownloadDropdown(false) }}
-                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                          >
-                            <FileText className="w-4 h-4 mr-3 text-purple-500" />
-                            Download as SVG
-                          </button>
-                          <button
                             onClick={() => { handleDownload('pdf'); setShowDownloadDropdown(false) }}
                             className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-red-50 hover:text-red-600 transition-colors border-t border-neutral-100"
                           >
@@ -1554,25 +1547,11 @@ export default function GeneratePage() {
                             Share on X
                           </button>
                           <button
-                            onClick={() => { handleShare('facebook'); setShowShareDropdown(false) }}
-                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                          >
-                            <Facebook className="w-4 h-4 mr-3 text-blue-600" />
-                            Share on Facebook
-                          </button>
-                          <button
                             onClick={() => { handleShare('whatsapp'); setShowShareDropdown(false) }}
                             className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-green-50 hover:text-green-600 transition-colors"
                           >
                             <MessageCircle className="w-4 h-4 mr-3 text-green-500" />
                             Share on WhatsApp
-                          </button>
-                          <button
-                            onClick={() => { handleShare('copy'); setShowShareDropdown(false) }}
-                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-neutral-800 transition-colors border-t border-neutral-100"
-                          >
-                            <Copy className="w-4 h-4 mr-3 text-neutral-500" />
-                            Copy Link
                           </button>
                         </div>
                       )}
