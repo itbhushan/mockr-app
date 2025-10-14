@@ -2,9 +2,17 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Clock, Share2, Trash2, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Clock, Share2, Trash2, Download, ChevronDown, MessageCircle } from 'lucide-react'
+import html2canvas from 'html2canvas'
+
+// XIcon component for X (Twitter)
+const XIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+)
 
 interface SavedComic {
   id: string
@@ -24,9 +32,23 @@ interface ComicWithSVG extends SavedComic {
 export default function GalleryPage() {
   const [savedComics, setSavedComics] = useState<ComicWithSVG[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [activeShareDropdown, setActiveShareDropdown] = useState<string | null>(null)
+  const shareDropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     loadSavedComics()
+  }, [])
+
+  // Close share dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareDropdownRef.current && !shareDropdownRef.current.contains(event.target as Node)) {
+        setActiveShareDropdown(null)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   const loadSavedComics = async () => {
@@ -72,20 +94,119 @@ export default function GalleryPage() {
     localStorage.setItem('mockr-saved-comics', JSON.stringify(updatedComics))
   }
 
-  const handleShare = (comic: SavedComic) => {
-    const text = `Check out this satirical political cartoon I created with Mockr! "${comic.dialogue}" - ${comic.situation.substring(0, 100)}${comic.situation.length > 100 ? '...' : ''}`
-    const url = `${window.location.origin}/gallery?comic=${comic.id}`
+  const captureComicScreenshot = async (comicId: string): Promise<Blob | null> => {
+    try {
+      const element = document.getElementById(`comic-card-${comicId}`)
+      if (!element) {
+        console.error('[Gallery] Comic element not found for ID:', comicId)
+        return null
+      }
 
-    if (navigator.share) {
-      navigator.share({
-        title: 'Mockr Political Cartoon',
-        text: text,
-        url: url
+      // Wait for images to load
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false
       })
-    } else {
-      navigator.clipboard.writeText(`${text}\n\n${url}`)
-      alert('Comic link copied to clipboard!')
+
+      return new Promise((resolve) => {
+        canvas.toBlob((blob) => {
+          resolve(blob)
+        }, 'image/jpeg', 0.95)
+      })
+    } catch (error) {
+      console.error('[Gallery] Screenshot capture failed:', error)
+      return null
     }
+  }
+
+  const handleShare = async (comic: SavedComic, platform: 'twitter' | 'whatsapp' | 'download') => {
+    console.log('[Gallery] Share initiated for platform:', platform)
+
+    // Detect if mobile device
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
+    // Capture screenshot of the comic card
+    const screenshotBlob = await captureComicScreenshot(comic.id)
+
+    if (!screenshotBlob) {
+      alert('❌ Failed to capture comic screenshot. Please try again.')
+      return
+    }
+
+    const file = new File([screenshotBlob], 'mockr-comic.jpg', { type: 'image/jpeg' })
+
+    switch (platform) {
+      case 'twitter':
+        if (isMobile && navigator.share) {
+          try {
+            await navigator.share({ files: [file] })
+            return
+          } catch (error: any) {
+            if (error.name === 'AbortError') return
+            console.error('[Gallery] X share failed:', error)
+          }
+        }
+
+        // Desktop or fallback: Download
+        const downloadUrlX = URL.createObjectURL(screenshotBlob)
+        const linkX = document.createElement('a')
+        linkX.href = downloadUrlX
+        linkX.download = 'mockr-comic.jpg'
+        document.body.appendChild(linkX)
+        linkX.click()
+        document.body.removeChild(linkX)
+        URL.revokeObjectURL(downloadUrlX)
+
+        if (!isMobile) {
+          const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent('#MockrApp #PoliticalSatire')}`
+          setTimeout(() => window.open(xUrl, '_blank', 'width=550,height=400'), 500)
+        }
+        break
+
+      case 'whatsapp':
+        if (isMobile && navigator.share) {
+          try {
+            await navigator.share({ files: [file] })
+            return
+          } catch (error: any) {
+            if (error.name === 'AbortError') return
+            console.error('[Gallery] WhatsApp share failed:', error)
+          }
+        }
+
+        // Desktop or fallback: Download
+        const downloadUrlWa = URL.createObjectURL(screenshotBlob)
+        const linkWa = document.createElement('a')
+        linkWa.href = downloadUrlWa
+        linkWa.download = 'mockr-comic.jpg'
+        document.body.appendChild(linkWa)
+        linkWa.click()
+        document.body.removeChild(linkWa)
+        URL.revokeObjectURL(downloadUrlWa)
+
+        if (!isMobile) {
+          alert('✅ Comic downloaded!\n\nOpen WhatsApp Web and attach the downloaded image to share.')
+        }
+        break
+
+      case 'download':
+        const downloadUrl = URL.createObjectURL(screenshotBlob)
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.download = 'mockr-comic.jpg'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(downloadUrl)
+        break
+    }
+
+    setActiveShareDropdown(null)
   }
 
   const formatDate = (dateString: string) => {
@@ -198,6 +319,7 @@ export default function GalleryPage() {
             {savedComics.map((comic, index) => (
               <motion.div
                 key={comic.id}
+                id={`comic-card-${comic.id}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
@@ -262,13 +384,42 @@ export default function GalleryPage() {
 
                   {/* Action Buttons */}
                   <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleShare(comic)}
-                      className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 text-sm font-medium rounded-lg px-3 py-2 transition-colors flex items-center justify-center"
-                    >
-                      <Share2 className="w-4 h-4 mr-1" />
-                      Share
-                    </button>
+                    <div className="flex-1 relative" ref={activeShareDropdown === comic.id ? shareDropdownRef : null}>
+                      <button
+                        onClick={() => setActiveShareDropdown(activeShareDropdown === comic.id ? null : comic.id)}
+                        className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 text-sm font-medium rounded-lg px-3 py-2 transition-colors flex items-center justify-center"
+                      >
+                        <Share2 className="w-4 h-4 mr-1" />
+                        Share
+                        <ChevronDown className={`w-3.5 h-3.5 ml-1 transition-transform ${activeShareDropdown === comic.id ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {activeShareDropdown === comic.id && (
+                        <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
+                          <button
+                            onClick={() => handleShare(comic, 'twitter')}
+                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                          >
+                            <XIcon className="w-4 h-4 mr-3 text-neutral-900" />
+                            Share on X
+                          </button>
+                          <button
+                            onClick={() => handleShare(comic, 'whatsapp')}
+                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-green-50 hover:text-green-600 transition-colors"
+                          >
+                            <MessageCircle className="w-4 h-4 mr-3 text-green-500" />
+                            Share on WhatsApp
+                          </button>
+                          <button
+                            onClick={() => handleShare(comic, 'download')}
+                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-amber-50 hover:text-amber-600 transition-colors border-t border-neutral-100"
+                          >
+                            <Download className="w-4 h-4 mr-3 text-amber-500" />
+                            Download
+                          </button>
+                        </div>
+                      )}
+                    </div>
                     <button
                       onClick={() => deleteComic(comic.id)}
                       className="bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium rounded-lg px-3 py-2 transition-colors"
