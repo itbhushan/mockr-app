@@ -74,17 +74,16 @@
   [build.processing.html]
     pretty_urls = true
 
-  # Functions settings - increased timeout for AI image generation
+  # Functions settings for AI image generation
   [functions]
     directory = "netlify/functions"
     node_bundler = "esbuild"
-    # Increase timeout to 26 seconds (max allowed) for Hugging Face PRO API calls
-    # This allows FLUX model enough time to generate high-quality images
     external_node_modules = ["sharp"]
     included_files = ["public/**"]
 
-  # Note: Netlify's Next.js plugin handles API route timeouts automatically
-  # The 26s timeout is configured via Netlify dashboard for the site
+  # Note: Netlify Free tier has 10-second function timeout (non-configurable)
+  # API routes use 8-second timeout for Hugging Face PRO API to leave processing buffer
+  # Hugging Face PRO account provides priority queue for faster responses
 
   # Form handling (for contact forms if needed)
   [forms]
