@@ -33,7 +33,13 @@ export default function GalleryPage() {
   const [savedComics, setSavedComics] = useState<ComicWithSVG[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeShareDropdown, setActiveShareDropdown] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
   const shareDropdownRef = useRef<HTMLDivElement>(null)
+
+  // Detect mobile on client side
+  useEffect(() => {
+    setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
+  }, [])
 
   useEffect(() => {
     loadSavedComics()
@@ -361,14 +367,15 @@ export default function GalleryPage() {
             {savedComics.map((comic, index) => (
               <motion.div
                 key={comic.id}
-                id={`comic-card-${comic.id}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden hover:shadow-md transition-shadow duration-200"
               >
-                {/* Comic Image */}
-                <div className="aspect-[4/3] bg-white relative">
+                {/* Wrapper for screenshot capture - includes ONLY image and text, excludes buttons */}
+                <div id={`comic-card-${comic.id}`}>
+                  {/* Comic Image */}
+                  <div className="aspect-[4/3] bg-white relative">
                   {comic.imageUrl.startsWith('data:') ? (
                     <Image
                       src={comic.imageUrl}
@@ -419,12 +426,15 @@ export default function GalleryPage() {
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-neutral-400 mb-4">
+                  <div className="flex items-center justify-between text-xs text-neutral-400">
                     <span className="capitalize">{comic.tone} • {comic.style}</span>
                     <span>{formatDate(comic.createdAt)}</span>
                   </div>
+                </div>
+                {/* End of screenshot capture wrapper */}
 
-                  {/* Action Buttons */}
+                {/* Action Buttons - Outside capture area */}
+                <div className="p-6 pt-0">
                   <div className="flex items-center space-x-2">
                     <div className="flex-1 relative" ref={activeShareDropdown === comic.id ? shareDropdownRef : null}>
                       <button
@@ -438,7 +448,7 @@ export default function GalleryPage() {
 
                       {activeShareDropdown === comic.id && (
                         <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
-                          {typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? (
+                          {isMobile ? (
                             // Mobile: Show all 3 options (X, WhatsApp, Copy)
                             <>
                               <button
