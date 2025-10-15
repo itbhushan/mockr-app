@@ -74,10 +74,19 @@
   [build.processing.html]
     pretty_urls = true
 
-  # Functions settings for future serverless functions
+  # Functions settings - increased timeout for AI image generation
   [functions]
     directory = "netlify/functions"
     node_bundler = "esbuild"
+    # Increase timeout to 26 seconds (max allowed) for Hugging Face PRO API calls
+    # This allows FLUX model enough time to generate high-quality images
+    external_node_modules = ["sharp"]
+    included_files = ["public/**"]
+
+  # Function-specific settings for API routes
+  [[functions]]
+    function = "api/generate-comic"
+    timeout = 26
 
   # Form handling (for contact forms if needed)
   [forms]

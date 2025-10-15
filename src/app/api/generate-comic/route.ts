@@ -370,10 +370,11 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
     console.log('   - resolution: 1024x1024')
     console.log('   - model: black-forest-labs/FLUX.1-dev')
 
-    // Use FLUX.1-dev with 8-second timeout for Netlify compatibility
-    // Netlify free tier has 10-second function timeout, so we need to fail fast
+    // Use FLUX.1-dev with 25-second timeout
+    // Hugging Face PRO account has faster response times, but FLUX still needs time to generate
+    // Netlify allows up to 26 seconds for serverless functions (configurable in netlify.toml)
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 8000) // 8 seconds
+    const timeoutId = setTimeout(() => controller.abort(), 25000) // 25 seconds
 
     const response = await fetch(
       'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev',
@@ -427,8 +428,9 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
 
   } catch (error: any) {
     if (error.name === 'AbortError') {
-      console.log('⏱️ Hugging Face API timeout after 8 seconds (Netlify compatibility)')
-      console.log('📋 Falling back to SVG placeholder system')
+      console.log('⏱️ Hugging Face API timeout after 25 seconds')
+      console.log('📋 FLUX model generation took too long, falling back to SVG placeholder system')
+      console.log('💡 Note: Using Hugging Face PRO account with priority queue')
     } else {
       console.error('Error calling Hugging Face API:', error)
     }
