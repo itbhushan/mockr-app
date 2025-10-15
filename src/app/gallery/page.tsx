@@ -431,7 +431,8 @@ export default function GalleryPage() {
                     <span>{formatDate(comic.createdAt)}</span>
                   </div>
                 </div>
-                {/* End of screenshot capture wrapper */}
+              </div>
+              {/* End of screenshot capture wrapper */}
 
                 {/* Action Buttons - Outside capture area */}
                 <div className="p-6 pt-0">
