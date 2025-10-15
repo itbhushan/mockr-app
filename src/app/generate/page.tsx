@@ -894,7 +894,68 @@ export default function GeneratePage() {
     }
   }
 
-  const handleShare = async (platform: 'twitter' | 'facebook' | 'whatsapp' | 'copy') => {
+  const handleCopyImage = async () => {
+    if (!generatedComic || !generatedComic.imageUrl) {
+      alert('❌ Comic content not available. Please generate a comic first.')
+      return
+    }
+
+    console.log('[Copy] Capturing screenshot for clipboard...')
+    const screenshotBlob = await captureComicScreenshot()
+
+    if (!screenshotBlob) {
+      alert('❌ Failed to capture comic. Please try downloading instead.')
+      return
+    }
+
+    try {
+      // Convert JPEG blob to PNG blob (PNG is supported by Clipboard API)
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) throw new Error('Canvas context not available')
+
+      const img = new window.Image()
+      const imageUrl = URL.createObjectURL(screenshotBlob)
+
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => {
+          canvas.width = img.width
+          canvas.height = img.height
+          ctx.drawImage(img, 0, 0)
+          URL.revokeObjectURL(imageUrl)
+          resolve()
+        }
+        img.onerror = () => {
+          URL.revokeObjectURL(imageUrl)
+          reject(new Error('Failed to load image'))
+        }
+        img.src = imageUrl
+      })
+
+      // Convert canvas to PNG blob
+      const pngBlob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob)
+          else reject(new Error('Failed to create PNG blob'))
+        }, 'image/png')
+      })
+
+      // Copy PNG to clipboard
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': pngBlob
+        })
+      ])
+
+      console.log('[Copy] Image copied to clipboard successfully')
+      alert('✅ Image copied to clipboard!\n\nPaste (Cmd+V or Ctrl+V) into WhatsApp, X, Slack, or any app.')
+    } catch (error) {
+      console.error('[Copy] Failed to copy image:', error)
+      alert('❌ Failed to copy image.\n\nYour browser may not support this feature.\nPlease use the Download button instead.')
+    }
+  }
+
+  const handleShare = async (platform: 'share' | 'twitter' | 'whatsapp') => {
     if (!generatedComic || !generatedComic.imageUrl) {
       alert('❌ Comic content not available. Please generate a comic first.')
       return
@@ -903,16 +964,13 @@ export default function GeneratePage() {
     // Detect if mobile device
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
-    // No text needed - screenshot already contains quote and situation
-    // Just share the image
-
     // Capture screenshot of the comic preview
     console.log('[Share] Attempting to capture screenshot...')
     const screenshotBlob = await captureComicScreenshot()
 
     if (!screenshotBlob) {
       console.error('[Share] Screenshot capture returned null')
-      alert('❌ Failed to capture comic screenshot.\n\nPlease try:\n1. Wait for comic to fully load\n2. Try downloading instead (Download button)\n3. Check browser console for errors')
+      alert('❌ Failed to capture comic screenshot.\n\nPlease try downloading instead.')
       return
     }
 
@@ -920,163 +978,51 @@ export default function GeneratePage() {
 
     const file = new File([screenshotBlob], 'mockr-comic.jpg', { type: 'image/jpeg' })
 
-    switch (platform) {
-      case 'twitter':
-        if (isMobile) {
-          // Mobile: Use native share sheet (same as WhatsApp)
-          console.log('[Share] Mobile X sharing - using native share')
-
-          if (navigator.share) {
-            try {
-              await navigator.share({
-                files: [file]
-              })
-              console.log('[Share] X share successful!')
-              return
-            } catch (error: any) {
-              if (error.name === 'AbortError') {
-                console.log('[Share] User cancelled X share')
-                return
-              }
-              console.error('[Share] X share failed:', error)
-              // Fall through to download fallback
-            }
-          }
-
-          // Fallback: Download for browsers without file sharing
-          const downloadUrlX = URL.createObjectURL(screenshotBlob)
-          const linkX = document.createElement('a')
-          linkX.href = downloadUrlX
-          linkX.download = 'mockr-comic.jpg'
-          document.body.appendChild(linkX)
-          linkX.click()
-          document.body.removeChild(linkX)
-          URL.revokeObjectURL(downloadUrlX)
-          alert('✅ Comic downloaded!\n\nOpen X (Twitter) and attach the downloaded image to share.')
-          return
-        } else {
-          // Desktop: Download and open X compose window
-          const downloadUrlX = URL.createObjectURL(screenshotBlob)
-          const linkX = document.createElement('a')
-          linkX.href = downloadUrlX
-          linkX.download = 'mockr-comic.jpg'
-          document.body.appendChild(linkX)
-          linkX.click()
-          document.body.removeChild(linkX)
-          URL.revokeObjectURL(downloadUrlX)
-
-          // Open X (Twitter) compose window - user will attach image manually
-          const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent('#MockrApp #PoliticalSatire')}`
-          setTimeout(() => {
-            window.open(xUrl, '_blank', 'width=550,height=400')
-          }, 500)
-
-          alert('✅ Comic screenshot downloaded!\n\n📝 X (Twitter) will open - attach the downloaded image to your post.')
-        }
-        break
-
-      case 'facebook':
-        // Download screenshot
-        const downloadUrlFb = URL.createObjectURL(screenshotBlob)
-        const linkFb = document.createElement('a')
-        linkFb.href = downloadUrlFb
-        linkFb.download = 'mockr-comic.jpg'
-        document.body.appendChild(linkFb)
-        linkFb.click()
-        document.body.removeChild(linkFb)
-        URL.revokeObjectURL(downloadUrlFb)
-
-        alert('✅ Comic screenshot downloaded!\n\n📝 Please upload it manually to Facebook.')
-        break
-
-      case 'whatsapp':
-        if (isMobile) {
-          // Mobile: Use native share sheet ONLY (no file downloads)
-          // Try to share even if canShare reports false - some browsers support it anyway
-          console.log('[Share] Mobile detected')
-          console.log('[Share] User agent:', navigator.userAgent)
-          console.log('[Share] navigator.share available:', !!navigator.share)
-
-          if (navigator.share) {
-            try {
-              console.log('[Share] Attempting native share with image...')
-              console.log('[Share] canShare available:', !!navigator.canShare)
-              console.log('[Share] canShare files:', navigator.canShare ? navigator.canShare({ files: [file] }) : 'N/A')
-              console.log('[Share] File details:', { name: file.name, type: file.type, size: file.size })
-
-              // Try sharing with file only (no text message)
-              await navigator.share({
-                files: [file]
-              })
-              console.log('[Share] Native share successful!')
-              return
-            } catch (error: any) {
-              console.error('[Share] Share with file failed:', error)
-
-              // Check if user cancelled (AbortError) - this is normal, don't show error
-              if (error.name === 'AbortError') {
-                console.log('[Share] User cancelled share')
-                return
-              }
-
-              // File sharing failed - skip text-only share (user wants image only)
-              console.log('[Share] File sharing not supported, using download fallback')
-
-              // All sharing attempts failed - download as fallback
-              console.log('[Share] All share attempts failed, falling back to download')
-              const downloadUrl = URL.createObjectURL(screenshotBlob)
-              const link = document.createElement('a')
-              link.href = downloadUrl
-              link.download = 'mockr-comic.jpg'
-              document.body.appendChild(link)
-              link.click()
-              document.body.removeChild(link)
-              URL.revokeObjectURL(downloadUrl)
-
-              alert('✅ Comic downloaded to your device!\n\nYou can now:\n1. Open WhatsApp\n2. Select a chat\n3. Tap attach (📎)\n4. Choose the downloaded comic\n5. Send!')
-              return
-            }
-          } else {
-            // Browser doesn't support Web Share API at all
-            alert('❌ Your browser does not support sharing.\n\nPlease try:\n1. Update your browser\n2. Use the Download button instead')
-            return
-          }
-        } else {
-          // Desktop: Copy to clipboard and open WhatsApp Web
-          try {
-            await navigator.clipboard.write([
-              new ClipboardItem({
-                'image/jpeg': screenshotBlob
-              })
-            ])
-
-            // Open WhatsApp Web
-            setTimeout(() => {
-              window.open('https://web.whatsapp.com', '_blank')
-            }, 500)
-
-            alert('✅ Comic screenshot copied to clipboard!\n\n📝 WhatsApp Web will open:\n\n1. Select a chat\n2. Paste (Ctrl+V / Cmd+V) the image directly\n3. Add your message and send!')
-          } catch (clipboardError) {
-            console.error('[Share] Clipboard copy failed:', clipboardError)
-            alert('❌ Failed to copy image to clipboard.\n\nPlease use the Download button instead.')
-          }
-        }
-        break
-
-      case 'copy':
-        // Copy screenshot to clipboard
+    if (platform === 'share') {
+      // Universal share - use native share API on mobile
+      if (isMobile && navigator.share) {
         try {
-          await navigator.clipboard.write([
-            new ClipboardItem({
-              'image/jpeg': screenshotBlob
-            })
-          ])
-          alert('✅ Comic screenshot copied to clipboard!\n\nYou can now paste it anywhere.')
-        } catch (err) {
-          console.error('[Clipboard] Failed to copy screenshot:', err)
-          alert('❌ Failed to copy to clipboard')
+          await navigator.share({ files: [file] })
+          return
+        } catch (error: any) {
+          if (error.name === 'AbortError') return
+          console.error('[Share] Native share failed:', error)
         }
-        break
+      }
+
+      // Desktop fallback: Copy to clipboard
+      await handleCopyImage()
+      return
+    }
+
+    // Platform-specific sharing (mobile only)
+    if (isMobile && navigator.share) {
+      try {
+        await navigator.share({ files: [file] })
+        return
+      } catch (error: any) {
+        if (error.name === 'AbortError') return
+        console.error('[Share] Platform share failed:', error)
+      }
+    }
+
+    // Desktop fallback for platform-specific
+    const downloadUrl = URL.createObjectURL(screenshotBlob)
+    const link = document.createElement('a')
+    link.href = downloadUrl
+    link.download = 'mockr-comic.jpg'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(downloadUrl)
+
+    if (platform === 'twitter') {
+      const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent('#MockrApp #PoliticalSatire')}`
+      setTimeout(() => window.open(xUrl, '_blank', 'width=550,height=400'), 500)
+      alert('✅ Comic downloaded!\n\n📝 X (Twitter) will open - attach the downloaded image.')
+    } else if (platform === 'whatsapp') {
+      setTimeout(() => window.open('https://web.whatsapp.com', '_blank'), 500)
+      alert('✅ Comic downloaded!\n\n📝 WhatsApp Web will open - attach the downloaded image.')
     }
   }
 
@@ -1526,36 +1472,14 @@ export default function GeneratePage() {
                       )}
                     </div>
 
-                    {/* Enhanced Share Dropdown */}
-                    <div className="relative" ref={shareDropdownRef}>
-                      <button
-                        onClick={() => setShowShareDropdown(!showShareDropdown)}
-                        className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
-                      >
-                        <Share2 className="w-3.5 h-3.5 mr-1.5" />
-                        Share
-                        <ChevronDown className={`w-3.5 h-3.5 ml-1.5 transition-transform ${showShareDropdown ? 'rotate-180' : ''}`} />
-                      </button>
-
-                      {showShareDropdown && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
-                          <button
-                            onClick={() => { handleShare('twitter'); setShowShareDropdown(false) }}
-                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                          >
-                            <XIcon className="w-4 h-4 mr-3 text-neutral-900" />
-                            Share on X
-                          </button>
-                          <button
-                            onClick={() => { handleShare('whatsapp'); setShowShareDropdown(false) }}
-                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-green-50 hover:text-green-600 transition-colors"
-                          >
-                            <MessageCircle className="w-4 h-4 mr-3 text-green-500" />
-                            Share on WhatsApp
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                    {/* Copy Image Button */}
+                    <button
+                      onClick={handleCopyImage}
+                      className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
+                    >
+                      <Copy className="w-3.5 h-3.5 mr-1.5" />
+                      Copy Image
+                    </button>
                   </div>
 
                   <button

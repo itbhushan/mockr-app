@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Clock, Share2, Trash2, Download, ChevronDown, MessageCircle } from 'lucide-react'
+import { ArrowLeft, Clock, Share2, Trash2, Download, ChevronDown, MessageCircle, Copy } from 'lucide-react'
 import html2canvas from 'html2canvas'
 
 // XIcon component for X (Twitter)
@@ -124,7 +124,66 @@ export default function GalleryPage() {
     }
   }
 
-  const handleShare = async (comic: SavedComic, platform: 'twitter' | 'whatsapp' | 'download') => {
+  const handleCopyImage = async (comic: SavedComic) => {
+    console.log('[Gallery] Copy image initiated for comic:', comic.id)
+
+    const screenshotBlob = await captureComicScreenshot(comic.id)
+
+    if (!screenshotBlob) {
+      alert('❌ Failed to capture comic. Please try downloading instead.')
+      return
+    }
+
+    try {
+      // Convert JPEG blob to PNG blob (PNG is supported by Clipboard API)
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) throw new Error('Canvas context not available')
+
+      const img = new window.Image()
+      const imageUrl = URL.createObjectURL(screenshotBlob)
+
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => {
+          canvas.width = img.width
+          canvas.height = img.height
+          ctx.drawImage(img, 0, 0)
+          URL.revokeObjectURL(imageUrl)
+          resolve()
+        }
+        img.onerror = () => {
+          URL.revokeObjectURL(imageUrl)
+          reject(new Error('Failed to load image'))
+        }
+        img.src = imageUrl
+      })
+
+      // Convert canvas to PNG blob
+      const pngBlob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob)
+          else reject(new Error('Failed to create PNG blob'))
+        }, 'image/png')
+      })
+
+      // Copy PNG to clipboard
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': pngBlob
+        })
+      ])
+
+      console.log('[Gallery] Image copied to clipboard successfully')
+      alert('✅ Image copied to clipboard!\n\nPaste (Cmd+V or Ctrl+V) into WhatsApp, X, Slack, or any app.')
+    } catch (error) {
+      console.error('[Gallery] Failed to copy image:', error)
+      alert('❌ Failed to copy image.\n\nYour browser may not support this feature.\nPlease use the Download button instead.')
+    }
+
+    setActiveShareDropdown(null)
+  }
+
+  const handleShare = async (comic: SavedComic, platform: 'share' | 'download') => {
     console.log('[Gallery] Share initiated for platform:', platform)
 
     // Detect if mobile device
@@ -140,70 +199,36 @@ export default function GalleryPage() {
 
     const file = new File([screenshotBlob], 'mockr-comic.jpg', { type: 'image/jpeg' })
 
-    switch (platform) {
-      case 'twitter':
-        if (isMobile && navigator.share) {
-          try {
-            await navigator.share({ files: [file] })
+    if (platform === 'share') {
+      // Universal share - use native share API on mobile
+      if (isMobile && navigator.share) {
+        try {
+          await navigator.share({ files: [file] })
+          setActiveShareDropdown(null)
+          return
+        } catch (error: any) {
+          if (error.name === 'AbortError') {
+            setActiveShareDropdown(null)
             return
-          } catch (error: any) {
-            if (error.name === 'AbortError') return
-            console.error('[Gallery] X share failed:', error)
           }
+          console.error('[Gallery] Native share failed:', error)
         }
+      }
 
-        // Desktop or fallback: Download
-        const downloadUrlX = URL.createObjectURL(screenshotBlob)
-        const linkX = document.createElement('a')
-        linkX.href = downloadUrlX
-        linkX.download = 'mockr-comic.jpg'
-        document.body.appendChild(linkX)
-        linkX.click()
-        document.body.removeChild(linkX)
-        URL.revokeObjectURL(downloadUrlX)
+      // Desktop: Copy to clipboard
+      await handleCopyImage(comic)
+      return
+    }
 
-        if (!isMobile) {
-          const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent('#MockrApp #PoliticalSatire')}`
-          setTimeout(() => window.open(xUrl, '_blank', 'width=550,height=400'), 500)
-        }
-        break
-
-      case 'whatsapp':
-        if (isMobile && navigator.share) {
-          try {
-            await navigator.share({ files: [file] })
-            return
-          } catch (error: any) {
-            if (error.name === 'AbortError') return
-            console.error('[Gallery] WhatsApp share failed:', error)
-          }
-        }
-
-        // Desktop or fallback: Download
-        const downloadUrlWa = URL.createObjectURL(screenshotBlob)
-        const linkWa = document.createElement('a')
-        linkWa.href = downloadUrlWa
-        linkWa.download = 'mockr-comic.jpg'
-        document.body.appendChild(linkWa)
-        linkWa.click()
-        document.body.removeChild(linkWa)
-        URL.revokeObjectURL(downloadUrlWa)
-
-        if (!isMobile) {
-          alert('✅ Comic downloaded!\n\nOpen WhatsApp Web and attach the downloaded image to share.')
-        }
-        break
-
-      case 'download':
-        const downloadUrl = URL.createObjectURL(screenshotBlob)
-        const link = document.createElement('a')
-        link.href = downloadUrl
-        link.download = 'mockr-comic.jpg'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(downloadUrl)
-        break
+    if (platform === 'download') {
+      const downloadUrl = URL.createObjectURL(screenshotBlob)
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = 'mockr-comic.jpg'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(downloadUrl)
     }
 
     setActiveShareDropdown(null)
@@ -397,18 +422,11 @@ export default function GalleryPage() {
                       {activeShareDropdown === comic.id && (
                         <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
                           <button
-                            onClick={() => handleShare(comic, 'twitter')}
+                            onClick={() => handleShare(comic, 'share')}
                             className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                           >
-                            <XIcon className="w-4 h-4 mr-3 text-neutral-900" />
-                            Share on X
-                          </button>
-                          <button
-                            onClick={() => handleShare(comic, 'whatsapp')}
-                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-green-50 hover:text-green-600 transition-colors"
-                          >
-                            <MessageCircle className="w-4 h-4 mr-3 text-green-500" />
-                            Share on WhatsApp
+                            <Copy className="w-4 h-4 mr-3 text-blue-500" />
+                            Copy Image
                           </button>
                           <button
                             onClick={() => handleShare(comic, 'download')}
