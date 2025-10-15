@@ -181,13 +181,24 @@ export default function GeneratePage() {
     }
 
     try {
+      // Create AbortController with 3-minute timeout to handle slow Hugging Face API responses
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 180000) // 3 minutes
+
       const response = await fetch('/api/generate-comic', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(enhancedFormData),
+        signal: controller.signal
       })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
 
       const data = await response.json()
 
@@ -234,9 +245,15 @@ export default function GeneratePage() {
         console.error('Generation failed:', data.error)
         alert('Failed to generate comic. Please try again.')
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error calling API:', error)
-      alert('Something went wrong. Please try again.')
+
+      // Handle abort/timeout error
+      if (error.name === 'AbortError') {
+        alert('⏱️ Comic generation is taking longer than expected.\n\nThe AI image service might be busy. Please try again in a moment.')
+      } else {
+        alert('❌ Something went wrong while generating the comic.\n\nPlease try again.')
+      }
     } finally {
       setIsGenerating(false)
     }
