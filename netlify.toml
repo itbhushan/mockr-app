@@ -83,10 +83,8 @@
     external_node_modules = ["sharp"]
     included_files = ["public/**"]
 
-  # Function-specific settings for API routes
-  [[functions]]
-    function = "api/generate-comic"
-    timeout = 26
+  # Note: Netlify's Next.js plugin handles API route timeouts automatically
+  # The 26s timeout is configured via Netlify dashboard for the site
 
   # Form handling (for contact forms if needed)
   [forms]
