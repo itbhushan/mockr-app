@@ -1472,14 +1472,55 @@ export default function GeneratePage() {
                       )}
                     </div>
 
-                    {/* Copy Image Button */}
-                    <button
-                      onClick={handleCopyImage}
-                      className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
-                    >
-                      <Copy className="w-3.5 h-3.5 mr-1.5" />
-                      Copy Image
-                    </button>
+                    {/* Share/Copy Button - Different UI for Mobile vs Desktop */}
+                    {typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? (
+                      // Mobile: Show Share dropdown with 3 options
+                      <div className="relative" ref={shareDropdownRef}>
+                        <button
+                          onClick={() => setShowShareDropdown(!showShareDropdown)}
+                          className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
+                        >
+                          <Share2 className="w-3.5 h-3.5 mr-1.5" />
+                          Share
+                          <ChevronDown className={`w-3.5 h-3.5 ml-1.5 transition-transform ${showShareDropdown ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {showShareDropdown && (
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
+                            <button
+                              onClick={() => { handleShare('twitter'); setShowShareDropdown(false) }}
+                              className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                            >
+                              <XIcon className="w-4 h-4 mr-3 text-neutral-900" />
+                              Share on X
+                            </button>
+                            <button
+                              onClick={() => { handleShare('whatsapp'); setShowShareDropdown(false) }}
+                              className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-green-50 hover:text-green-600 transition-colors"
+                            >
+                              <MessageCircle className="w-4 h-4 mr-3 text-green-500" />
+                              Share on WhatsApp
+                            </button>
+                            <button
+                              onClick={() => { handleCopyImage(); setShowShareDropdown(false) }}
+                              className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-purple-50 hover:text-purple-600 transition-colors border-t border-neutral-100"
+                            >
+                              <Copy className="w-4 h-4 mr-3 text-purple-500" />
+                              Copy Image
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      // Desktop: Show Copy Image button only
+                      <button
+                        onClick={handleCopyImage}
+                        className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
+                      >
+                        <Copy className="w-3.5 h-3.5 mr-1.5" />
+                        Copy Image
+                      </button>
+                    )}
                   </div>
 
                   <button

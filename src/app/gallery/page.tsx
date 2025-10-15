@@ -183,7 +183,7 @@ export default function GalleryPage() {
     setActiveShareDropdown(null)
   }
 
-  const handleShare = async (comic: SavedComic, platform: 'share' | 'download') => {
+  const handleShare = async (comic: SavedComic, platform: 'share' | 'twitter' | 'whatsapp' | 'download') => {
     console.log('[Gallery] Share initiated for platform:', platform)
 
     // Detect if mobile device
@@ -218,6 +218,23 @@ export default function GalleryPage() {
       // Desktop: Copy to clipboard
       await handleCopyImage(comic)
       return
+    }
+
+    if (platform === 'twitter' || platform === 'whatsapp') {
+      // Mobile platform-specific sharing
+      if (isMobile && navigator.share) {
+        try {
+          await navigator.share({ files: [file] })
+          setActiveShareDropdown(null)
+          return
+        } catch (error: any) {
+          if (error.name === 'AbortError') {
+            setActiveShareDropdown(null)
+            return
+          }
+          console.error('[Gallery] Platform share failed:', error)
+        }
+      }
     }
 
     if (platform === 'download') {
@@ -421,20 +438,57 @@ export default function GalleryPage() {
 
                       {activeShareDropdown === comic.id && (
                         <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
-                          <button
-                            onClick={() => handleShare(comic, 'share')}
-                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                          >
-                            <Copy className="w-4 h-4 mr-3 text-blue-500" />
-                            Copy Image
-                          </button>
-                          <button
-                            onClick={() => handleShare(comic, 'download')}
-                            className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-amber-50 hover:text-amber-600 transition-colors border-t border-neutral-100"
-                          >
-                            <Download className="w-4 h-4 mr-3 text-amber-500" />
-                            Download
-                          </button>
+                          {typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? (
+                            // Mobile: Show all 3 options (X, WhatsApp, Copy)
+                            <>
+                              <button
+                                onClick={() => handleShare(comic, 'twitter')}
+                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                              >
+                                <XIcon className="w-4 h-4 mr-3 text-neutral-900" />
+                                Share on X
+                              </button>
+                              <button
+                                onClick={() => handleShare(comic, 'whatsapp')}
+                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-green-50 hover:text-green-600 transition-colors"
+                              >
+                                <MessageCircle className="w-4 h-4 mr-3 text-green-500" />
+                                Share on WhatsApp
+                              </button>
+                              <button
+                                onClick={() => handleShare(comic, 'share')}
+                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-purple-50 hover:text-purple-600 transition-colors border-t border-neutral-100"
+                              >
+                                <Copy className="w-4 h-4 mr-3 text-purple-500" />
+                                Copy Image
+                              </button>
+                              <button
+                                onClick={() => handleShare(comic, 'download')}
+                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-amber-50 hover:text-amber-600 transition-colors border-t border-neutral-100"
+                              >
+                                <Download className="w-4 h-4 mr-3 text-amber-500" />
+                                Download
+                              </button>
+                            </>
+                          ) : (
+                            // Desktop: Show only Copy Image and Download
+                            <>
+                              <button
+                                onClick={() => handleShare(comic, 'share')}
+                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                              >
+                                <Copy className="w-4 h-4 mr-3 text-blue-500" />
+                                Copy Image
+                              </button>
+                              <button
+                                onClick={() => handleShare(comic, 'download')}
+                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-amber-50 hover:text-amber-600 transition-colors border-t border-neutral-100"
+                              >
+                                <Download className="w-4 h-4 mr-3 text-amber-500" />
+                                Download
+                              </button>
+                            </>
+                          )}
                         </div>
                       )}
                     </div>
