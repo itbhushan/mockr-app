@@ -1529,13 +1529,13 @@ export default function GeneratePage() {
                         )}
                       </div>
                     ) : (
-                      // Desktop: Show Copy Image button only
+                      // Desktop: Show Copy and Share button
                       <button
                         onClick={handleCopyImage}
                         className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
                       >
                         <Copy className="w-3.5 h-3.5 mr-1.5" />
-                        Copy Image
+                        Copy and Share
                       </button>
                     )}
                   </div>
