@@ -917,41 +917,82 @@ export default function GeneratePage() {
       return
     }
 
-    // Detect mobile - clipboard doesn't work for images on mobile
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    console.log('[Copy] Starting copy to clipboard...')
 
-    console.log('[Copy] Capturing screenshot...')
-    const screenshotBlob = await captureComicScreenshot()
-
-    if (!screenshotBlob) {
-      alert('❌ Failed to capture comic. Please try downloading instead.')
-      return
-    }
-
-    // Mobile: Download the image instead (clipboard doesn't work)
-    if (isMobile) {
-      try {
-        const downloadUrl = URL.createObjectURL(screenshotBlob)
-        const link = document.createElement('a')
-        link.href = downloadUrl
-        link.download = `mockr-comic-${generatedComic.id}.jpg`
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(downloadUrl)
-
-        console.log('[Copy] Image downloaded on mobile')
-        alert('✅ Comic downloaded!\n\nYou can now share it from your Downloads folder to WhatsApp, X, or any app.')
-      } catch (error) {
-        console.error('[Copy] Mobile download failed:', error)
-        alert('❌ Failed to download comic. Please use the Download button instead.')
-      }
-      return
-    }
-
-    // Desktop: Copy to clipboard
     try {
-      // Convert JPEG blob to PNG blob (PNG is supported by Clipboard API)
+      // Detect Safari (iOS or Desktop) for promise-based clipboard
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) ||
+                       /iPhone|iPad|iPod/i.test(navigator.userAgent)
+
+      // For Safari: Create promise that will be passed to ClipboardItem
+      // This keeps the clipboard call synchronous with user interaction
+      if (isSafari) {
+        console.log('[Copy] Safari detected - using promise-based approach')
+
+        const imagePromise = new Promise<Blob>(async (resolve, reject) => {
+          try {
+            const screenshotBlob = await captureComicScreenshot()
+            if (!screenshotBlob) {
+              reject(new Error('Screenshot capture failed'))
+              return
+            }
+
+            // Convert JPEG to PNG
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+            if (!ctx) {
+              reject(new Error('Canvas context not available'))
+              return
+            }
+
+            const img = new window.Image()
+            const imageUrl = URL.createObjectURL(screenshotBlob)
+
+            img.onload = () => {
+              canvas.width = img.width
+              canvas.height = img.height
+              ctx.drawImage(img, 0, 0)
+              URL.revokeObjectURL(imageUrl)
+
+              canvas.toBlob((blob) => {
+                if (blob) resolve(blob)
+                else reject(new Error('Failed to create PNG blob'))
+              }, 'image/png')
+            }
+
+            img.onerror = () => {
+              URL.revokeObjectURL(imageUrl)
+              reject(new Error('Failed to load image'))
+            }
+
+            img.src = imageUrl
+          } catch (error) {
+            reject(error)
+          }
+        })
+
+        // Pass promise directly to ClipboardItem (Safari requirement)
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'image/png': imagePromise
+          })
+        ])
+
+        console.log('[Copy] Image copied to clipboard successfully (Safari)')
+        alert('✅ Image copied to clipboard!\n\nYou can now paste it into any app (WhatsApp, X, Messages, etc.)')
+        return
+      }
+
+      // For non-Safari browsers: Standard approach
+      console.log('[Copy] Non-Safari browser - using standard approach')
+      const screenshotBlob = await captureComicScreenshot()
+
+      if (!screenshotBlob) {
+        alert('❌ Failed to capture comic. Please try downloading instead.')
+        return
+      }
+
+      // Convert JPEG blob to PNG blob
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
       if (!ctx) throw new Error('Canvas context not available')
@@ -974,7 +1015,6 @@ export default function GeneratePage() {
         img.src = imageUrl
       })
 
-      // Convert canvas to PNG blob
       const pngBlob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob((blob) => {
           if (blob) resolve(blob)
