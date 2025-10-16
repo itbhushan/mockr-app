@@ -1489,55 +1489,82 @@ export default function GeneratePage() {
                       )}
                     </div>
 
-                    {/* Share/Copy Button - Different UI for Mobile vs Desktop */}
-                    {typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? (
-                      // Mobile: Show Share dropdown with 3 options
-                      <div className="relative" ref={shareDropdownRef}>
+                    {/* Share/Copy Button - Platform-specific UI */}
+                    {(() => {
+                      if (typeof window === 'undefined') return null
+
+                      const ua = navigator.userAgent
+                      const isIOSChrome = /CriOS/i.test(ua) || (/iPhone|iPad|iPod/i.test(ua) && /Chrome/i.test(ua))
+                      const isIOSSafari = /iPhone|iPad|iPod/i.test(ua) && !isIOSChrome && !/CriOS|FxiOS|OPiOS|EdgiOS/i.test(ua)
+                      const isAndroid = /Android/i.test(ua)
+                      const isDesktop = !(/iPhone|iPad|iPod|Android/i.test(ua))
+
+                      // iOS Chrome: Show simple Copy and Share button (no dropdown)
+                      if (isIOSChrome) {
+                        return (
+                          <button
+                            onClick={handleCopyImage}
+                            className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
+                          >
+                            <Copy className="w-3.5 h-3.5 mr-1.5" />
+                            Copy and Share
+                          </button>
+                        )
+                      }
+
+                      // iOS Safari or Android: Show dropdown with Copy and Share + X + WhatsApp
+                      if (isIOSSafari || isAndroid) {
+                        return (
+                          <div className="relative" ref={shareDropdownRef}>
+                            <button
+                              onClick={() => setShowShareDropdown(!showShareDropdown)}
+                              className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
+                            >
+                              <Share2 className="w-3.5 h-3.5 mr-1.5" />
+                              Share
+                              <ChevronDown className={`w-3.5 h-3.5 ml-1.5 transition-transform ${showShareDropdown ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {showShareDropdown && (
+                              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
+                                <button
+                                  onClick={() => { handleCopyImage(); setShowShareDropdown(false) }}
+                                  className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                                >
+                                  <Copy className="w-4 h-4 mr-3 text-purple-500" />
+                                  Copy and Share
+                                </button>
+                                <button
+                                  onClick={() => { handleShare('twitter'); setShowShareDropdown(false) }}
+                                  className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                >
+                                  <XIcon className="w-4 h-4 mr-3 text-neutral-900" />
+                                  Share on X
+                                </button>
+                                <button
+                                  onClick={() => { handleShare('whatsapp'); setShowShareDropdown(false) }}
+                                  className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-green-50 hover:text-green-600 transition-colors"
+                                >
+                                  <MessageCircle className="w-4 h-4 mr-3 text-green-500" />
+                                  Share on WhatsApp
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      }
+
+                      // Desktop: Show Copy and Share button
+                      return (
                         <button
-                          onClick={() => setShowShareDropdown(!showShareDropdown)}
+                          onClick={handleCopyImage}
                           className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
                         >
-                          <Share2 className="w-3.5 h-3.5 mr-1.5" />
-                          Share
-                          <ChevronDown className={`w-3.5 h-3.5 ml-1.5 transition-transform ${showShareDropdown ? 'rotate-180' : ''}`} />
+                          <Copy className="w-3.5 h-3.5 mr-1.5" />
+                          Copy and Share
                         </button>
-
-                        {showShareDropdown && (
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
-                            <button
-                              onClick={() => { handleShare('twitter'); setShowShareDropdown(false) }}
-                              className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                            >
-                              <XIcon className="w-4 h-4 mr-3 text-neutral-900" />
-                              Share on X
-                            </button>
-                            <button
-                              onClick={() => { handleShare('whatsapp'); setShowShareDropdown(false) }}
-                              className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-green-50 hover:text-green-600 transition-colors"
-                            >
-                              <MessageCircle className="w-4 h-4 mr-3 text-green-500" />
-                              Share on WhatsApp
-                            </button>
-                            <button
-                              onClick={() => { handleShare('share'); setShowShareDropdown(false) }}
-                              className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-purple-50 hover:text-purple-600 transition-colors border-t border-neutral-100"
-                            >
-                              <Share2 className="w-4 h-4 mr-3 text-purple-500" />
-                              Share Image
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      // Desktop: Show Copy and Share button
-                      <button
-                        onClick={handleCopyImage}
-                        className="bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
-                      >
-                        <Copy className="w-3.5 h-3.5 mr-1.5" />
-                        Copy and Share
-                      </button>
-                    )}
+                      )
+                    })()}
                   </div>
 
                   <button
