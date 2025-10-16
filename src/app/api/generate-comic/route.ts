@@ -354,26 +354,26 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
   }
 
   try {
-    console.log('🌐 Making request to Hugging Face API with FLUX.1-schnell model...')
+    console.log('🌐 Making request to Hugging Face API with SDXL-Lightning model...')
     console.log('📝 Original prompt from Gemini:', prompt.substring(0, 200) + '...')
 
-    // Transform Gemini description into optimized FLUX prompt
+    // Transform Gemini description into optimized prompt
     const optimizedPrompt = optimizePromptForFLUX(prompt)
 
-    console.log('📝 Optimized prompt for FLUX.1-schnell:', optimizedPrompt.substring(0, 200) + '...')
+    console.log('📝 Optimized prompt for SDXL-Lightning:', optimizedPrompt.substring(0, 200) + '...')
     console.log('📝 Full optimized prompt length:', optimizedPrompt.length)
 
     // Log exact parameters being sent
-    console.log('⚙️ FLUX.1-schnell Parameters:')
-    console.log('   - guidance_scale: 3.5 (FLUX optimal)')
-    console.log('   - num_inference_steps: 4 (schnell fast mode)')
+    console.log('⚙️ SDXL-Lightning Parameters:')
+    console.log('   - guidance_scale: 0 (Lightning uses CFG distillation)')
+    console.log('   - num_inference_steps: 4 (Lightning 4-step)')
     console.log('   - resolution: 1024x1024')
-    console.log('   - model: black-forest-labs/FLUX.1-schnell')
+    console.log('   - model: ByteDance/SDXL-Lightning')
 
-    // Use FLUX.1-schnell with Hugging Face PRO API (90% cheaper, 10x faster than dev)
-    // To revert to FLUX.1-dev: change URL to '/FLUX.1-dev' and num_inference_steps to 40
+    // Use SDXL-Lightning with Hugging Face PRO API (80% cheaper, better quality than schnell)
+    // To revert to FLUX.1-dev: change URL to '/black-forest-labs/FLUX.1-dev', guidance_scale to 3.5, and num_inference_steps to 40
     const response = await fetch(
-      'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell',
+      'https://api-inference.huggingface.co/models/ByteDance/SDXL-Lightning',
       {
         headers: {
           'Authorization': `Bearer ${apiToken}`,
@@ -383,8 +383,8 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
         body: JSON.stringify({
           inputs: optimizedPrompt,
           parameters: {
-            num_inference_steps: 4, // schnell uses 4 steps (dev uses 40)
-            guidance_scale: 3.5, // FLUX optimal guidance
+            num_inference_steps: 4, // Lightning uses 4 steps for speed
+            guidance_scale: 0, // Lightning uses CFG distillation (no guidance needed)
             width: 1024,
             height: 1024
           }
