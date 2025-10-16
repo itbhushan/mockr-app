@@ -917,7 +917,10 @@ export default function GeneratePage() {
       return
     }
 
-    console.log('[Copy] Capturing screenshot for clipboard...')
+    // Detect mobile - clipboard doesn't work for images on mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
+    console.log('[Copy] Capturing screenshot...')
     const screenshotBlob = await captureComicScreenshot()
 
     if (!screenshotBlob) {
@@ -925,6 +928,28 @@ export default function GeneratePage() {
       return
     }
 
+    // Mobile: Download the image instead (clipboard doesn't work)
+    if (isMobile) {
+      try {
+        const downloadUrl = URL.createObjectURL(screenshotBlob)
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.download = `mockr-comic-${generatedComic.id}.jpg`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(downloadUrl)
+
+        console.log('[Copy] Image downloaded on mobile')
+        alert('✅ Comic downloaded!\n\nYou can now share it from your Downloads folder to WhatsApp, X, or any app.')
+      } catch (error) {
+        console.error('[Copy] Mobile download failed:', error)
+        alert('❌ Failed to download comic. Please use the Download button instead.')
+      }
+      return
+    }
+
+    // Desktop: Copy to clipboard
     try {
       // Convert JPEG blob to PNG blob (PNG is supported by Clipboard API)
       const canvas = document.createElement('canvas')
