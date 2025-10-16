@@ -1519,11 +1519,11 @@ export default function GeneratePage() {
                               Share on WhatsApp
                             </button>
                             <button
-                              onClick={() => { handleCopyImage(); setShowShareDropdown(false) }}
+                              onClick={() => { handleShare('share'); setShowShareDropdown(false) }}
                               className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-purple-50 hover:text-purple-600 transition-colors border-t border-neutral-100"
                             >
-                              <Copy className="w-4 h-4 mr-3 text-purple-500" />
-                              Copy Image
+                              <Share2 className="w-4 h-4 mr-3 text-purple-500" />
+                              Share Image
                             </button>
                           </div>
                         )}
