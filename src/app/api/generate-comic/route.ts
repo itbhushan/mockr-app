@@ -370,12 +370,7 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
     console.log('   - resolution: 1024x1024')
     console.log('   - model: black-forest-labs/FLUX.1-dev')
 
-    // Use FLUX.1-dev with 8-second timeout for Netlify Free tier
-    // Hugging Face PRO account has priority queue access for faster responses
-    // Netlify Free tier has 10-second max timeout, so we use 8s to leave buffer for processing
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 8000) // 8 seconds
-
+    // Use FLUX.1-dev with Hugging Face PRO API
     const response = await fetch(
       'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev',
       {
@@ -392,12 +387,9 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
             width: 1024,
             height: 1024
           }
-        }),
-        signal: controller.signal
+        })
       }
     )
-
-    clearTimeout(timeoutId)
 
     console.log('📡 API Response status:', response.status)
     console.log('📡 API Response ok:', response.ok)
@@ -427,14 +419,7 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
     return finalComicWithCommonMan
 
   } catch (error: any) {
-    if (error.name === 'AbortError') {
-      console.log('⏱️ Hugging Face API timeout after 8 seconds (Netlify Free tier limit)')
-      console.log('📋 Falling back to SVG placeholder system')
-      console.log('💡 Note: Using Hugging Face PRO account with priority queue')
-      console.log('💡 Most requests should complete within 8s with PRO account')
-    } else {
-      console.error('Error calling Hugging Face API:', error)
-    }
+    console.error('Error calling Hugging Face API:', error)
     return null
   }
 }

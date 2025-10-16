@@ -81,10 +81,6 @@
     external_node_modules = ["sharp"]
     included_files = ["public/**"]
 
-  # Note: Netlify Free tier has 10-second function timeout (non-configurable)
-  # API routes use 8-second timeout for Hugging Face PRO API to leave processing buffer
-  # Hugging Face PRO account provides priority queue for faster responses
-
   # Form handling (for contact forms if needed)
   [forms]
     spam_protection = true
