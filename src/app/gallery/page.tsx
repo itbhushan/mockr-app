@@ -343,9 +343,9 @@ export default function GalleryPage() {
             <Image
               src="/brand/mockr-signature.png"
               alt="Mockr"
-              width={390}
-              height={158}
-              className="h-[5.7rem] lg:h-[6.75rem] w-auto"
+              width={507}
+              height={205}
+              className="h-[7.4rem] lg:h-[8.75rem] w-auto"
               priority
             />
           </Link>
