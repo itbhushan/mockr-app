@@ -1187,18 +1187,16 @@ export default function GeneratePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
       {/* Navigation */}
-      <nav className="w-full px-6 py-2 lg:py-2 bg-white/95 backdrop-blur-md border-b border-neutral-200/60 sticky top-0 z-50">
+      <nav className="w-full px-6 py-4 lg:py-6 bg-white/95 backdrop-blur-md border-b border-neutral-200/60 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
             <ArrowLeft className="w-5 h-5 text-neutral-600 hover:text-blue-600 transition-colors" />
-            <Image
-              src="/brand/mockr-signature.png"
-              alt="Mockr"
-              width={507}
-              height={205}
-              className="h-[7.4rem] lg:h-[8.75rem] w-auto"
-              priority
-            />
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-sm">
+                <span className="text-white font-bold text-xl lg:text-2xl">M</span>
+              </div>
+              <span className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">Mockr</span>
+            </div>
           </Link>
 
           <div className="flex items-center space-x-4">

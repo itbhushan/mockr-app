@@ -9,7 +9,7 @@ const nextConfig = {
       ignoreDuringBuilds: true,
     },
     images: {
-      unoptimized: true, // Required for Netlify static deployment
+      unoptimized: true, // Required for Netlify static deployment (kept for sample images)
       remotePatterns: [
         {
           protocol: 'https',

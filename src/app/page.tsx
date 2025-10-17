@@ -36,17 +36,13 @@ export default function SimpleHomePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Navigation */}
       <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-6 py-2">
+        <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Image
-                src="/brand/mockr-signature.png"
-                alt="Mockr"
-                width={605}
-                height={244}
-                className="h-[8.75rem] md:h-[9.75rem] w-auto"
-                priority
-              />
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xl">M</span>
+              </div>
+              <span className="text-2xl font-bold text-blue-600">Mockr</span>
             </div>
 
             <div className="flex items-center space-x-4">
