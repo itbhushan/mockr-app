@@ -340,12 +340,14 @@ export default function GalleryPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
             <ArrowLeft className="w-5 h-5 text-neutral-600 hover:text-blue-600 transition-colors" />
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-xl lg:text-2xl">M</span>
-              </div>
-              <span className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">Mockr</span>
-            </div>
+            <Image
+              src="/brand/mockr-signature.png"
+              alt="Mockr"
+              width={140}
+              height={56}
+              className="h-12 w-auto"
+              priority
+            />
           </Link>
 
           <div className="flex items-center space-x-4">

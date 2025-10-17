@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useUser, UserButton, SignInButton } from '@clerk/nextjs'
 import { Sparkles, Zap, Users, ArrowRight } from 'lucide-react'
 
@@ -13,10 +14,14 @@ export default function SimpleHomePage() {
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">M</span>
-              </div>
-              <span className="text-2xl font-bold text-blue-600">Mockr</span>
+              <Image
+                src="/brand/mockr-signature.png"
+                alt="Mockr"
+                width={120}
+                height={48}
+                className="h-10 w-auto"
+                priority
+              />
             </div>
 
             <div className="flex items-center space-x-4">
