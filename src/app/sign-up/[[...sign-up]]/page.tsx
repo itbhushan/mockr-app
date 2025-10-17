@@ -21,9 +21,9 @@ export default function SignUpPage() {
             <Image
               src="/brand/mockr-signature.png"
               alt="Mockr"
-              width={280}
-              height={112}
-              className="h-16 w-auto"
+              width={465}
+              height={188}
+              className="h-[8.75rem] w-auto"
               priority
             />
           </div>

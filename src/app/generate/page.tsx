@@ -1194,9 +1194,9 @@ export default function GeneratePage() {
             <Image
               src="/brand/mockr-signature.png"
               alt="Mockr"
-              width={340}
-              height={137}
-              className="h-14 lg:h-16 w-auto"
+              width={507}
+              height={205}
+              className="h-[7.4rem] lg:h-[8.75rem] w-auto"
               priority
             />
           </Link>
