@@ -1187,7 +1187,7 @@ export default function GeneratePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
       {/* Navigation */}
-      <nav className="w-full px-6 py-3 lg:py-4 bg-white/95 backdrop-blur-md border-b border-neutral-200/60 sticky top-0 z-50">
+      <nav className="w-full px-6 py-2 lg:py-2 bg-white/95 backdrop-blur-md border-b border-neutral-200/60 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
             <ArrowLeft className="w-5 h-5 text-neutral-600 hover:text-blue-600 transition-colors" />
