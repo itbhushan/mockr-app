@@ -42,9 +42,9 @@ export default function SimpleHomePage() {
               <Image
                 src="/brand/mockr-signature.png"
                 alt="Mockr"
-                width={120}
-                height={48}
-                className="h-10 w-auto"
+                width={180}
+                height={72}
+                className="h-12 w-auto"
                 priority
               />
             </div>
