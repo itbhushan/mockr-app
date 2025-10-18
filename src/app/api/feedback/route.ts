@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth, clerkClient } from '@clerk/nextjs/server'
-import { submitFeedback } from '@/lib/supabase'
+import { saveFeedback } from '@/lib/feedback'
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'Unauthorized. Please sign in to submit feedback.' },
+        { error: 'Please sign in to submit feedback.' },
         { status: 401 }
       )
     }
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     if (!['general', 'bug', 'feature_request'].includes(feedbackType)) {
       return NextResponse.json(
-        { error: 'Invalid feedback type' },
+        { error: 'Invalid feedback type. Must be: general, bug, or feature_request' },
         { status: 400 }
       )
     }
@@ -40,30 +40,33 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get user email from Clerk
+    // Get user details from Clerk
     const client = await clerkClient()
     const user = await client.users.getUser(userId)
     const email = user.emailAddresses[0]?.emailAddress
+    const name = `${user.firstName || ''} ${user.lastName || ''}`.trim()
 
-    // Submit feedback to database
-    const success = await submitFeedback(
+    // Save feedback to JSON file
+    const success = saveFeedback({
       userId,
       email,
+      name: name || undefined,
       feedbackType,
       message,
-      rating
-    )
+      rating,
+      userAgent: request.headers.get('user-agent') || undefined
+    })
 
     if (!success) {
       return NextResponse.json(
-        { error: 'Failed to submit feedback' },
+        { error: 'Failed to save feedback' },
         { status: 500 }
       )
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Thank you for your feedback!'
+      message: 'Thank you for your feedback! We really appreciate it.'
     })
   } catch (error) {
     console.error('Error submitting feedback:', error)

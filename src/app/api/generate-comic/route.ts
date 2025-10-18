@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { generateEnhancedDialogue, generateEnhancedPrompt } from '@/lib/gemini'
 import { addCommonManToComic } from '@/lib/imageComposite'
-import { checkUserDailyLimit, incrementUserComicCount } from '@/lib/supabase'
+import { checkDailyLimit, incrementComicCount } from '@/lib/rateLimiting'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,8 +17,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check daily rate limit
-    const limitCheck = await checkUserDailyLimit(userId)
+    // Check daily rate limit using Clerk metadata
+    const limitCheck = await checkDailyLimit(userId)
     if (!limitCheck.allowed) {
       return NextResponse.json(
         {
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Increment user's comic count after successful generation
-    await incrementUserComicCount(userId)
+    await incrementComicCount(userId)
 
     const response = {
       success: true,

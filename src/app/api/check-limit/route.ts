@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { checkUserDailyLimit } from '@/lib/supabase'
+import { checkDailyLimit } from '@/lib/rateLimiting'
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,13 +9,13 @@ export async function GET(request: NextRequest) {
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'Unauthorized. Please sign in to generate comics.' },
+        { error: 'Please sign in to generate comics.' },
         { status: 401 }
       )
     }
 
-    // Check daily limit
-    const limitCheck = await checkUserDailyLimit(userId)
+    // Check daily limit using Clerk metadata
+    const limitCheck = await checkDailyLimit(userId)
 
     return NextResponse.json({
       success: true,
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       message: limitCheck.message
     })
   } catch (error) {
-    console.error('Error checking usage:', error)
+    console.error('Error checking usage limit:', error)
     return NextResponse.json(
       { error: 'Failed to check usage limits' },
       { status: 500 }
