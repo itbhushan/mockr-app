@@ -2,11 +2,33 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { generateEnhancedDialogue, generateEnhancedPrompt } from '@/lib/gemini'
 import { addCommonManToComic } from '@/lib/imageComposite'
+import { checkUserDailyLimit, incrementUserComicCount } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
     // Get user authentication status
     const { userId } = await auth()
+
+    // Require authentication for comic generation
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Please sign in to generate comics.' },
+        { status: 401 }
+      )
+    }
+
+    // Check daily rate limit
+    const limitCheck = await checkUserDailyLimit(userId)
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: limitCheck.message || 'Daily limit reached',
+          current: limitCheck.current,
+          limit: limitCheck.limit
+        },
+        { status: 429 }
+      )
+    }
 
     const body = await request.json()
     const { situation, quote, description, characters, setting, tone, style } = body
@@ -61,6 +83,9 @@ export async function POST(request: NextRequest) {
       // - Context box display
       // - Complete character visualization
     }
+
+    // Increment user's comic count after successful generation
+    await incrementUserComicCount(userId)
 
     const response = {
       success: true,
