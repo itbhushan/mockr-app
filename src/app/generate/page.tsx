@@ -6,6 +6,9 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Sparkles, RefreshCw, Download, Share2, Shuffle, Twitter as XIcon, Facebook, MessageCircle, Copy, ChevronDown, FileImage, FileText } from 'lucide-react'
 import html2canvas from 'html2canvas'
+import UsageIndicator from '@/components/UsageIndicator'
+import FeedbackModal from '@/components/FeedbackModal'
+import StorageDisclaimer from '@/components/StorageDisclaimer'
 
 export default function GeneratePage() {
   const [formData, setFormData] = useState({
@@ -35,6 +38,8 @@ export default function GeneratePage() {
   const [showDownloadDropdown, setShowDownloadDropdown] = useState(false)
   const shareDropdownRef = useRef<HTMLDivElement>(null)
   const downloadDropdownRef = useRef<HTMLDivElement>(null)
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null)
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -165,6 +170,7 @@ export default function GeneratePage() {
 
   const handleGenerateComic = async () => {
     setIsGenerating(true)
+    setRateLimitError(null)
 
     const quoteToUse = isEditingQuote ? editableQuote : generatedQuote
     const descriptionToUse = isEditingDescription ? editableDescription : generatedDescription
@@ -195,6 +201,14 @@ export default function GeneratePage() {
       })
 
       clearTimeout(timeoutId)
+
+      // Handle rate limit error
+      if (response.status === 429) {
+        const errorData = await response.json()
+        setRateLimitError(errorData.error || 'Daily limit reached. Please try again tomorrow!')
+        setIsGenerating(false)
+        return
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -1200,6 +1214,12 @@ export default function GeneratePage() {
           </Link>
 
           <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setIsFeedbackModalOpen(true)}
+              className="text-blue-600 hover:text-blue-700 font-medium text-sm lg:text-base transition-colors"
+            >
+              Feedback
+            </button>
             <Link
               href="/gallery"
               className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3"
@@ -1227,6 +1247,16 @@ export default function GeneratePage() {
                 <p className="text-lg lg:text-xl leading-relaxed text-neutral-600">
                   Describe your political satire idea and watch AI bring it to life in classic editorial cartoon style.
                 </p>
+              </div>
+
+              {/* Usage Indicator */}
+              <div className="mb-6">
+                <UsageIndicator />
+              </div>
+
+              {/* Storage Disclaimer */}
+              <div className="mb-6">
+                <StorageDisclaimer />
               </div>
 
               {/* Sample Generation Button */}
@@ -1392,11 +1422,20 @@ export default function GeneratePage() {
                       )}
                     </div>
 
+                    {/* Rate Limit Error Display */}
+                    {rateLimitError && (
+                      <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                        <p className="text-sm text-red-900 font-medium">
+                          ⚠️ {rateLimitError}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Generate Comic Button - Always Available When Description Exists */}
                     <button
                       type="button"
                       onClick={handleGenerateComic}
-                      disabled={isGenerating || isEditingDescription}
+                      disabled={isGenerating || isEditingDescription || !!rateLimitError}
                       className="bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isGenerating ? (
@@ -1651,6 +1690,12 @@ export default function GeneratePage() {
           </motion.div>
         </div>
       </div>
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
+      />
     </div>
   )
 }

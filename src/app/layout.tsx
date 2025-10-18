@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
+import MVPRegistration from '@/components/MVPRegistration'
 
 import './globals.css'
 
@@ -87,6 +88,7 @@ import './globals.css'
         </head>
         <body className={`${inter.className} antialiased bg-neutral-50 text-neutral-900`} suppressHydrationWarning>
           <div className="min-h-screen flex flex-col">
+            <MVPRegistration />
             <main className="flex-1">
               {children}
             </main>
