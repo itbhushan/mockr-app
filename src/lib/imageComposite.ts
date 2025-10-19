@@ -89,43 +89,18 @@ export async function addCommonManToComic(
     // Resize Common Man to 36% of base height (30% + 20% increase)
     const commonManHeight = Math.floor(baseHeight * 0.36)
 
-    // Process Common Man image: remove white background and resize
+    // Process Common Man image: KEEP white background opaque (don't remove it)
+    // The window's white background should COVER the comic scene behind it
     const resizedCommonMan = await sharp(commonManBuffer)
       .resize({
         height: commonManHeight,
         fit: 'contain',
-        background: { r: 255, g: 255, b: 255, alpha: 0 }
+        background: { r: 255, g: 255, b: 255, alpha: 1 } // Opaque white background
       })
-      // Remove white/light gray background (make it transparent)
-      .ensureAlpha()
-      .raw()
-      .toBuffer({ resolveWithObject: true })
-      .then(({ data, info }) => {
-        // Process pixels to remove white/near-white backgrounds
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i]
-          const g = data[i + 1]
-          const b = data[i + 2]
-
-          // Conservative background removal - only pure whites
-          // This preserves the character while removing background
-          if (r > 245 && g > 245 && b > 245) {
-            data[i + 3] = 0 // Remove only very white pixels
-          }
-          // Fade very light grays (not remove)
-          else if (r > 230 && g > 230 && b > 230) {
-            data[i + 3] = Math.floor(data[i + 3] * 0.5) // 50% fade
-          }
-        }
-
-        return sharp(data, {
-          raw: {
-            width: info.width,
-            height: info.height,
-            channels: 4
-          }
-        }).png().toBuffer()
-      })
+      // Keep the image as-is with opaque white background
+      // This ensures the window frame covers/hides the comic scene behind it
+      .png()
+      .toBuffer()
 
     // Get resized Common Man dimensions
     const commonManMetadata = await sharp(resizedCommonMan).metadata()
@@ -133,21 +108,21 @@ export async function addCommonManToComic(
 
     console.log('[Composite] Common Man dimensions:', `${commonManWidth}x${commonManHeight}`)
 
-    // FOREGROUND placement - Common Man in FRONT of the scene (bottom area)
-    // This ensures he's visible as an overlay observer, not hidden behind the scene
+    // FOREGROUND placement - Common Man window in TOP-RIGHT (overlaying the scene)
+    // Window should appear as a layer ON TOP of the comic, covering anything behind it
     let left: number
     let top: number
     let position: string
 
-    // Always position in bottom-right area (FOREGROUND) to ensure visibility
-    // Common Man should appear as if he's standing in front of the comic, observing the scene
+    // Position in TOP-RIGHT area as FOREGROUND overlay
+    // The white window background will cover/hide any scene elements behind it
     left = baseWidth - commonManWidth - 40 // 40px margin from right edge
-    top = baseHeight - commonManHeight - 40 // 40px margin from bottom - FOREGROUND position
-    position = 'BOTTOM-RIGHT (FOREGROUND)'
+    top = 35 // 35px from top - FOREGROUND overlay position
+    position = 'TOP-RIGHT (FOREGROUND OVERLAY)'
 
     console.log(`[Composite] Positioning at ${position}`)
     console.log('[Composite] Final position:', `left=${left}, top=${top}`)
-    console.log('[Composite] Common Man will appear in FOREGROUND, overlaying the comic scene')
+    console.log('[Composite] Common Man window will overlay and cover scene elements behind it')
 
     // Apply moderate darkening WITHOUT rotation (keep window upright)
     const enhancedCommonMan = await sharp(resizedCommonMan)
