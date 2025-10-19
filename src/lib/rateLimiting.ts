@@ -4,6 +4,12 @@ import { clerkClient } from '@clerk/nextjs/server'
 export const DAILY_COMIC_LIMIT = 10
 export const MAX_MVP_USERS = 100
 
+// Whitelisted testing email addresses with unlimited access
+const UNLIMITED_ACCESS_EMAILS = [
+  'bhuvnagreens@gmail.com',
+  'refundreturn8@gmail.com'
+]
+
 export interface DailyUsage {
   date: string
   count: number
@@ -30,6 +36,18 @@ export async function checkDailyLimit(userId: string): Promise<{
     const client = await clerkClient()
     const user = await client.users.getUser(userId)
     const metadata = (user.publicMetadata || {}) as UserMetadata
+
+    // Check if user has unlimited access (whitelisted testing accounts)
+    const userEmail = user.emailAddresses[0]?.emailAddress?.toLowerCase()
+    if (userEmail && UNLIMITED_ACCESS_EMAILS.includes(userEmail)) {
+      console.log(`[Rate Limit] Unlimited access granted for testing account: ${userEmail}`)
+      return {
+        allowed: true,
+        current: 0,
+        limit: 999999, // Show as unlimited in UI
+        message: 'Testing account - unlimited access'
+      }
+    }
 
     const today = new Date().toISOString().split('T')[0]
     const dailyUsage = metadata.dailyUsage
@@ -73,6 +91,13 @@ export async function incrementComicCount(userId: string): Promise<boolean> {
     const client = await clerkClient()
     const user = await client.users.getUser(userId)
     const metadata = (user.publicMetadata || {}) as UserMetadata
+
+    // Skip incrementing for whitelisted testing accounts
+    const userEmail = user.emailAddresses[0]?.emailAddress?.toLowerCase()
+    if (userEmail && UNLIMITED_ACCESS_EMAILS.includes(userEmail)) {
+      console.log(`[Rate Limit] Skipping count increment for testing account: ${userEmail}`)
+      return true
+    }
 
     const today = new Date().toISOString().split('T')[0]
     const now = new Date().toISOString()
