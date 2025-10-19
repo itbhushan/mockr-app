@@ -104,11 +104,26 @@ export async function addCommonManToComic(
 
     console.log('[Composite] Common Man dimensions:', `${commonManWidth}x${commonManHeight}`)
 
-    // Position Common Man window in TOP-RIGHT as foreground overlay
-    const left = baseWidth - commonManWidth - 40 // 40px margin from right edge
-    const top = 35 // 35px from top
+    // Position based on expression:
+    // - Neutral: TOP-LEFT corner
+    // - Worried & Surprised: TOP-RIGHT corner
+    let left: number
+    let top: number
+    let position: string
 
-    console.log('[Composite] Positioning Common Man window at TOP-RIGHT')
+    if (selectedExpression === 'neutral') {
+      // TOP-LEFT corner for neutral expression
+      left = 40 // 40px from left edge
+      top = 35 // 35px from top
+      position = 'TOP-LEFT'
+    } else {
+      // TOP-RIGHT corner for worried and surprised expressions
+      left = baseWidth - commonManWidth - 40 // 40px from right edge
+      top = 35 // 35px from top
+      position = 'TOP-RIGHT'
+    }
+
+    console.log(`[Composite] Positioning Common Man window at ${position} (${selectedExpression} expression)`)
     console.log('[Composite] Final position:', `left=${left}, top=${top}`)
 
     console.log('[Composite] Applying Common Man window overlay...')
