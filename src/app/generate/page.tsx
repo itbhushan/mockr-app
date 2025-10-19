@@ -1498,14 +1498,16 @@ export default function GeneratePage() {
                 <div className="space-y-4">
                   {/* Wrapping div with ID for screenshot capture */}
                   <div id="comic-preview-capture" className="bg-white rounded-2xl shadow-sm border border-neutral-100">
-                    {/* Comic Image - Larger Display */}
-                    <div className="aspect-square bg-white relative">
+                    {/* Comic Image - Full Size Display */}
+                    <div className="w-full bg-white relative" style={{ minHeight: '600px' }}>
                       {generatedComic.imageUrl.startsWith('data:') ? (
                         <Image
                           src={generatedComic.imageUrl}
                           alt={`Comic: ${generatedComic.situation.substring(0, 50)}...`}
-                          fill
-                          className="object-contain"
+                          width={1024}
+                          height={1024}
+                          className="w-full h-auto"
+                          priority
                         />
                       ) : svgContent ? (
                         <div

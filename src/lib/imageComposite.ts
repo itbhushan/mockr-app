@@ -89,7 +89,7 @@ export async function addCommonManToComic(
     // Resize Common Man to 36% of base height (30% + 20% increase)
     const commonManHeight = Math.floor(baseHeight * 0.36)
 
-    // Process Common Man image: KEEP white background opaque (don't remove it)
+    // Process Common Man image: Convert grey background to WHITE and keep opaque
     // The window's white background should COVER the comic scene behind it
     const resizedCommonMan = await sharp(commonManBuffer)
       .resize({
@@ -97,10 +97,34 @@ export async function addCommonManToComic(
         fit: 'contain',
         background: { r: 255, g: 255, b: 255, alpha: 1 } // Opaque white background
       })
-      // Keep the image as-is with opaque white background
-      // This ensures the window frame covers/hides the comic scene behind it
-      .png()
-      .toBuffer()
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true })
+      .then(({ data, info }) => {
+        // Convert GREY background to pure WHITE (keep it opaque, not transparent)
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i]
+          const g = data[i + 1]
+          const b = data[i + 2]
+
+          // Convert grey/light backgrounds to pure white (RGB: 255, 255, 255)
+          // Keep alpha at 255 (fully opaque) - DO NOT make transparent
+          if (r > 180 && g > 180 && b > 180) {
+            data[i] = 255     // R = 255 (white)
+            data[i + 1] = 255 // G = 255 (white)
+            data[i + 2] = 255 // B = 255 (white)
+            data[i + 3] = 255 // Alpha = 255 (fully opaque)
+          }
+        }
+
+        return sharp(data, {
+          raw: {
+            width: info.width,
+            height: info.height,
+            channels: 4
+          }
+        }).png().toBuffer()
+      })
 
     // Get resized Common Man dimensions
     const commonManMetadata = await sharp(resizedCommonMan).metadata()
