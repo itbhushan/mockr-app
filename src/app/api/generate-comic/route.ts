@@ -477,23 +477,20 @@ function optimizePromptForFLUX(description: string): string {
   // 6. NO COMMON MAN IN TOP-RIGHT - Will be added as overlay
   optimizedPrompt += `DO NOT include any observer or bystander characters. DO NOT place any characters in the TOP-RIGHT CORNER. Keep the top-right area clear and empty with plain white background. `
 
-  // 7. NO SIGNATURES OR TEXT - Mockr branding will be added separately
-  optimizedPrompt += `CRITICAL: DO NOT add any artist signatures, watermarks, dates, or text labels anywhere in the image. ABSOLUTELY NO text in the bottom-right corner. NO signatures like "Mockr", "AI", or any artist name anywhere in the image. Do not write "Mockr" or any other text. Keep the entire image completely clean without any text overlays, signatures, or written words. The branding will be added separately after generation. `
+  // 7. NO TEXT ANYWHERE - All branding will be added separately
+  optimizedPrompt += `CRITICAL TEXT REMOVAL: DO NOT add ANY text, words, letters, signatures, watermarks, dates, labels, or writing ANYWHERE in the image. ABSOLUTELY NO text in ANY corners (top-left, top-right, bottom-left, bottom-right). NO signatures like "Mockr", "@Laxman", "AI", or any artist name. NO random words, NO speech text, NO labels. Keep the ENTIRE image completely clean without ANY text overlays, signatures, or written words whatsoever. This is MANDATORY - the image must be 100% text-free. All branding and captions will be added separately after generation. `
 
-  // 6. BACKGROUND MANDATE - Be explicit about simplicity
+  // 8. BACKGROUND MANDATE - Be explicit about simplicity
   optimizedPrompt += `Background must be minimal and simple: plain white space with basic geometric shapes only, a simple indoor setting if needed (desk, chair, door, window). NO cityscapes, NO crowds, NO complex architecture, NO multiple buildings. `
 
-  // 7. ARTISTIC TECHNIQUE - Natural language description
+  // 9. ARTISTIC TECHNIQUE - Natural language description
   optimizedPrompt += `Drawing style: Clean black ink pen strokes on white paper, diagonal crosshatching for shadows, bold solid blacks for contrast, hand-drawn editorial cartoon quality from 1960s-1990s Indian political cartoons. `
 
-  // 8. COMPOSITION - Frame and layout
+  // 10. COMPOSITION - Frame and layout
   optimizedPrompt += `Composition: Single rectangular panel with thick black border frame around the entire image, characters in clear view with recognizable faces, main action in center or foreground. `
 
-  // 9. MOCKR WATERMARK/SIGNATURE - Brand identity
-  optimizedPrompt += `MANDATORY: Include the text "Mockr" in bottom right corner in casual handwritten cartoon font style, similar to artist signature style. `
-
-  // 10. TECHNICAL CONSTRAINTS - What to avoid
-  optimizedPrompt += `No color, no gradients, no photorealism, no speech bubbles in the main image. Pure black and white line art only.`
+  // 11. TECHNICAL CONSTRAINTS - What to avoid
+  optimizedPrompt += `No color, no gradients, no photorealism, no speech bubbles in the main image. Pure black and white line art only. REMINDER: Absolutely zero text or written words anywhere in the image.`
 
   console.log('🔧 FLUX-OPTIMIZED PROMPT CREATED')
   console.log('📝 Final prompt length:', optimizedPrompt.length)

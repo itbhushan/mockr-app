@@ -133,25 +133,21 @@ export async function addCommonManToComic(
 
     console.log('[Composite] Common Man dimensions:', `${commonManWidth}x${commonManHeight}`)
 
-    // Directional placement based on expression
-    // Worried → TOP-RIGHT (looks left toward scene)
-    // Neutral/Surprised → TOP-LEFT (looks right toward scene)
+    // FOREGROUND placement - Common Man in FRONT of the scene (bottom area)
+    // This ensures he's visible as an overlay observer, not hidden behind the scene
     let left: number
-    let top = 35 // 35px margin from top edge
+    let top: number
     let position: string
 
-    if (selectedExpression === 'worried') {
-      // TOP-RIGHT corner
-      left = baseWidth - commonManWidth - 40 // 40px margin from right edge
-      position = 'TOP-RIGHT'
-    } else {
-      // TOP-LEFT corner (neutral and surprised)
-      left = 40 // 40px margin from left edge
-      position = 'TOP-LEFT'
-    }
+    // Always position in bottom-right area (FOREGROUND) to ensure visibility
+    // Common Man should appear as if he's standing in front of the comic, observing the scene
+    left = baseWidth - commonManWidth - 40 // 40px margin from right edge
+    top = baseHeight - commonManHeight - 40 // 40px margin from bottom - FOREGROUND position
+    position = 'BOTTOM-RIGHT (FOREGROUND)'
 
-    console.log(`[Composite] Positioning at ${position} CORNER`)
+    console.log(`[Composite] Positioning at ${position}`)
     console.log('[Composite] Final position:', `left=${left}, top=${top}`)
+    console.log('[Composite] Common Man will appear in FOREGROUND, overlaying the comic scene')
 
     // Apply moderate darkening WITHOUT rotation (keep window upright)
     const enhancedCommonMan = await sharp(resizedCommonMan)
