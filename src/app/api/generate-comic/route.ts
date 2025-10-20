@@ -378,53 +378,75 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
     return null
   }
 
-  try {
-    console.log('🌐 Making request to Hugging Face API with FLUX.1-dev model...')
-    console.log('📝 Original prompt from Gemini:', prompt.substring(0, 200) + '...')
+  // Retry logic for cold model starts
+  const maxRetries = 2
+  let lastError: string | null = null
 
-    // Transform Gemini description into optimized FLUX prompt
-    const optimizedPrompt = optimizePromptForFLUX(prompt)
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🌐 Attempt ${attempt}/${maxRetries}: Making request to Hugging Face API with FLUX.1-dev model...`)
+      console.log('📝 Original prompt from Gemini:', prompt.substring(0, 200) + '...')
 
-    console.log('📝 Optimized prompt for FLUX.1-dev:', optimizedPrompt.substring(0, 200) + '...')
-    console.log('📝 Full optimized prompt length:', optimizedPrompt.length)
+      // Transform Gemini description into optimized FLUX prompt
+      const optimizedPrompt = optimizePromptForFLUX(prompt)
 
-    // Log exact parameters being sent
-    console.log('⚙️ FLUX.1-dev Parameters:')
-    console.log('   - guidance_scale: 3.5 (FLUX optimal)')
-    console.log('   - num_inference_steps: 20 (reduced from 40 for 50% cost savings)')
-    console.log('   - resolution: 1024x1024')
-    console.log('   - model: black-forest-labs/FLUX.1-dev')
+      console.log('📝 Optimized prompt for FLUX.1-dev:', optimizedPrompt.substring(0, 200) + '...')
+      console.log('📝 Full optimized prompt length:', optimizedPrompt.length)
 
-    // Use FLUX.1-dev with 20 steps (50% cheaper than 40, maintains 90-95% quality)
-    // Easy cost adjustment: change num_inference_steps (10, 20, 30, 40)
-    const response = await fetch(
-      'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev',
-      {
-        headers: {
-          'Authorization': `Bearer ${apiToken}`,
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify({
-          inputs: optimizedPrompt,
-          parameters: {
-            num_inference_steps: 20, // Reduced from 40 for cost savings (adjustable: 10-40)
-            guidance_scale: 3.5, // FLUX optimal guidance
-            width: 1024,
-            height: 1024
-          }
-        })
+      // Log exact parameters being sent
+      console.log('⚙️ FLUX.1-dev Parameters:')
+      console.log('   - guidance_scale: 3.5 (FLUX optimal)')
+      console.log('   - num_inference_steps: 20 (reduced from 40 for 50% cost savings)')
+      console.log('   - resolution: 1024x1024')
+      console.log('   - model: black-forest-labs/FLUX.1-dev')
+
+      // Use FLUX.1-dev with 20 steps (50% cheaper than 40, maintains 90-95% quality)
+      // Easy cost adjustment: change num_inference_steps (10, 20, 30, 40)
+      const response = await fetch(
+        'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev',
+        {
+          headers: {
+            'Authorization': `Bearer ${apiToken}`,
+            'Content-Type': 'application/json',
+            'x-wait-for-model': 'true', // Wait for model to load if needed
+          },
+          method: 'POST',
+          body: JSON.stringify({
+            inputs: optimizedPrompt,
+            parameters: {
+              num_inference_steps: 20, // Reduced from 40 for cost savings (adjustable: 10-40)
+              guidance_scale: 3.5, // FLUX optimal guidance
+              width: 1024,
+              height: 1024
+            }
+          })
+        }
+      )
+
+      console.log('📡 API Response status:', response.status)
+      console.log('📡 API Response ok:', response.ok)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        lastError = `${response.status}: ${errorText}`
+        console.error(`❌ Attempt ${attempt} failed:`, lastError)
+
+        // If model is loading, wait and retry
+        if (response.status === 503 && attempt < maxRetries) {
+          console.log('⏳ Model is loading, waiting 5 seconds before retry...')
+          await new Promise(resolve => setTimeout(resolve, 5000))
+          continue
+        }
+
+        // If it's another error and we have retries left, try again
+        if (attempt < maxRetries) {
+          console.log('🔄 Retrying...')
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          continue
+        }
+
+        return null
       }
-    )
-
-    console.log('📡 API Response status:', response.status)
-    console.log('📡 API Response ok:', response.ok)
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Hugging Face API error:', response.status, errorText)
-      return null
-    }
 
     // Get the image blob
     const imageBlob = await response.blob()
@@ -440,14 +462,26 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
     // Apply Common Man composite overlay with context-aware expression and position
     const finalComicWithCommonMan = await addCommonManToComic(baseComicDataUrl, prompt)
 
-    console.log('✅ Final composite comic created successfully')
+      console.log('✅ Final composite comic created successfully')
 
-    return finalComicWithCommonMan
+      return finalComicWithCommonMan
 
-  } catch (error: any) {
-    console.error('Error calling Hugging Face API:', error)
-    return null
+    } catch (error: any) {
+      lastError = error.message
+      console.error(`❌ Attempt ${attempt} exception:`, error)
+
+      // Retry on exception if we have attempts left
+      if (attempt < maxRetries) {
+        console.log('🔄 Retrying after exception...')
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        continue
+      }
+    }
   }
+
+  // All retries failed
+  console.error('❌ All retry attempts failed. Last error:', lastError)
+  return null
 }
 
 function optimizePromptForFLUX(description: string): string {
