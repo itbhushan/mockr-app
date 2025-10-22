@@ -933,6 +933,51 @@ export default function GeneratePage() {
 
     console.log('[Copy] Starting copy to clipboard...')
 
+    // Detect mobile Chrome specifically - it has very limited clipboard support
+    const isMobileChrome = /Android.*Chrome/i.test(navigator.userAgent) ||
+                           /CriOS/i.test(navigator.userAgent)
+
+    // Check if clipboard API is supported
+    const hasClipboardSupport = navigator.clipboard && navigator.clipboard.write
+
+    // Mobile Chrome: Fallback to native share or download
+    if (isMobileChrome && !hasClipboardSupport) {
+      console.log('[Copy] Mobile Chrome detected with no clipboard support - using native share')
+
+      try {
+        const screenshotBlob = await captureComicScreenshot()
+        if (!screenshotBlob) {
+          alert('❌ Failed to capture comic. Please try downloading instead.')
+          return
+        }
+
+        const file = new File([screenshotBlob], 'mockr-comic.jpg', { type: 'image/jpeg' })
+
+        // Try native share API first
+        if (navigator.share) {
+          await navigator.share({ files: [file] })
+          return
+        }
+
+        // Fallback to download if share not available
+        const downloadUrl = URL.createObjectURL(screenshotBlob)
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.download = `mockr-comic-${generatedComic.id}.jpg`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(downloadUrl)
+        alert('✅ Comic downloaded!\n\nYou can now share it from your Downloads folder.')
+        return
+      } catch (error: any) {
+        if (error.name === 'AbortError') return
+        console.error('[Copy] Native share failed:', error)
+        alert('❌ Failed to share. Please try the Download button instead.')
+        return
+      }
+    }
+
     try {
       // Detect Safari (iOS or Desktop) for promise-based clipboard
       const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) ||
@@ -1047,7 +1092,28 @@ export default function GeneratePage() {
       alert('✅ Image copied to clipboard!\n\nPaste (Cmd+V or Ctrl+V) into WhatsApp, X, Slack, or any app.')
     } catch (error) {
       console.error('[Copy] Failed to copy image:', error)
-      alert('❌ Failed to copy image.\n\nYour browser may not support this feature.\nPlease use the Download button instead.')
+
+      // Fallback to download on clipboard error
+      console.log('[Copy] Attempting download fallback...')
+      try {
+        const screenshotBlob = await captureComicScreenshot()
+        if (screenshotBlob) {
+          const downloadUrl = URL.createObjectURL(screenshotBlob)
+          const link = document.createElement('a')
+          link.href = downloadUrl
+          link.download = `mockr-comic-${generatedComic.id}.jpg`
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          URL.revokeObjectURL(downloadUrl)
+          alert('✅ Comic downloaded!\n\nYour browser doesn\'t support copying images, so we\'ve downloaded it instead.\n\nYou can now share it from your Downloads folder.')
+        } else {
+          alert('❌ Failed to copy image.\n\nYour browser may not support this feature.\nPlease use the Download button instead.')
+        }
+      } catch (fallbackError) {
+        console.error('[Copy] Download fallback failed:', fallbackError)
+        alert('❌ Failed to copy image.\n\nYour browser may not support this feature.\nPlease use the Download button instead.')
+      }
     }
   }
 
@@ -1600,7 +1666,9 @@ export default function GeneratePage() {
                       if (typeof window === 'undefined') return null
 
                       const ua = navigator.userAgent
-                      const isIOSChrome = /CriOS/i.test(ua) || (/iPhone|iPad|iPod/i.test(ua) && /Chrome/i.test(ua))
+                      // iOS Chrome detection: CriOS is the iOS Chrome identifier
+                      const isIOSChrome = /CriOS/i.test(ua)
+                      // iOS Safari: iOS device that's NOT Chrome and NOT other browsers
                       const isIOSSafari = /iPhone|iPad|iPod/i.test(ua) && !isIOSChrome && !/CriOS|FxiOS|OPiOS|EdgiOS/i.test(ua)
                       const isAndroid = /Android/i.test(ua)
                       const isDesktop = !(/iPhone|iPad|iPod|Android/i.test(ua))
