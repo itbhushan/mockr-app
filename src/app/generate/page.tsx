@@ -1565,7 +1565,7 @@ export default function GeneratePage() {
                   {/* Wrapping div with ID for screenshot capture */}
                   <div id="comic-preview-capture" className="bg-white rounded-2xl shadow-sm border border-neutral-100">
                     {/* Comic Image - Full Size Display */}
-                    <div className="w-full bg-white relative" style={{ minHeight: '600px' }}>
+                    <div className="w-full bg-white">
                       {generatedComic.imageUrl.startsWith('data:') ? (
                         <Image
                           src={generatedComic.imageUrl}
@@ -1577,7 +1577,7 @@ export default function GeneratePage() {
                         />
                       ) : svgContent ? (
                         <div
-                          className="w-full h-full flex items-center justify-center"
+                          className="w-full"
                           style={{ backgroundColor: 'white', aspectRatio: '4/3' }}
                         >
                           <div
@@ -1596,7 +1596,7 @@ export default function GeneratePage() {
                           />
                         </div>
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center">
+                        <div className="w-full min-h-[400px] flex items-center justify-center">
                           <div className="text-center text-neutral-500">
                             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
                             <p className="text-sm">Loading comic...</p>
