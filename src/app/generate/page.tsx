@@ -1608,12 +1608,12 @@ export default function GeneratePage() {
                     </div>
 
                     {/* Comic Details - Compact */}
-                    <div className="p-4">
+                    <div className="px-4 pt-4 pb-8">
                       <div className="mb-3">
-                        <h3 className="text-sm font-semibold text-neutral-900 mb-1">
+                        <h3 className="text-sm font-semibold text-neutral-900 mb-2 leading-relaxed">
                           "{generatedComic.dialogue}"
                         </h3>
-                        <p className="text-xs text-neutral-600">
+                        <p className="text-xs text-neutral-600 leading-relaxed">
                           {generatedComic.situation}
                         </p>
                       </div>

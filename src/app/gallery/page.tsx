@@ -549,12 +549,12 @@ export default function GalleryPage() {
                 </div>
 
                 {/* Comic Details */}
-                <div className="p-6">
+                <div className="px-6 pt-6 pb-8">
                   <div className="mb-4">
-                    <h3 className="font-semibold text-neutral-900 mb-2 line-clamp-2">
+                    <h3 className="font-semibold text-neutral-900 mb-2 line-clamp-2 leading-relaxed">
                       "{comic.dialogue}"
                     </h3>
-                    <p className="text-sm text-neutral-600 line-clamp-3">
+                    <p className="text-sm text-neutral-600 line-clamp-3 leading-relaxed">
                       {comic.situation}
                     </p>
                   </div>
