@@ -508,17 +508,18 @@ export default function GalleryPage() {
                 {/* Wrapper for screenshot capture - includes ONLY image and text, excludes buttons */}
                 <div id={`comic-card-${comic.id}`}>
                   {/* Comic Image */}
-                  <div className="aspect-[4/3] bg-white relative">
+                  <div className="w-full bg-white">
                   {comic.imageUrl.startsWith('data:') ? (
                     <Image
                       src={comic.imageUrl}
                       alt={`Comic: ${comic.situation.substring(0, 50)}...`}
-                      fill
-                      className="object-contain"
+                      width={1024}
+                      height={1024}
+                      className="w-full h-auto"
                     />
                   ) : comic.svgContent ? (
                     <div
-                      className="w-full h-full flex items-center justify-center"
+                      className="w-full"
                       style={{ backgroundColor: 'white', aspectRatio: '4/3' }}
                     >
                       <div
@@ -537,7 +538,7 @@ export default function GalleryPage() {
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-full min-h-[300px] flex items-center justify-center">
                       <div className="text-center text-neutral-500">
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
                         <p className="text-sm">Loading comic...</p>
