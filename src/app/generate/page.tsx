@@ -1674,10 +1674,27 @@ export default function GeneratePage() {
                   </div>
 
                   <button
-                    onClick={() => setGeneratedComic(null)}
-                    className="w-full text-blue-600 hover:text-blue-700 transition-colors text-center py-2 border border-blue-200 rounded-lg"
+                    onClick={() => {
+                      // Clear current comic and trigger fresh generation
+                      setGeneratedComic(null)
+                      setSvgContent(null)
+                      // Small delay to ensure state clears before regenerating
+                      setTimeout(() => handleGenerateComic(), 100)
+                    }}
+                    disabled={isGenerating}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors text-center py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
-                    ← Back to Description (Generate Another Version)
+                    {isGenerating ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Generate Another Comic
+                      </>
+                    )}
                   </button>
                 </div>
               )}

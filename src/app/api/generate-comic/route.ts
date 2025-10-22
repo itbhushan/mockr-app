@@ -67,16 +67,23 @@ export async function POST(request: NextRequest) {
     console.log('📝 Enhanced prompt with Common Man mandate:', prompt.substring(0, 200) + '...')
     console.log('🔗 Placeholder URL:', imageUrl)
     console.log('🔑 Environment check - HF Token exists:', !!process.env.HUGGINGFACE_API_TOKEN)
+    console.log('🔑 Environment check - Replicate Token exists:', !!process.env.REPLICATE_API_TOKEN)
 
-    // Try Hugging Face AI generation first (Pro API) - using official SDXL defaults
-    const aiImageUrl = await generateComicWithHuggingFace(prompt)
+    // Try Hugging Face FLUX-schnell first (Pro subscription - maximize value)
+    let aiImageUrl = await generateComicWithHuggingFace(prompt)
+
+    // Fallback to Replicate FLUX-schnell if HF fails or runs out
+    if (!aiImageUrl) {
+      console.log('⚠️ Hugging Face failed, trying Replicate as fallback...')
+      aiImageUrl = await generateComicWithReplicate(prompt)
+    }
 
     if (aiImageUrl) {
       console.log('✅ AI image generation successful!')
       imageUrl = aiImageUrl
       aiGenerated = true
     } else {
-      console.log('⚠️ AI image generation failed, using enhanced SVG placeholder system')
+      console.log('⚠️ All AI providers failed, using enhanced SVG placeholder system')
       // Fallback to enhanced SVG placeholder with full functionality:
       // - Dynamic dialogue generation with Gemini AI
       // - Speech bubble integration
@@ -366,6 +373,139 @@ function generateSeriousCritique(situation: string): string {
   return options[timestamp % options.length]
 }
 
+async function generateComicWithReplicate(prompt: string): Promise<string | null> {
+  const apiToken = process.env.REPLICATE_API_TOKEN
+
+  console.log('🔑 Checking Replicate API token...')
+  console.log('🔑 Token exists:', !!apiToken)
+  console.log('🔑 Token starts with:', apiToken?.substring(0, 5) || 'N/A')
+
+  if (!apiToken) {
+    console.warn('❌ Replicate API token not configured')
+    return null
+  }
+
+  // Retry logic for transient failures
+  const maxRetries = 2
+  let lastError: string | null = null
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🌐 [Replicate] Attempt ${attempt}/${maxRetries}: Making request with FLUX.1-schnell model...`)
+      console.log('📝 Original prompt from Gemini:', prompt.substring(0, 200) + '...')
+
+      // Transform Gemini description into optimized FLUX prompt
+      const optimizedPrompt = optimizePromptForFLUX(prompt)
+
+      console.log('📝 Optimized prompt for FLUX.1-schnell:', optimizedPrompt.substring(0, 200) + '...')
+      console.log('📝 Full optimized prompt length:', optimizedPrompt.length)
+
+      // Log exact parameters being sent
+      console.log('⚙️ Replicate FLUX.1-schnell Parameters:')
+      console.log('   - num_inference_steps: 4 (schnell optimized)')
+      console.log('   - resolution: 1024x1024')
+      console.log('   - model: black-forest-labs/flux-schnell')
+      console.log('   - cost: ~$0.003 per image')
+
+      // Replicate API call with FLUX-schnell
+      const response = await fetch(
+        'https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions',
+        {
+          headers: {
+            'Authorization': `Bearer ${apiToken}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'wait'
+          },
+          method: 'POST',
+          body: JSON.stringify({
+            input: {
+              prompt: optimizedPrompt,
+              num_outputs: 1,
+              aspect_ratio: '1:1',
+              output_format: 'jpg',
+              output_quality: 95,
+              num_inference_steps: 4
+            }
+          })
+        }
+      )
+
+      console.log('📡 [Replicate] API Response status:', response.status)
+      console.log('📡 [Replicate] API Response ok:', response.ok)
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        lastError = `${response.status}: ${errorText}`
+        console.error(`❌ [Replicate] Attempt ${attempt} failed:`, lastError)
+
+        // If it's a transient error and we have retries left, try again
+        if (attempt < maxRetries) {
+          console.log('🔄 [Replicate] Retrying...')
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          continue
+        }
+
+        return null
+      }
+
+      // Parse Replicate response
+      const result = await response.json()
+
+      if (!result.output || !result.output[0]) {
+        lastError = 'Invalid response format from Replicate'
+        console.error(`❌ [Replicate] ${lastError}`)
+
+        if (attempt < maxRetries) {
+          console.log('🔄 [Replicate] Retrying...')
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          continue
+        }
+
+        return null
+      }
+
+      // Get image URL from response
+      const imageUrl = result.output[0]
+
+      // Download the image and convert to base64
+      const imageResponse = await fetch(imageUrl)
+      if (!imageResponse.ok) {
+        throw new Error('Failed to download image from Replicate')
+      }
+
+      const imageBlob = await imageResponse.blob()
+      const arrayBuffer = await imageBlob.arrayBuffer()
+      const base64 = Buffer.from(arrayBuffer).toString('base64')
+      const baseComicDataUrl = `data:image/jpeg;base64,${base64}`
+
+      console.log('✅ [Replicate] Base comic generated successfully with FLUX.1-schnell')
+      console.log('🎨 Now adding Common Man overlay with smart positioning...')
+
+      // Apply Common Man composite overlay with context-aware expression and position
+      const finalComicWithCommonMan = await addCommonManToComic(baseComicDataUrl, prompt)
+
+      console.log('✅ [Replicate] Final composite comic created successfully')
+
+      return finalComicWithCommonMan
+
+    } catch (error: any) {
+      lastError = error.message
+      console.error(`❌ [Replicate] Attempt ${attempt} exception:`, error)
+
+      // Retry on exception if we have attempts left
+      if (attempt < maxRetries) {
+        console.log('🔄 [Replicate] Retrying after exception...')
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        continue
+      }
+    }
+  }
+
+  // All retries failed
+  console.error('❌ [Replicate] All retry attempts failed. Last error:', lastError)
+  return null
+}
+
 async function generateComicWithHuggingFace(prompt: string): Promise<string | null> {
   const apiToken = process.env.HUGGINGFACE_API_TOKEN
 
@@ -384,26 +524,25 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`🌐 Attempt ${attempt}/${maxRetries}: Making request to Hugging Face API with FLUX.1-dev model...`)
+      console.log(`🌐 [HF] Attempt ${attempt}/${maxRetries}: Making request to Hugging Face API with FLUX.1-schnell model...`)
       console.log('📝 Original prompt from Gemini:', prompt.substring(0, 200) + '...')
 
       // Transform Gemini description into optimized FLUX prompt
       const optimizedPrompt = optimizePromptForFLUX(prompt)
 
-      console.log('📝 Optimized prompt for FLUX.1-dev:', optimizedPrompt.substring(0, 200) + '...')
+      console.log('📝 Optimized prompt for FLUX.1-schnell:', optimizedPrompt.substring(0, 200) + '...')
       console.log('📝 Full optimized prompt length:', optimizedPrompt.length)
 
       // Log exact parameters being sent
-      console.log('⚙️ FLUX.1-dev Parameters:')
-      console.log('   - guidance_scale: 3.5 (FLUX optimal)')
-      console.log('   - num_inference_steps: 20 (reduced from 40 for 50% cost savings)')
+      console.log('⚙️ FLUX.1-schnell Parameters:')
+      console.log('   - guidance_scale: 0 (schnell uses distillation, no CFG needed)')
+      console.log('   - num_inference_steps: 4 (schnell optimized)')
       console.log('   - resolution: 1024x1024')
-      console.log('   - model: black-forest-labs/FLUX.1-dev')
+      console.log('   - model: black-forest-labs/FLUX.1-schnell')
 
-      // Use FLUX.1-dev with 20 steps (50% cheaper than 40, maintains 90-95% quality)
-      // Easy cost adjustment: change num_inference_steps (10, 20, 30, 40)
+      // Use FLUX.1-schnell with 4 steps (90% quality of dev, 10x faster, cheaper)
       const response = await fetch(
-        'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev',
+        'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell',
         {
           headers: {
             'Authorization': `Bearer ${apiToken}`,
@@ -414,8 +553,8 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
           body: JSON.stringify({
             inputs: optimizedPrompt,
             parameters: {
-              num_inference_steps: 20, // Reduced from 40 for cost savings (adjustable: 10-40)
-              guidance_scale: 3.5, // FLUX optimal guidance
+              num_inference_steps: 4, // Schnell optimal (distilled model)
+              guidance_scale: 0, // Schnell doesn't use CFG
               width: 1024,
               height: 1024
             }
@@ -456,13 +595,13 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
     const base64 = Buffer.from(arrayBuffer).toString('base64')
     const baseComicDataUrl = `data:image/jpeg;base64,${base64}`
 
-    console.log('✅ Base comic generated successfully')
+    console.log('✅ [HF] Base comic generated successfully with FLUX.1-schnell')
     console.log('🎨 Now adding Common Man overlay with smart positioning...')
 
     // Apply Common Man composite overlay with context-aware expression and position
     const finalComicWithCommonMan = await addCommonManToComic(baseComicDataUrl, prompt)
 
-      console.log('✅ Final composite comic created successfully')
+      console.log('✅ [HF] Final composite comic created successfully')
 
       return finalComicWithCommonMan
 
@@ -491,40 +630,57 @@ function optimizePromptForFLUX(description: string): string {
   // FLUX.1-dev excels at natural language understanding - simpler, clearer prompts work better
   // No need for complex weighting syntax - FLUX follows instructions precisely
 
+  // Add random variation to prevent identical outputs on regeneration
+  const randomVariations = [
+    'slightly different character poses',
+    'alternate character positioning',
+    'varied facial expressions',
+    'different viewing angle',
+    'alternative character arrangement',
+    'varied character gestures',
+    'unique character positions',
+    'distinct character orientations'
+  ]
+  const randomSeed = Math.floor(Math.random() * 10000)
+  const variation = randomVariations[Math.floor(Math.random() * randomVariations.length)]
+
   let optimizedPrompt = ``
 
-  // 1. CLEAR DIRECTIVE START - Tell FLUX exactly what to create
-  optimizedPrompt += `Create a single-panel black and white editorial cartoon in classic Indian editorial style. `
+  // 1. CLEAR DIRECTIVE START - Tell FLUX exactly what to create in R.K. Laxman's distinctive style
+  optimizedPrompt += `Create a single-panel black and white editorial cartoon in authentic R.K. Laxman style from 1960s-1980s Indian political cartoons with ${variation} (variation seed: ${randomSeed}). `
 
   // 2. MAIN SCENE & CHARACTERS - Primary action in CENTER/LEFT area
   optimizedPrompt += `MAIN SCENE: ${description}. `
 
   // 3. COMPOSITION CONSTRAINT - Reserve space for Common Man overlay (top only - signature will be added below image)
-  optimizedPrompt += `IMPORTANT LAYOUT: Position all main characters and action in the LEFT and CENTER portions of the frame. Keep the TOP-RIGHT CORNER area EMPTY and CLEAR (reserve approximately 20% width and 40% height of the top-right area for an observer character that will be added later). Reserved area must be plain white/empty background. `
+  optimizedPrompt += `CRITICAL LAYOUT REQUIREMENT: Position ALL main characters and scene action in the LOWER TWO-THIRDS (bottom 66%) and CENTER portions of the frame. Keep the ENTIRE TOP area (upper 40% of image on BOTH left and right sides) COMPLETELY EMPTY with plain white background - absolutely nothing should appear in top areas. NO characters, NO faces, NO windows, NO frames, NO portraits, NO wall decorations, NO objects of any kind in the top 40% of the image. The top portion must be 100% empty white space. All action, all characters, all furniture must stay in the lower 60% of the image only. `
 
-  // 4. CHARACTER COUNT - Main scene only
-  optimizedPrompt += `Show 1-2 main characters performing the scene action in the CENTER/LEFT area of the frame. `
+  // 4. CHARACTER COUNT - Main scene only (REDUCED for simplicity)
+  optimizedPrompt += `Show ONLY 2-3 main characters performing the scene action. Keep the scene SIMPLE with minimal characters. Do not add crowds, background people, or extra bystanders. Maximum 3 characters total in the entire scene. `
 
-  // 5. MAIN CHARACTER DETAILS - Describe scene participants
-  optimizedPrompt += `The main characters from the scene description should have clear, distinct cartoon faces with round simple features and expressive emotions, positioned in the center-left area doing the actions described. `
+  // 5. VISUAL STYLE - R.K. Laxman's signature drawing technique
+  optimizedPrompt += `CRITICAL DRAWING STYLE - R.K. Laxman's signature SIMPLE line art technique: Draw ALL characters (whatever type they are - politicians, common people, officials, anyone) with EXTREMELY SIMPLE round faces like circles, minimal facial features (just two dots or small circles for eyes, small curved line for nose, tiny curved line for mouth), no detailed realistic features, no heavy shading on faces, minimalist cartoon expressions. Keep all faces simple and round regardless of who the character represents. All characters should wear SIMPLE clothing appropriate to their role with minimal detail - simple shirts, simple pants, simple traditional wear - drawn with clean minimal lines. NO complex costume details, NO elaborate patterns. Keep ALL clothing extremely simple with minimal lines. CRITICAL ANATOMY: Both hands visible with all fingers, both arms complete, both legs visible, full torso, complete head. NO missing body parts, NO deformed limbs. `
 
-  // 6. NO COMMON MAN IN TOP-RIGHT - Will be added as overlay
-  optimizedPrompt += `DO NOT include any observer or bystander characters. DO NOT place any characters in the TOP-RIGHT CORNER. Keep the top-right area clear and empty with plain white background. `
+  // 6. BACKGROUND SIMPLICITY - Minimal details like authentic Laxman
+  optimizedPrompt += `EXTREMELY SIMPLE BACKGROUND: Draw only essential elements in LOWER 60% portion of image below the empty top area - one simple empty desk (just plain rectangle, NO items on desk), one basic empty chair (simple lines, NO one sitting), one plain door outline (simple rectangle, door CLOSED). ABSOLUTELY NO windows anywhere in the image, NO window frames at all, NO wall frames, NO picture frames on walls, NO portraits hanging on walls, NO photographs, NO paintings, NO wall decorations of any kind. Plain completely empty white walls with maximum white space everywhere, especially in the entire top 40% area. Floor shown with just 2-3 simple diagonal perspective lines for depth in lower area only. Absolute minimal architectural detail - keep it extremely sparse, clean, and empty like authentic Laxman cartoons with lots of negative white space. `
 
-  // 7. NO TEXT ANYWHERE - All branding will be added separately
-  optimizedPrompt += `CRITICAL TEXT REMOVAL: DO NOT add ANY text, words, letters, signatures, watermarks, dates, labels, scribbles, handwriting, or writing ANYWHERE in the image. ABSOLUTELY NO text in ANY location - not in corners, not at bottom, not at top, not on sides. NO signatures like "Mockr", "@Laxman", "AI", or any artist name. NO random words, NO speech text, NO labels, NO scribbled letters. Do not write ANYTHING. Keep the ENTIRE image completely clean without ANY text overlays, signatures, written words, or letter-like marks whatsoever. This is MANDATORY and CRITICAL - the image must be 100% text-free with zero written characters. All branding and captions will be added separately after generation. `
+  // 7. STRICT TOP AREA PROHIBITION - Must be completely empty for Common Man overlay
+  optimizedPrompt += `ABSOLUTELY CRITICAL - EMPTY TOP AREA REQUIREMENT: DO NOT draw ANYTHING in the top 40% of the image. NO windows with people, NO portraits on walls, NO picture frames, NO faces in windows, NO observer characters, NO people looking out, NO wall decorations, NO hanging frames, NO photographs on walls. The ENTIRE top 40% must be completely blank white space with absolutely nothing drawn. DO NOT include observer characters looking through windows or doors anywhere. DO NOT place any spectator characters in the TOP areas at all. Keep ALL top areas (both left and right, entire upper 40%) completely clear and empty with 100% plain white background. NO extra people beyond the 2-3 main characters standing in the LOWER part of the scene. NO background characters anywhere, NO people in windows anywhere, NO faces visible in top areas, NO portraits of people on walls. Only the main 2-3 characters in the lower portion, nothing else. `
 
-  // 8. BACKGROUND MANDATE - Be explicit about simplicity
-  optimizedPrompt += `Background must be minimal and simple: plain white space with basic geometric shapes only, a simple indoor setting if needed (desk, chair, door, window). NO cityscapes, NO crowds, NO complex architecture, NO multiple buildings. `
+  // 8. NO TEXT ANYWHERE - All branding will be added separately
+  optimizedPrompt += `CRITICAL TEXT REMOVAL: DO NOT add ANY text, words, letters, signatures, watermarks, dates, labels, scribbles, handwriting, or writing ANYWHERE in the image. ABSOLUTELY NO text in ANY location - not in corners, not at bottom, not at top, not on sides. NO signatures like "Mockr", "R.K. Laxman", "AI", or any artist name. NO random words, NO speech text, NO labels, NO scribbled letters. Do not write ANYTHING. Keep the ENTIRE image completely clean without ANY text overlays, signatures, written words, or letter-like marks whatsoever. This is MANDATORY and CRITICAL - the image must be 100% text-free with zero written characters. `
 
-  // 9. ARTISTIC TECHNIQUE - Natural language description
-  optimizedPrompt += `Drawing style: Clean black ink pen strokes on white paper, diagonal crosshatching for shadows, bold solid blacks for contrast, hand-drawn editorial cartoon quality from 1960s-1990s Indian political cartoons. `
+  // 9. ARTISTIC TECHNIQUE - Clean confident ink lines
+  optimizedPrompt += `AUTHENTIC R.K. LAXMAN INK TECHNIQUE: Draw with CLEAN, CONFIDENT single ink lines - no sketchy overlapping lines, no rough pencil texture, no multiple trial lines. Each line should be drawn ONCE with confidence. Use HEAVY diagonal crosshatching (dense parallel 45-degree lines) for ALL shadows: under chairs, under desks, on floors, behind characters, on clothing folds, in corners. The crosshatching should be VERY PROMINENT and DENSE creating strong texture. Use solid black fills for hair, dark clothing, deep shadows. The overall look should be simple line art with heavy shadow hatching, NOT detailed realistic sketching. `
 
-  // 10. COMPOSITION - Frame and layout
-  optimizedPrompt += `Composition: Single rectangular panel with thick black border frame around the entire image, characters in clear view with recognizable faces, main action in center or foreground. `
+  // 10. FRAME AND COMPOSITION - Distinctive thick black border
+  optimizedPrompt += `MANDATORY THICK BLACK BORDER FRAME: The ENTIRE comic panel MUST be surrounded by a VERY THICK, BOLD, SOLID black rectangular border frame. Draw a thick black line (minimum 15-20 pixels wide) forming a complete rectangle around ALL FOUR SIDES of the image. This thick black border is ABSOLUTELY ESSENTIAL - it should be one of the most prominent features of the cartoon, forming a strong black frame visible on top edge, bottom edge, left edge, and right edge. The border must be continuous, unbroken, and very prominent. Inside the frame, position 2-3 characters in clear arrangement with proper size perspective. Main action in center-left area. `
 
-  // 11. TECHNICAL CONSTRAINTS - What to avoid
-  optimizedPrompt += `No color, no gradients, no photorealism, no speech bubbles in the main image. Pure black and white line art only. REMINDER: Absolutely zero text or written words anywhere in the image.`
+  // 11. TECHNICAL CONSTRAINTS - Pure minimalist Laxman aesthetic
+  optimizedPrompt += `STRICT TECHNICAL REQUIREMENTS: Pure black and white only - no color, no gray tones except from crosshatching, no gradients, no photorealism, no sketchy rough lines, no Western cartoon style. Hand-drawn quality with SINGLE confident ink lines for outlines. HEAVY diagonal crosshatching for shadows (very dense parallel lines). Solid black fills for contrast. VERY THICK black border frame around entire panel. Minimal simple background (empty walls, basic furniture). Simple round faces with minimal features (no detailed realistic faces). Clean white background in reserved top-right area. NO text anywhere. `
+
+  // 12. FINAL STYLE EMPHASIS - Match visual style, not content
+  optimizedPrompt += `FINAL CRITICAL REQUIREMENT: The characters, scenario, and subject matter should match the DESCRIPTION PROVIDED, but the DRAWING STYLE, SKETCHING TECHNIQUE, LINE QUALITY, SHADING PATTERN, LAYOUT FORMAT, COMPOSITION, and VISUAL APPEARANCE must look EXACTLY like an authentic R.K. Laxman political cartoon from The Times of India 1960s-1980s era. Focus on matching: SIMPLE clean line work, HEAVY diagonal crosshatching for shadows, THICK black border frame, MINIMAL background details, SIMPLE round cartoon faces, lots of white space, confident single-line technique. The scene content will be different but the artistic style must be identical to classic Laxman cartoons.`
 
   console.log('🔧 FLUX-OPTIMIZED PROMPT CREATED')
   console.log('📝 Final prompt length:', optimizedPrompt.length)

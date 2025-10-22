@@ -86,8 +86,8 @@ export async function addCommonManToComic(
 
     console.log('[Composite] Base comic dimensions:', `${baseWidth}x${baseHeight}`)
 
-    // Resize Common Man to 36% of base height (30% + 20% increase)
-    const commonManHeight = Math.floor(baseHeight * 0.36)
+    // Resize Common Man to 28% of base height (smaller, less intrusive)
+    const commonManHeight = Math.floor(baseHeight * 0.28)
 
     // Resize Common Man image - keep original background as-is from PNG files
     const resizedCommonMan = await sharp(commonManBuffer)
