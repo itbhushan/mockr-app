@@ -33,13 +33,7 @@ export default function GalleryPage() {
   const [savedComics, setSavedComics] = useState<ComicWithSVG[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeShareDropdown, setActiveShareDropdown] = useState<string | null>(null)
-  const [isMobile, setIsMobile] = useState(false)
   const shareDropdownRef = useRef<HTMLDivElement>(null)
-
-  // Detect mobile on client side
-  useEffect(() => {
-    setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
-  }, [])
 
   useEffect(() => {
     loadSavedComics()
@@ -132,6 +126,58 @@ export default function GalleryPage() {
 
   const handleCopyImage = async (comic: SavedComic) => {
     console.log('[Gallery] Copy image initiated for comic:', comic.id)
+
+    // Detect mobile Chrome specifically - it has very limited clipboard support
+    const isMobileChrome = /Android.*Chrome/i.test(navigator.userAgent) ||
+                           /CriOS/i.test(navigator.userAgent)
+
+    // Check if clipboard API is supported
+    const hasClipboardSupport = navigator.clipboard && navigator.clipboard.write
+
+    // Mobile Chrome: Fallback to native share or download
+    if (isMobileChrome && !hasClipboardSupport) {
+      console.log('[Gallery] Mobile Chrome detected with no clipboard support - using native share')
+
+      try {
+        const screenshotBlob = await captureComicScreenshot(comic.id)
+        if (!screenshotBlob) {
+          alert('❌ Failed to capture comic. Please try downloading instead.')
+          setActiveShareDropdown(null)
+          return
+        }
+
+        const file = new File([screenshotBlob], 'mockr-comic.jpg', { type: 'image/jpeg' })
+
+        // Try native share API first
+        if (navigator.share) {
+          await navigator.share({ files: [file] })
+          setActiveShareDropdown(null)
+          return
+        }
+
+        // Fallback to download if share not available
+        const downloadUrl = URL.createObjectURL(screenshotBlob)
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.download = `mockr-comic-${comic.id}.jpg`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(downloadUrl)
+        alert('✅ Comic downloaded!\n\nYou can now share it from your Downloads folder.')
+        setActiveShareDropdown(null)
+        return
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          setActiveShareDropdown(null)
+          return
+        }
+        console.error('[Gallery] Native share failed:', error)
+        alert('❌ Failed to share. Please try the Download button instead.')
+        setActiveShareDropdown(null)
+        return
+      }
+    }
 
     try {
       // Detect Safari (iOS or Desktop) for promise-based clipboard
@@ -249,7 +295,28 @@ export default function GalleryPage() {
       alert('✅ Image copied to clipboard!\n\nPaste (Cmd+V or Ctrl+V) into WhatsApp, X, Slack, or any app.')
     } catch (error) {
       console.error('[Gallery] Failed to copy image:', error)
-      alert('❌ Failed to copy image.\n\nYour browser may not support this feature.\nPlease use the Download button instead.')
+
+      // Fallback to download on clipboard error
+      console.log('[Gallery] Attempting download fallback...')
+      try {
+        const screenshotBlob = await captureComicScreenshot(comic.id)
+        if (screenshotBlob) {
+          const downloadUrl = URL.createObjectURL(screenshotBlob)
+          const link = document.createElement('a')
+          link.href = downloadUrl
+          link.download = `mockr-comic-${comic.id}.jpg`
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          URL.revokeObjectURL(downloadUrl)
+          alert('✅ Comic downloaded!\n\nYour browser doesn\'t support copying images, so we\'ve downloaded it instead.\n\nYou can now share it from your Downloads folder.')
+        } else {
+          alert('❌ Failed to copy image.\n\nYour browser may not support this feature.\nPlease use the Download button instead.')
+        }
+      } catch (fallbackError) {
+        console.error('[Gallery] Download fallback failed:', fallbackError)
+        alert('❌ Failed to copy image.\n\nYour browser may not support this feature.\nPlease use the Download button instead.')
+      }
     }
 
     setActiveShareDropdown(null)
@@ -503,71 +570,85 @@ export default function GalleryPage() {
                 {/* Action Buttons - Outside capture area */}
                 <div className="p-6 pt-0">
                   <div className="flex items-center space-x-2">
-                    <div className="flex-1 relative" ref={activeShareDropdown === comic.id ? shareDropdownRef : null}>
-                      <button
-                        onClick={() => setActiveShareDropdown(activeShareDropdown === comic.id ? null : comic.id)}
-                        className="w-full bg-blue-50 hover:bg-blue-100 text-blue-600 text-sm font-medium rounded-lg px-3 py-2 transition-colors flex items-center justify-center"
-                      >
-                        <Share2 className="w-4 h-4 mr-1" />
-                        Share
-                        <ChevronDown className={`w-3.5 h-3.5 ml-1 transition-transform ${activeShareDropdown === comic.id ? 'rotate-180' : ''}`} />
-                      </button>
+                    {/* Share/Copy Button - Platform-specific UI */}
+                    <div className="flex-1">
+                      {(() => {
+                        if (typeof window === 'undefined') return null
 
-                      {activeShareDropdown === comic.id && (
-                        <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
-                          {isMobile ? (
-                            // Mobile: Show all 3 options (X, WhatsApp, Copy)
-                            <>
+                        const ua = navigator.userAgent
+                        // iOS Chrome detection: CriOS is the iOS Chrome identifier
+                        const isIOSChrome = /CriOS/i.test(ua)
+                        // iOS Safari: iOS device that's NOT Chrome and NOT other browsers
+                        const isIOSSafari = /iPhone|iPad|iPod/i.test(ua) && !isIOSChrome && !/CriOS|FxiOS|OPiOS|EdgiOS/i.test(ua)
+                        const isAndroid = /Android/i.test(ua)
+                        const isDesktop = !(/iPhone|iPad|iPod|Android/i.test(ua))
+
+                        // iOS Chrome: Show simple Copy and Share button (no dropdown)
+                        if (isIOSChrome) {
+                          return (
+                            <button
+                              onClick={() => handleCopyImage(comic)}
+                              className="w-full bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md px-3 py-2 flex items-center justify-center"
+                            >
+                              <Copy className="w-3.5 h-3.5 mr-1.5" />
+                              Copy and Share
+                            </button>
+                          )
+                        }
+
+                        // iOS Safari or Android: Show dropdown with Copy and Share + X + WhatsApp
+                        if (isIOSSafari || isAndroid) {
+                          return (
+                            <div className="relative" ref={activeShareDropdown === comic.id ? shareDropdownRef : null}>
                               <button
-                                onClick={() => handleShare(comic, 'twitter')}
-                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                onClick={() => setActiveShareDropdown(activeShareDropdown === comic.id ? null : comic.id)}
+                                className="w-full bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md px-3 py-2 flex items-center justify-center"
                               >
-                                <XIcon className="w-4 h-4 mr-3 text-neutral-900" />
-                                Share on X
+                                <Share2 className="w-3.5 h-3.5 mr-1.5" />
+                                Share
+                                <ChevronDown className={`w-3.5 h-3.5 ml-1.5 transition-transform ${activeShareDropdown === comic.id ? 'rotate-180' : ''}`} />
                               </button>
-                              <button
-                                onClick={() => handleShare(comic, 'whatsapp')}
-                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-green-50 hover:text-green-600 transition-colors"
-                              >
-                                <MessageCircle className="w-4 h-4 mr-3 text-green-500" />
-                                Share on WhatsApp
-                              </button>
-                              <button
-                                onClick={() => handleShare(comic, 'share')}
-                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-purple-50 hover:text-purple-600 transition-colors border-t border-neutral-100"
-                              >
-                                <Copy className="w-4 h-4 mr-3 text-purple-500" />
-                                Copy Image
-                              </button>
-                              <button
-                                onClick={() => handleShare(comic, 'download')}
-                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-amber-50 hover:text-amber-600 transition-colors border-t border-neutral-100"
-                              >
-                                <Download className="w-4 h-4 mr-3 text-amber-500" />
-                                Download
-                              </button>
-                            </>
-                          ) : (
-                            // Desktop: Show only Copy Image and Download
-                            <>
-                              <button
-                                onClick={() => handleShare(comic, 'share')}
-                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                              >
-                                <Copy className="w-4 h-4 mr-3 text-blue-500" />
-                                Copy Image
-                              </button>
-                              <button
-                                onClick={() => handleShare(comic, 'download')}
-                                className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-amber-50 hover:text-amber-600 transition-colors border-t border-neutral-100"
-                              >
-                                <Download className="w-4 h-4 mr-3 text-amber-500" />
-                                Download
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      )}
+
+                              {activeShareDropdown === comic.id && (
+                                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-xl shadow-lg border border-neutral-200 z-10 overflow-hidden">
+                                  <button
+                                    onClick={() => { handleCopyImage(comic); setActiveShareDropdown(null) }}
+                                    className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                                  >
+                                    <Copy className="w-4 h-4 mr-3 text-purple-500" />
+                                    Copy and Share
+                                  </button>
+                                  <button
+                                    onClick={() => { handleShare(comic, 'twitter'); setActiveShareDropdown(null) }}
+                                    className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                  >
+                                    <XIcon className="w-4 h-4 mr-3 text-neutral-900" />
+                                    Share on X
+                                  </button>
+                                  <button
+                                    onClick={() => { handleShare(comic, 'whatsapp'); setActiveShareDropdown(null) }}
+                                    className="w-full flex items-center px-4 py-3 text-sm text-neutral-700 hover:bg-green-50 hover:text-green-600 transition-colors"
+                                  >
+                                    <MessageCircle className="w-4 h-4 mr-3 text-green-500" />
+                                    Share on WhatsApp
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        }
+
+                        // Desktop: Show Copy and Share button
+                        return (
+                          <button
+                            onClick={() => handleCopyImage(comic)}
+                            className="w-full bg-gradient-to-r from-amber-500 to-amber-400 hover:opacity-90 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md px-3 py-2 flex items-center justify-center"
+                          >
+                            <Copy className="w-3.5 h-3.5 mr-1.5" />
+                            Copy and Share
+                          </button>
+                        )
+                      })()}
                     </div>
                     <button
                       onClick={() => deleteComic(comic.id)}
