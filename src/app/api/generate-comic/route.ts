@@ -624,72 +624,65 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
 }
 
 function optimizePromptForFLUX(description: string): string {
-  console.log('🔧 CREATING FLUX-OPTIMIZED INDIAN EDITORIAL CARTOON PROMPT...')
+  console.log('🔧 CREATING FLUX-OPTIMIZED MOCKR CARTOON PROMPT...')
   console.log('📝 Original AI description:', description.substring(0, 300) + '...')
 
-  // FLUX.1-dev excels at natural language understanding - simpler, clearer prompts work better
-  // No need for complex weighting syntax - FLUX follows instructions precisely
-
-  // Add random variation to prevent identical outputs on regeneration
-  const randomVariations = [
-    'slightly different character poses',
-    'alternate character positioning',
-    'varied facial expressions',
-    'different viewing angle',
-    'alternative character arrangement',
-    'varied character gestures',
-    'unique character positions',
-    'distinct character orientations'
-  ]
+  // Add random variation to prevent identical outputs
   const randomSeed = Math.floor(Math.random() * 10000)
+  const randomVariations = [
+    'slightly different poses',
+    'alternate positioning',
+    'varied expressions',
+    'different angle'
+  ]
   const variation = randomVariations[Math.floor(Math.random() * randomVariations.length)]
 
   let optimizedPrompt = ``
 
-  // 1. CLEAR DIRECTIVE START - Tell FLUX exactly what to create in classic Indian editorial cartoon style
-  optimizedPrompt += `Create a single-panel black and white editorial cartoon in authentic 1960s-1980s Indian political cartoon style with ${variation} (variation seed: ${randomSeed}). `
+  // 1. STYLE FOUNDATION - Match the exact Mockr cartoon style from reference images
+  optimizedPrompt += `Create a single-panel political editorial cartoon in Mockr style with ${variation} (seed: ${randomSeed}). `
 
-  // 2. MAIN SCENE & CHARACTERS - Primary action in CENTER/LEFT area
-  optimizedPrompt += `MAIN SCENE: ${description}. `
+  // 2. MAIN SCENE
+  optimizedPrompt += `SCENE: ${description}. `
 
-  // 3. COMPOSITION CONSTRAINT - Reserve space for Common Man overlay (top only - signature will be added below image)
-  optimizedPrompt += `CRITICAL LAYOUT REQUIREMENT: Position ALL main characters and scene action in the LOWER HALF (bottom 50%) of the frame only. Keep the ENTIRE TOP HALF (upper 50% of image on ALL sides - left, center, and right) COMPLETELY EMPTY with plain white background - absolutely nothing should appear in top half. NO characters, NO faces, NO hands, NO arms, NO heads, NO windows, NO frames, NO portraits, NO wall decorations, NO objects, NO furniture of any kind in the top 50% of the image. The entire top half must be 100% empty white space with nothing drawn. All action, all characters, all furniture, all objects must stay in the LOWER 50% of the image only. Characters must be drawn SHORT and COMPACT in the lower half, not extending upward into the empty top half. `
+  // 3. CRITICAL LAYOUT - Top space for Common Man window, main scene in lower area
+  optimizedPrompt += `LAYOUT: Keep ENTIRE TOP 40% of image EMPTY (plain white background) for character overlay. Position ALL scene elements (characters, furniture, objects) in the BOTTOM 60% only. NO elements should extend into top 40%. `
 
-  // 4. CHARACTER COUNT - Main scene only (REDUCED for simplicity)
-  optimizedPrompt += `Show ONLY 2-3 main characters performing the scene action. Keep the scene SIMPLE with minimal characters. Do not add crowds, background people, or extra bystanders. Maximum 3 characters total in the entire scene. `
+  // 4. CHARACTER DESIGN - Extremely simple like the reference images
+  optimizedPrompt += `CHARACTERS: Draw 2-3 simple cartoon characters with VERY SIMPLE round faces (just dots for eyes, tiny curve for nose, small line for mouth). Simple clothing with minimal detail. All characters SHORT and compact, fitting in bottom 60% area. Simple round heads, basic body shapes. `
 
-  // 5. VISUAL STYLE - Classic Indian editorial cartoon drawing technique
-  optimizedPrompt += `CRITICAL DRAWING STYLE - Classic Indian editorial cartoon SIMPLE line art technique: Draw ALL characters (whatever type they are - politicians, common people, officials, anyone) with EXTREMELY SIMPLE round faces like circles, minimal facial features (just two dots or small circles for eyes, small curved line for nose, tiny curved line for mouth), no detailed realistic features, no heavy shading on faces, minimalist cartoon expressions. Keep all faces simple and round regardless of who the character represents. All characters should wear SIMPLE clothing appropriate to their role with minimal detail - simple shirts, simple pants, simple traditional wear - drawn with clean minimal lines. NO complex costume details, NO elaborate patterns. Keep ALL clothing extremely simple with minimal lines. CRITICAL ANATOMY: Both hands visible with all fingers, both arms complete, both legs visible, full torso, complete head. NO missing body parts, NO deformed limbs. Draw characters SHORT in height so they fit in bottom 50% without extending into top half. `
+  // 5. SHADING STYLE - Light gray wash, NOT heavy crosshatching
+  optimizedPrompt += `SHADING: Use LIGHT GRAY WASH shading for depth and volume - NOT heavy crosshatching or dense hatching. Apply subtle gray tones on clothing folds, under furniture, floor shadows. Keep it soft and minimal like watercolor wash. NO dense diagonal line hatching. Simple soft gray shading only. `
 
-  // 6. BACKGROUND SIMPLICITY - Minimal details like classic editorial cartoons
-  optimizedPrompt += `EXTREMELY SIMPLE BACKGROUND: Draw only essential elements in LOWER 50% portion of image below the empty top half - one simple empty desk (just plain rectangle, NO items on desk), one basic empty chair (simple lines, NO one sitting), one plain door outline (simple rectangle, door CLOSED). ABSOLUTELY NO windows anywhere in the image, NO window frames at all, NO wall frames, NO picture frames on walls, NO portraits hanging on walls, NO photographs, NO paintings, NO wall decorations of any kind. Plain completely empty white walls with maximum white space everywhere, especially in the entire top 50% area. Floor shown with just 2-3 simple diagonal perspective lines for depth in lower area only. Absolute minimal architectural detail - keep it extremely sparse, clean, and empty like classic Indian editorial cartoons with lots of negative white space. `
+  // 6. SIMPLE BACKGROUND - Minimal furniture and maximum white space
+  optimizedPrompt += `BACKGROUND: EXTREMELY MINIMAL - mostly white empty space. If needed, draw simple basic furniture in bottom 60% only: plain rectangular desk/table (simple lines), basic chair outlines (minimal detail). Absolutely NO windows, NO picture frames on walls, NO wall decorations, NO portraits. Plain empty white walls everywhere, especially entire top 40%. Floor shown with 1-2 simple perspective lines if needed. Maximum white space and emptiness. `
 
-  // 7. STRICT TOP AREA PROHIBITION - Must be completely empty for Common Man overlay
-  optimizedPrompt += `ABSOLUTELY CRITICAL - EMPTY TOP HALF REQUIREMENT: DO NOT draw ANYTHING in the top 50% of the image. NO character heads extending upward, NO character arms raised up, NO tall characters, NO windows with people, NO portraits on walls, NO picture frames, NO faces in windows, NO observer characters, NO people looking out, NO wall decorations, NO hanging frames, NO photographs on walls, NO furniture in top half. The ENTIRE top 50% (upper half) must be completely blank white space with absolutely nothing drawn - not even parts of characters. DO NOT let any character body parts (heads, arms, hands, hair) extend into the top 50%. Draw all characters SHORT and COMPACT so they fit entirely in the bottom 50%. Keep ALL top areas (left, center, right - entire upper 50%) completely clear and empty with 100% plain white background. NO extra people beyond the 2-3 main characters standing in the LOWER 50% of the scene. NO background characters anywhere, NO people in windows anywhere, NO faces visible in top areas, NO portraits of people on walls. Only the main 2-3 short compact characters in the lower half, nothing else. `
+  // 7. TOP AREA PROHIBITION - Must be completely clear
+  optimizedPrompt += `TOP AREA CRITICAL: The entire TOP 40% of image must be COMPLETELY EMPTY with pure white background. NO character heads, NO arms, NO objects, NO furniture, NO windows, NO frames extending into this area. Draw all characters SEATED or SHORT so they stay in bottom 60% only. `
 
-  // 8. NO TEXT OR SIGNATURES ANYWHERE - All branding will be added separately (COPYRIGHT CRITICAL)
-  optimizedPrompt += `CRITICAL TEXT AND SIGNATURE REMOVAL: DO NOT add ANY text, words, letters, signatures, watermarks, artist names, dates, labels, scribbles, handwriting, or writing ANYWHERE in the image. ABSOLUTELY NO text in ANY location - not in corners, not at bottom, not at top, not on sides. NO signatures of any kind, NO artist signatures, NO names like "Mockr", "AI", or any real or fictional artist name whatsoever. NO random words, NO speech text, NO labels, NO scribbled letters, NO handwritten signatures, NO artist marks. Do not write ANYTHING. Do not sign ANYTHING. Keep the ENTIRE image completely clean without ANY text overlays, signatures, written words, artist names, or letter-like marks whatsoever. This is MANDATORY and CRITICAL for copyright reasons - the image must be 100% text-free and signature-free with zero written characters or artist marks. `
+  // 8. NO TEXT - Mockr signature added separately
+  optimizedPrompt += `TEXT: DO NOT add ANY text, words, signatures, watermarks, labels, or writing ANYWHERE in the image. NO artist signatures, NO "Mockr" text, NO speech bubbles with words, NO labels. Keep image 100% text-free. All branding added separately. `
 
-  // 9. ARTISTIC TECHNIQUE - Classic Indian editorial cartoon ink style
-  optimizedPrompt += `AUTHENTIC INDIAN EDITORIAL CARTOON INK TECHNIQUE: Draw with CLEAN, CONFIDENT single ink lines - no sketchy overlapping lines, no rough pencil texture, no multiple trial lines. Each line should be drawn ONCE with confidence. Use HEAVY diagonal crosshatching (dense parallel 45-degree lines) for ALL shadows: under chairs, under desks, on floors, behind characters, on clothing folds, in corners. The crosshatching should be VERY PROMINENT and DENSE creating strong texture. Use solid black fills for hair, dark clothing, deep shadows. The overall look should be simple line art with heavy shadow hatching, NOT detailed realistic sketching. `
+  // 9. LINE QUALITY - Clean confident single lines
+  optimizedPrompt += `LINE WORK: Draw with CLEAN, SIMPLE black ink lines. Single confident strokes for outlines. NO sketchy overlapping lines, NO rough pencil texture. Clean simple line art like newspaper editorial cartoons. `
 
-  // 10. FRAME AND COMPOSITION - Distinctive thick black border
-  optimizedPrompt += `MANDATORY THICK BLACK BORDER FRAME: The ENTIRE comic panel MUST be surrounded by a VERY THICK, BOLD, SOLID black rectangular border frame. Draw a thick black line (minimum 15-20 pixels wide) forming a complete rectangle around ALL FOUR SIDES of the image. This thick black border is ABSOLUTELY ESSENTIAL - it should be one of the most prominent features of the cartoon, forming a strong black frame visible on top edge, bottom edge, left edge, and right edge. The border must be continuous, unbroken, and very prominent. Inside the frame, position 2-3 characters in clear arrangement with proper size perspective. Main action in center-left area. `
+  // 10. BORDER FRAME - Thick black border around panel
+  optimizedPrompt += `BORDER: Surround the entire panel with a THICK BLACK BORDER (15-20px wide solid black rectangle frame on all four sides). This thick frame is essential to the style. `
 
-  // 11. TECHNICAL CONSTRAINTS - Pure minimalist Laxman aesthetic
-  optimizedPrompt += `STRICT TECHNICAL REQUIREMENTS: Pure black and white only - no color, no gray tones except from crosshatching, no gradients, no photorealism, no sketchy rough lines, no Western cartoon style. Hand-drawn quality with SINGLE confident ink lines for outlines. HEAVY diagonal crosshatching for shadows (very dense parallel lines). Solid black fills for contrast. VERY THICK black border frame around entire panel. Minimal simple background (empty walls, basic furniture). Simple round faces with minimal features (no detailed realistic faces). Clean white background in reserved top-right area. NO text anywhere. `
+  // 11. TECHNICAL SPECS - Black and white with light gray shading
+  optimizedPrompt += `TECHNICAL: Black ink lines on white background. Light soft gray wash for shading (NOT heavy hatching). Simple round cartoon faces. Minimal background. Thick black border frame. Characters in bottom 60% only. Top 40% empty white space. NO text anywhere. Clean simple style. `
 
-  // 12. FINAL STYLE EMPHASIS - Match visual style, not content (COPYRIGHT SAFE)
-  optimizedPrompt += `FINAL CRITICAL REQUIREMENT: The characters, scenario, and subject matter should match the DESCRIPTION PROVIDED, but the DRAWING STYLE, SKETCHING TECHNIQUE, LINE QUALITY, SHADING PATTERN, LAYOUT FORMAT, COMPOSITION, and VISUAL APPEARANCE must look like authentic 1960s-1980s Indian political editorial cartoons. Focus on matching: SIMPLE clean line work, HEAVY diagonal crosshatching for shadows, THICK black border frame, MINIMAL background details, SIMPLE round cartoon faces, lots of white space, confident single-line technique, characters in LOWER 50% only. The scene content will be different but the artistic style must match classic Indian editorial cartoons. NO artist signatures or names anywhere.`
+  // 12. FINAL EMPHASIS
+  optimizedPrompt += `STYLE MATCH: The drawing style must look exactly like simple editorial cartoons with: VERY SIMPLE round-faced characters, LIGHT GRAY WASH shading (not heavy crosshatch), MINIMAL background furniture, THICK BLACK BORDER, lots of white empty space especially in top 40%, characters seated/positioned LOW in bottom 60%, clean confident line work. Match this visual style precisely.`
 
-  console.log('🔧 FLUX-OPTIMIZED PROMPT CREATED')
+  console.log('🔧 MOCKR-STYLE PROMPT CREATED')
   console.log('📝 Final prompt length:', optimizedPrompt.length)
-  console.log('✅ Natural language structure for FLUX')
-  console.log('✅ Clear character count directive')
-  console.log('✅ CONSISTENT Common Man character (50s, untucked shirt, pants, slippers)')
-  console.log('✅ Mockr watermark in bottom right corner')
-  console.log('✅ Explicit background simplicity mandate')
-  console.log('🎯 COMPLETE FLUX-OPTIMIZED PROMPT:')
+  console.log('✅ Simple round-faced characters')
+  console.log('✅ Light gray wash shading (no heavy hatching)')
+  console.log('✅ Top 40% empty for Common Man overlay')
+  console.log('✅ Thick black border frame')
+  console.log('✅ Minimal background with max white space')
+  console.log('🎯 MOCKR-OPTIMIZED PROMPT:')
   console.log('=====================================')
   console.log(optimizedPrompt)
   console.log('=====================================')
