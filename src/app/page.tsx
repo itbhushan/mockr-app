@@ -261,11 +261,6 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative mt-8 lg:mt-0"
             >
-              {/* Floating badge */}
-              <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg z-10">
-                ✓ AI Generated
-              </div>
-
               {/* Sample comic with subtle shadow */}
               <div className="rounded-2xl shadow-2xl border border-neutral-200 overflow-hidden bg-white">
                 <Image
