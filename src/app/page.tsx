@@ -60,23 +60,23 @@ export default function HomePage() {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-sm">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-neutral-800 via-neutral-700 to-neutral-600 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-sm">
                 <span className="text-white font-bold text-lg sm:text-xl">M</span>
               </div>
-              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 via-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-600 bg-clip-text text-transparent">
                 Mockr
               </span>
             </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-8">
-              <a href="#how-it-works" className="text-neutral-600 hover:text-purple-600 transition-colors font-medium">
+              <a href="#how-it-works" className="text-neutral-600 hover:text-neutral-900 transition-colors font-medium">
                 How It Works
               </a>
-              <a href="#examples" className="text-neutral-600 hover:text-purple-600 transition-colors font-medium">
+              <a href="#examples" className="text-neutral-600 hover:text-neutral-900 transition-colors font-medium">
                 Examples
               </a>
-              <Link href="/gallery" className="text-neutral-600 hover:text-purple-600 transition-colors font-medium">
+              <Link href="/gallery" className="text-neutral-600 hover:text-neutral-900 transition-colors font-medium">
                 Gallery
               </Link>
             </div>
@@ -86,7 +86,7 @@ export default function HomePage() {
               {isSignedIn ? (
                 <>
                   <Link href="/generate">
-                    <button className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-violet-600 text-white rounded-lg hover:from-purple-700 hover:to-violet-700 transition-all shadow-sm hover:shadow-md font-medium">
+                    <button className="px-5 py-2.5 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm hover:shadow-md font-medium">
                       Create Comic
                     </button>
                   </Link>
@@ -101,12 +101,12 @@ export default function HomePage() {
               ) : (
                 <>
                   <SignInButton mode="modal">
-                    <button className="px-4 py-2 text-neutral-700 hover:text-purple-600 transition-colors font-medium">
+                    <button className="px-4 py-2 text-neutral-700 hover:text-neutral-900 transition-colors font-medium">
                       Sign In
                     </button>
                   </SignInButton>
                   <Link href="/generate">
-                    <button className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-violet-600 text-white rounded-lg hover:from-purple-700 hover:to-violet-700 transition-all shadow-sm hover:shadow-md font-medium">
+                    <button className="px-5 py-2.5 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm hover:shadow-md font-medium">
                       Get Started
                     </button>
                   </Link>
@@ -117,7 +117,7 @@ export default function HomePage() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-neutral-600 hover:text-purple-600 transition-colors"
+              className="lg:hidden p-2 text-neutral-600 hover:text-neutral-900 transition-colors"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -135,28 +135,28 @@ export default function HomePage() {
               <a
                 href="#how-it-works"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 text-neutral-600 hover:text-purple-600 transition-colors font-medium"
+                className="block py-2 text-neutral-600 hover:text-neutral-900 transition-colors font-medium"
               >
                 How It Works
               </a>
               <a
                 href="#examples"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 text-neutral-600 hover:text-purple-600 transition-colors font-medium"
+                className="block py-2 text-neutral-600 hover:text-neutral-900 transition-colors font-medium"
               >
                 Examples
               </a>
               <Link
                 href="/gallery"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 text-neutral-600 hover:text-purple-600 transition-colors font-medium"
+                className="block py-2 text-neutral-600 hover:text-neutral-900 transition-colors font-medium"
               >
                 Gallery
               </Link>
               <div className="pt-3 border-t border-neutral-100 space-y-2">
                 {isSignedIn ? (
                   <Link href="/generate">
-                    <button className="w-full px-5 py-3 bg-gradient-to-r from-purple-600 to-violet-600 text-white rounded-lg hover:from-purple-700 hover:to-violet-700 transition-all shadow-sm font-medium">
+                    <button className="w-full px-5 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm font-medium">
                       Create Comic
                     </button>
                   </Link>
@@ -168,7 +168,7 @@ export default function HomePage() {
                       </button>
                     </SignInButton>
                     <Link href="/generate">
-                      <button className="w-full px-5 py-3 bg-gradient-to-r from-purple-600 to-violet-600 text-white rounded-lg hover:from-purple-700 hover:to-violet-700 transition-all shadow-sm font-medium">
+                      <button className="w-full px-5 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm font-medium">
                         Get Started
                       </button>
                     </Link>
@@ -181,7 +181,7 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 sm:pt-32 lg:pt-40 pb-16 sm:pb-20 lg:pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-purple-50/50 via-violet-50/30 to-white">
+      <section className="pt-24 sm:pt-32 lg:pt-40 pb-16 sm:pb-20 lg:pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 via-neutral-50/50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             {/* Left: Text Content */}
@@ -192,7 +192,7 @@ export default function HomePage() {
               className="text-center lg:text-left"
             >
               {/* Badge */}
-              <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <div className="inline-flex items-center space-x-2 bg-neutral-100 text-neutral-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
                 <Sparkles className="w-4 h-4" />
                 <span>AI-Powered Political Satire</span>
               </div>
@@ -206,7 +206,7 @@ export default function HomePage() {
                 ) : (
                   <>
                     Turn Political News Into
-                    <span className="block bg-gradient-to-r from-purple-600 via-violet-600 to-fuchsia-600 bg-clip-text text-transparent mt-2">Viral Cartoons</span>
+                    <span className="block bg-gradient-to-r from-neutral-800 to-neutral-600 bg-clip-text text-transparent mt-2">Viral Cartoons</span>
                   </>
                 )}
               </h1>
@@ -221,13 +221,13 @@ export default function HomePage() {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link href="/generate">
-                  <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-purple-600 via-violet-600 to-fuchsia-600 text-white rounded-xl hover:from-purple-700 hover:via-violet-700 hover:to-fuchsia-700 transition-all shadow-lg hover:shadow-xl font-semibold text-lg group">
+                  <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-xl hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-lg hover:shadow-xl font-semibold text-lg group">
                     {isSignedIn ? "Create New Comic" : "Start Creating Free"}
                     <ArrowRight className="w-5 h-5 ml-2 inline group-hover:translate-x-1 transition-transform" />
                   </button>
                 </Link>
                 <a href="#examples">
-                  <button className="w-full sm:w-auto px-8 py-4 bg-white text-neutral-700 border-2 border-purple-200 rounded-xl hover:border-purple-300 hover:bg-purple-50/50 transition-all font-semibold text-lg">
+                  <button className="w-full sm:w-auto px-8 py-4 bg-white text-neutral-700 border-2 border-neutral-200 rounded-xl hover:border-neutral-300 hover:bg-neutral-50 transition-all font-semibold text-lg">
                     View Examples
                   </button>
                 </a>
@@ -240,7 +240,7 @@ export default function HomePage() {
                     {[1, 2, 3, 4].map((i) => (
                       <div
                         key={i}
-                        className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 via-violet-400 to-fuchsia-400 border-2 border-white"
+                        className="w-8 h-8 rounded-full bg-gradient-to-br from-neutral-400 to-neutral-600 border-2 border-white"
                       />
                     ))}
                   </div>
@@ -267,7 +267,7 @@ export default function HomePage() {
               </div>
 
               {/* Sample comic with subtle shadow */}
-              <div className="rounded-2xl shadow-2xl border border-purple-100 overflow-hidden bg-white">
+              <div className="rounded-2xl shadow-2xl border border-neutral-200 overflow-hidden bg-white">
                 <Image
                   src="/samples/sample-1.jpg"
                   alt="Sample political cartoon"
@@ -279,8 +279,8 @@ export default function HomePage() {
               </div>
 
               {/* Decorative elements */}
-              <div className="absolute -bottom-6 -left-6 w-24 h-24 sm:w-32 sm:h-32 bg-purple-200 rounded-full blur-3xl opacity-50" />
-              <div className="absolute -top-6 -right-6 w-24 h-24 sm:w-32 sm:h-32 bg-fuchsia-200 rounded-full blur-3xl opacity-50" />
+              <div className="absolute -bottom-6 -left-6 w-24 h-24 sm:w-32 sm:h-32 bg-neutral-200 rounded-full blur-3xl opacity-50" />
+              <div className="absolute -top-6 -right-6 w-24 h-24 sm:w-32 sm:h-32 bg-neutral-300 rounded-full blur-3xl opacity-50" />
             </motion.div>
           </div>
         </div>
@@ -369,10 +369,10 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="relative bg-white rounded-2xl p-6 sm:p-8 border border-neutral-100 hover:border-purple-200 hover:shadow-lg transition-all"
+                className="relative bg-white rounded-2xl p-6 sm:p-8 border border-neutral-100 hover:border-neutral-300 hover:shadow-lg transition-all"
               >
                 {/* Step Number */}
-                <div className="text-5xl sm:text-6xl lg:text-7xl font-bold text-purple-50 mb-4">{item.step}</div>
+                <div className="text-5xl sm:text-6xl lg:text-7xl font-bold text-neutral-100 mb-4">{item.step}</div>
 
                 {/* Icon */}
                 <div className="text-3xl sm:text-4xl mb-4">{item.icon}</div>
@@ -383,7 +383,7 @@ export default function HomePage() {
 
                 {/* Connector Line (desktop only) */}
                 {index < 2 && (
-                  <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-purple-200 to-transparent -ml-8" />
+                  <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-neutral-300 to-transparent -ml-8" />
                 )}
               </motion.div>
             ))}
@@ -411,7 +411,7 @@ export default function HomePage() {
           {/* Carousel Container */}
           <div className="relative max-w-4xl mx-auto">
             {/* Main Carousel */}
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-white border border-purple-100 shadow-2xl">
+            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-white border border-neutral-200 shadow-2xl">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentSlide}
@@ -442,14 +442,14 @@ export default function HomePage() {
             {/* Navigation Arrows */}
             <button
               onClick={prevSlide}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-6 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-purple-600 hover:bg-purple-50 hover:scale-110 z-10"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-6 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-neutral-700 hover:bg-neutral-50 hover:scale-110 z-10"
               aria-label="Previous slide"
             >
               <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
             <button
               onClick={nextSlide}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-6 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-purple-600 hover:bg-purple-50 hover:scale-110 z-10"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-6 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-neutral-700 hover:bg-neutral-50 hover:scale-110 z-10"
               aria-label="Next slide"
             >
               <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -463,8 +463,8 @@ export default function HomePage() {
                   onClick={() => goToSlide(index)}
                   className={`transition-all rounded-full ${
                     index === currentSlide
-                      ? 'w-8 sm:w-10 h-2 sm:h-2.5 bg-gradient-to-r from-purple-600 to-violet-600'
-                      : 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-neutral-300 hover:bg-purple-300'
+                      ? 'w-8 sm:w-10 h-2 sm:h-2.5 bg-gradient-to-r from-neutral-800 to-neutral-600'
+                      : 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-neutral-300 hover:bg-neutral-400'
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
@@ -480,7 +480,7 @@ export default function HomePage() {
             className="text-center mt-10 sm:mt-12"
           >
             <Link href="/generate">
-              <button className="px-8 py-4 bg-gradient-to-r from-purple-600 via-violet-600 to-fuchsia-600 text-white rounded-xl hover:from-purple-700 hover:via-violet-700 hover:to-fuchsia-700 transition-all shadow-lg hover:shadow-xl font-semibold text-lg inline-flex items-center">
+              <button className="px-8 py-4 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-xl hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-lg hover:shadow-xl font-semibold text-lg inline-flex items-center">
                 <Sparkles className="w-5 h-5 mr-2" />
                 Create Your Own
               </button>
@@ -496,7 +496,7 @@ export default function HomePage() {
             {/* Brand Column */}
             <div className="col-span-2">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 via-violet-600 to-fuchsia-600 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-neutral-700 to-neutral-600 rounded-xl flex items-center justify-center">
                   <span className="text-white font-bold text-xl">M</span>
                 </div>
                 <span className="text-2xl font-bold text-white">Mockr</span>
