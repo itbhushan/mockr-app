@@ -4,64 +4,67 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useUser, UserButton, SignInButton } from '@clerk/nextjs'
-import { Sparkles, Zap, Users, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Sparkles, Zap, Users, ArrowRight, Menu, X } from 'lucide-react'
+import { motion } from 'framer-motion'
 
-export default function SimpleHomePage() {
+export default function HomePage() {
   const { isSignedIn, user } = useUser()
-  const [currentSlide, setCurrentSlide] = useState(0)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
-  const sampleComics = [
-    '/samples/sample-1.jpg',
-    '/samples/sample-2.jpg',
-    '/samples/sample-3.jpg',
-    '/samples/sample-4.jpg'
-  ]
-
-  // Auto-advance carousel every 4 seconds
+  // Handle scroll for navbar background
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % sampleComics.length)
-    }, 4000)
-    return () => clearInterval(timer)
-  }, [sampleComics.length])
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % sampleComics.length)
-  }
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + sampleComics.length) % sampleComics.length)
-  }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">M</span>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        scrolled ? 'bg-white/80 backdrop-blur-lg shadow-sm' : 'bg-white'
+      } border-b border-neutral-100`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 lg:h-20">
+            {/* Logo */}
+            <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform shadow-sm">
+                <span className="text-white font-bold text-lg sm:text-xl">M</span>
               </div>
-              <span className="text-2xl font-bold text-blue-600">Mockr</span>
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
+                Mockr
+              </span>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-8">
+              <a href="#how-it-works" className="text-neutral-600 hover:text-blue-600 transition-colors font-medium">
+                How It Works
+              </a>
+              <a href="#examples" className="text-neutral-600 hover:text-blue-600 transition-colors font-medium">
+                Examples
+              </a>
+              <Link href="/gallery" className="text-neutral-600 hover:text-blue-600 transition-colors font-medium">
+                Gallery
+              </Link>
             </div>
 
-            <div className="flex items-center space-x-4">
+            {/* Desktop Auth Buttons */}
+            <div className="hidden lg:flex items-center space-x-3">
               {isSignedIn ? (
                 <>
-                  <Link href="/gallery">
-                    <button className="px-4 py-2 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
-                      Gallery
-                    </button>
-                  </Link>
                   <Link href="/generate">
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <button className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow-md font-medium">
                       Create Comic
                     </button>
                   </Link>
                   <UserButton
                     appearance={{
                       elements: {
-                        avatarBox: "w-8 h-8"
+                        avatarBox: "w-9 h-9"
                       }
                     }}
                   />
@@ -69,237 +72,414 @@ export default function SimpleHomePage() {
               ) : (
                 <>
                   <SignInButton mode="modal">
-                    <button className="px-4 py-2 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
+                    <button className="px-4 py-2 text-neutral-700 hover:text-blue-600 transition-colors font-medium">
                       Sign In
                     </button>
                   </SignInButton>
-                  <Link href="/sign-up">
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <Link href="/generate">
+                    <button className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow-md font-medium">
                       Get Started
                     </button>
                   </Link>
                 </>
               )}
             </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 text-neutral-600 hover:text-blue-600 transition-colors"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="lg:hidden bg-white border-t border-neutral-100 shadow-lg"
+          >
+            <div className="px-4 py-4 space-y-3">
+              <a
+                href="#how-it-works"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-neutral-600 hover:text-blue-600 transition-colors font-medium"
+              >
+                How It Works
+              </a>
+              <a
+                href="#examples"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-neutral-600 hover:text-blue-600 transition-colors font-medium"
+              >
+                Examples
+              </a>
+              <Link
+                href="/gallery"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-neutral-600 hover:text-blue-600 transition-colors font-medium"
+              >
+                Gallery
+              </Link>
+              <div className="pt-3 border-t border-neutral-100 space-y-2">
+                {isSignedIn ? (
+                  <Link href="/generate">
+                    <button className="w-full px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm font-medium">
+                      Create Comic
+                    </button>
+                  </Link>
+                ) : (
+                  <>
+                    <SignInButton mode="modal">
+                      <button className="w-full px-5 py-3 text-neutral-700 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-all font-medium">
+                        Sign In
+                      </button>
+                    </SignInButton>
+                    <Link href="/generate">
+                      <button className="w-full px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm font-medium">
+                        Get Started
+                      </button>
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
       </nav>
 
       {/* Hero Section */}
-      <section className="px-6 py-20">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="inline-flex items-center space-x-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-8">
-            <Sparkles className="w-4 h-4" />
-            <span>AI-Powered Political Satire</span>
-          </div>
+      <section className="pt-24 sm:pt-32 lg:pt-40 pb-16 sm:pb-20 lg:pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-blue-50/50 to-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+            {/* Left: Text Content */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center lg:text-left"
+            >
+              {/* Badge */}
+              <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <Sparkles className="w-4 h-4" />
+                <span>AI-Powered Political Satire</span>
+              </div>
 
-          <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 mb-6">
-            {isSignedIn && user?.firstName ? (
-              <>
-                Welcome back, {user.firstName}! 👋<br />
-                <span className="text-blue-600">Create</span> Amazing Cartoons
-              </>
-            ) : (
-              <>
-                Create{' '}
-                <span className="text-blue-600">Intelligent</span>{' '}
-                Political Cartoons
-              </>
-            )}
-          </h1>
+              {/* Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-neutral-900 mb-6 leading-tight">
+                {isSignedIn && user?.firstName ? (
+                  <>
+                    Welcome back,<br className="hidden sm:block" /> {user.firstName}! 👋
+                  </>
+                ) : (
+                  <>
+                    Turn Political News Into
+                    <span className="block text-blue-600 mt-2">Viral Cartoons</span>
+                  </>
+                )}
+              </h1>
 
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed">
-            {isSignedIn ? (
-              "Ready to create your next satirical masterpiece? Generate AI-powered political cartoons and share your unique perspective with the world."
-            ) : (
-              "Generate witty, shareable satirical content in classic editorial cartoon style. Turn political commentary into viral-worthy cartoons with AI."
-            )}
-          </p>
+              {/* Subheadline */}
+              <p className="text-lg sm:text-xl text-neutral-600 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                {isSignedIn
+                  ? "Ready to create your next satirical masterpiece? Generate witty cartoons in seconds."
+                  : "Create witty, shareable political cartoons in seconds. No design skills required."}
+              </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            {isSignedIn ? (
-              <>
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link href="/generate">
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
-                    Create New Comic
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                  <button className="w-full sm:w-auto px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold text-lg group">
+                    {isSignedIn ? "Create New Comic" : "Start Creating Free"}
+                    <ArrowRight className="w-5 h-5 ml-2 inline group-hover:translate-x-1 transition-transform" />
                   </button>
                 </Link>
-                <Link href="/gallery">
-                  <button className="bg-white hover:bg-gray-50 text-blue-600 font-semibold px-8 py-4 rounded-lg border border-blue-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
-                    View Gallery
+                <a href="#examples">
+                  <button className="w-full sm:w-auto px-8 py-4 bg-white text-neutral-700 border-2 border-neutral-200 rounded-xl hover:border-neutral-300 hover:bg-neutral-50 transition-all font-semibold text-lg">
+                    View Examples
                   </button>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/generate">
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
-                    Generate Your First Comic
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </button>
-                </Link>
-                <Link href="/gallery">
-                  <button className="bg-white hover:bg-gray-50 text-blue-600 font-semibold px-8 py-4 rounded-lg border border-blue-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center">
-                    Browse Gallery
-                  </button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
+                </a>
+              </div>
 
-      {/* Sample Comics Carousel */}
-      <section className="px-6 py-16 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              See What Mockr Creates
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Real political cartoons generated by our AI. Witty, shareable, and professionally crafted.
-            </p>
-          </div>
-
-          {/* Carousel Container */}
-          <div className="relative max-w-2xl mx-auto">
-            {/* Main Image Display */}
-            <div className="relative aspect-square bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-gray-100">
-              {sampleComics.map((comic, index) => (
-                <div
-                  key={comic}
-                  className={`absolute inset-0 transition-opacity duration-700 ${
-                    index === currentSlide ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  <Image
-                    src={comic}
-                    alt={`Sample comic ${index + 1}`}
-                    fill
-                    className="object-contain"
-                    priority={index === 0}
-                  />
+              {/* Social Proof */}
+              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-6 text-sm text-neutral-500">
+                <div className="flex items-center space-x-2">
+                  <div className="flex -space-x-2">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div
+                        key={i}
+                        className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-white"
+                      />
+                    ))}
+                  </div>
+                  <span className="font-medium text-neutral-700">1000+ creators</span>
                 </div>
-              ))}
-
-              {/* Navigation Arrows */}
-              <button
-                onClick={prevSlide}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
-                aria-label="Previous slide"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button
-                onClick={nextSlide}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110 z-10"
-                aria-label="Next slide"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
-
-              {/* Slide Indicators */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-3 z-10">
-                {sampleComics.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentSlide(index)}
-                    className={`transition-all duration-300 rounded-full ${
-                      index === currentSlide
-                        ? 'bg-blue-600 w-8 h-3'
-                        : 'bg-white/70 hover:bg-white w-3 h-3'
-                    }`}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
-                ))}
+                <div className="hidden sm:block h-4 w-px bg-neutral-200" />
+                <div className="flex items-center space-x-1">
+                  <Zap className="w-4 h-4 text-yellow-500" />
+                  <span>Generated in <span className="font-semibold text-neutral-700">60 seconds</span></span>
+                </div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Try It Out CTA */}
-            <div className="text-center mt-8">
-              <Link href="/generate">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 inline-flex items-center">
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Create Your Own Now
-                </button>
-              </Link>
-            </div>
+            {/* Right: Sample Comic */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative mt-8 lg:mt-0"
+            >
+              {/* Floating badge */}
+              <div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 bg-green-500 text-white px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg z-10">
+                ✓ AI Generated
+              </div>
+
+              {/* Sample comic with subtle shadow */}
+              <div className="rounded-2xl shadow-2xl border border-neutral-100 overflow-hidden bg-white">
+                <Image
+                  src="/samples/sample-1.jpg"
+                  alt="Sample political cartoon"
+                  width={600}
+                  height={600}
+                  className="w-full h-auto"
+                  priority
+                />
+              </div>
+
+              {/* Decorative elements */}
+              <div className="absolute -bottom-6 -left-6 w-24 h-24 sm:w-32 sm:h-32 bg-blue-100 rounded-full blur-3xl opacity-50" />
+              <div className="absolute -top-6 -right-6 w-24 h-24 sm:w-32 sm:h-32 bg-purple-100 rounded-full blur-3xl opacity-50" />
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="px-6 py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Why Choose Mockr?
+      {/* Social Proof Section */}
+      <section className="py-8 sm:py-12 bg-neutral-50 border-y border-neutral-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-3 gap-4 sm:gap-8 lg:gap-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center"
+            >
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">10K+</div>
+              <div className="text-xs sm:text-sm text-neutral-600 mt-1">Comics Created</div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-center"
+            >
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">1K+</div>
+              <div className="text-xs sm:text-sm text-neutral-600 mt-1">Active Users</div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-center"
+            >
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">60s</div>
+              <div className="text-xs sm:text-sm text-neutral-600 mt-1">Avg Generation</div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12 sm:mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-neutral-900 mb-4">
+              Three Steps to Viral Satire
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Professional-quality political satire made accessible to everyone.
-              Create, share, and go viral with intelligent humor.
+            <p className="text-lg sm:text-xl text-neutral-600 max-w-2xl mx-auto">
+              Creating political cartoons has never been this easy
+            </p>
+          </motion.div>
+
+          {/* Steps Grid */}
+          <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+            {[
+              {
+                step: "01",
+                title: "Describe Situation",
+                description: "Enter any political situation or news event you want to satirize",
+                icon: "✍️"
+              },
+              {
+                step: "02",
+                title: "AI Generates",
+                description: "Our AI creates a witty cartoon in classic editorial style",
+                icon: "✨"
+              },
+              {
+                step: "03",
+                title: "Share & Go Viral",
+                description: "Download and share on social media with one click",
+                icon: "🚀"
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="relative bg-white rounded-2xl p-6 sm:p-8 border border-neutral-100 hover:border-blue-200 hover:shadow-lg transition-all"
+              >
+                {/* Step Number */}
+                <div className="text-5xl sm:text-6xl lg:text-7xl font-bold text-blue-50 mb-4">{item.step}</div>
+
+                {/* Icon */}
+                <div className="text-3xl sm:text-4xl mb-4">{item.icon}</div>
+
+                {/* Content */}
+                <h3 className="text-xl sm:text-2xl font-semibold text-neutral-900 mb-3">{item.title}</h3>
+                <p className="text-neutral-600 leading-relaxed">{item.description}</p>
+
+                {/* Connector Line (desktop only) */}
+                {index < 2 && (
+                  <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-blue-200 to-transparent -ml-8" />
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Examples Gallery */}
+      <section id="examples" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-neutral-50">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12 sm:mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-neutral-900 mb-4">
+              Examples of AI Magic
+            </h2>
+            <p className="text-lg sm:text-xl text-neutral-600">
+              See what our community is creating
+            </p>
+          </motion.div>
+
+          {/* Grid Layout */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {['/samples/sample-1.jpg', '/samples/sample-2.jpg', '/samples/sample-3.jpg', '/samples/sample-4.jpg'].map((comic, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="group relative rounded-2xl overflow-hidden bg-white border border-neutral-200 hover:border-blue-200 transition-all hover:shadow-xl"
+              >
+                <Image
+                  src={comic}
+                  alt={`Sample ${index + 1}`}
+                  width={400}
+                  height={400}
+                  className="w-full h-auto"
+                />
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 sm:p-6">
+                  <div className="text-white font-medium text-sm sm:text-base">AI Generated Cartoon →</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mt-10 sm:mt-12"
+          >
+            <Link href="/generate">
+              <button className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl font-semibold text-lg inline-flex items-center">
+                <Sparkles className="w-5 h-5 mr-2" />
+                Create Your Own
+              </button>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-neutral-900 text-neutral-300 pt-12 sm:pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12">
+            {/* Brand Column */}
+            <div className="col-span-2">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-xl">M</span>
+                </div>
+                <span className="text-2xl font-bold text-white">Mockr</span>
+              </div>
+              <p className="text-neutral-400 mb-6 max-w-sm text-sm sm:text-base">
+                Create viral-worthy political cartoons in seconds with AI. No design skills required.
+              </p>
+              {/* Social Links */}
+              <div className="flex space-x-4">
+                <a href="https://x.com/mockr" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
+                  𝕏
+                </a>
+                <a href="https://linkedin.com/company/mockr" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
+                  in
+                </a>
+              </div>
+            </div>
+
+            {/* Product Column */}
+            <div>
+              <h3 className="text-white font-semibold mb-4 text-sm sm:text-base">Product</h3>
+              <ul className="space-y-3 text-sm sm:text-base">
+                <li><Link href="/generate" className="hover:text-white transition-colors">Create Comic</Link></li>
+                <li><Link href="/gallery" className="hover:text-white transition-colors">Gallery</Link></li>
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
+              </ul>
+            </div>
+
+            {/* Company Column */}
+            <div>
+              <h3 className="text-white font-semibold mb-4 text-sm sm:text-base">Company</h3>
+              <ul className="space-y-3 text-sm sm:text-base">
+                <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors">Terms</Link></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="pt-8 border-t border-neutral-800 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm text-neutral-500">
+            <p>© 2025 Mockr. All rights reserved.</p>
+            <p className="flex items-center space-x-1">
+              <span>Made with</span>
+              <span className="text-red-500">❤️</span>
+              <span>for free speech</span>
             </p>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            <div className="text-center bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-6">
-                <Sparkles className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-                AI-Powered Creativity
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Generate witty political cartoons in classic editorial style with cutting-edge AI technology.
-              </p>
-            </div>
-
-            <div className="text-center bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-6">
-                <Zap className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-                Instant Generation
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Create professional-quality satirical content in under 60 seconds. From idea to shareable cartoon instantly.
-              </p>
-            </div>
-
-            <div className="text-center bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
-              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-6">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-                Viral Potential
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Clean, minimalistic design perfect for social media sharing. Make your political commentary go viral.
-              </p>
-            </div>
-          </div>
         </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="px-6 py-20 bg-blue-600">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6">
-            Ready to Create Viral Political Satire?
-          </h2>
-          <p className="text-xl text-blue-100 mb-10 leading-relaxed">
-            Join thousands of creators using Mockr to make intelligent political commentary.
-            Your next viral cartoon is just one click away.
-          </p>
-          <Link href="/generate">
-            <button className="bg-white text-blue-600 hover:bg-gray-50 font-semibold text-lg py-4 px-8 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              Start Creating for Free
-              <ArrowRight className="w-5 h-5 ml-2 inline" />
-            </button>
-          </Link>
-        </div>
-      </section>
+      </footer>
     </div>
   )
 }
