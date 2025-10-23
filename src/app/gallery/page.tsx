@@ -6,6 +6,8 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Clock, Share2, Trash2, Download, ChevronDown, MessageCircle, Copy } from 'lucide-react'
 import html2canvas from 'html2canvas'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
 
 // XIcon component for X (Twitter)
 const XIcon = ({ className }: { className?: string }) => (
@@ -401,32 +403,12 @@ export default function GalleryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
-      {/* Navigation */}
-      <nav className="w-full px-6 py-4 lg:py-6 bg-white/95 backdrop-blur-md border-b border-neutral-200/60 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-3">
-            <ArrowLeft className="w-5 h-5 text-neutral-600 hover:text-blue-600 transition-colors" />
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-xl lg:text-2xl">M</span>
-              </div>
-              <span className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">Mockr</span>
-            </div>
-          </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
+      {/* Header */}
+      <Header />
 
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/generate"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3"
-            >
-              Create New Comic
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
+      <div className="flex-1 pt-16 lg:pt-20">
+        <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -442,8 +424,8 @@ export default function GalleryPage() {
           </p>
 
           {savedComics.length > 0 && (
-            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-              <p className="text-sm text-blue-700">
+            <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-200">
+              <p className="text-sm text-neutral-700">
                 <Clock className="w-4 h-4 inline mr-2" />
                 {savedComics.length} comic{savedComics.length !== 1 ? 's' : ''} saved locally
               </p>
@@ -454,7 +436,7 @@ export default function GalleryPage() {
         {/* Loading State */}
         {isLoading && (
           <div className="text-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-800 mx-auto mb-4"></div>
             <p className="text-neutral-500">Loading your comics...</p>
           </div>
         )}
@@ -467,7 +449,7 @@ export default function GalleryPage() {
             transition={{ duration: 0.6 }}
             className="text-center py-16"
           >
-            <div className="w-24 h-24 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mx-auto mb-6 flex items-center justify-center shadow-md">
+            <div className="w-24 h-24 bg-gradient-to-r from-neutral-800 to-neutral-700 rounded-full mx-auto mb-6 flex items-center justify-center shadow-md">
               <Image
                 src="/api/placeholder/96/96"
                 alt="Empty gallery"
@@ -482,7 +464,7 @@ export default function GalleryPage() {
             </p>
             <Link
               href="/generate"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 px-8 py-3 inline-block"
+              className="bg-gradient-to-r from-neutral-800 to-neutral-700 hover:from-neutral-900 hover:to-neutral-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 px-8 py-3 inline-block"
             >
               Create Your First Comic
             </Link>
@@ -663,7 +645,11 @@ export default function GalleryPage() {
             ))}
           </motion.div>
         )}
+        </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

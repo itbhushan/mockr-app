@@ -3,14 +3,19 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowLeft, Sparkles, RefreshCw, Download, Share2, Shuffle, Twitter as XIcon, Facebook, MessageCircle, Copy, ChevronDown, FileImage, FileText } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowLeft, Sparkles, RefreshCw, Download, Share2, Shuffle, Twitter as XIcon, Facebook, MessageCircle, Copy, ChevronDown, FileImage, FileText, X } from 'lucide-react'
+import { useUser, SignInButton } from '@clerk/nextjs'
 import html2canvas from 'html2canvas'
 import UsageIndicator from '@/components/UsageIndicator'
 import FeedbackModal from '@/components/FeedbackModal'
 import StorageDisclaimer from '@/components/StorageDisclaimer'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
 
 export default function GeneratePage() {
+  const { isSignedIn, isLoaded } = useUser()
+  const [showSignInModal, setShowSignInModal] = useState(false)
   const [formData, setFormData] = useState({
     situation: ''
   })
@@ -60,6 +65,13 @@ export default function GeneratePage() {
 
   const handleGenerateQuote = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Check if user is signed in
+    if (!isSignedIn) {
+      setShowSignInModal(true)
+      return
+    }
+
     setIsGeneratingQuote(true)
 
     try {
@@ -1265,38 +1277,12 @@ export default function GeneratePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
-      {/* Navigation */}
-      <nav className="w-full px-6 py-4 lg:py-6 bg-white/95 backdrop-blur-md border-b border-neutral-200/60 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-3">
-            <ArrowLeft className="w-5 h-5 text-neutral-600 hover:text-blue-600 transition-colors" />
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-xl lg:text-2xl">M</span>
-              </div>
-              <span className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">Mockr</span>
-            </div>
-          </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
+      {/* Header */}
+      <Header />
 
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setIsFeedbackModalOpen(true)}
-              className="text-blue-600 hover:text-blue-700 font-medium text-sm lg:text-base transition-colors"
-            >
-              Feedback
-            </button>
-            <Link
-              href="/gallery"
-              className="bg-white hover:bg-neutral-50 text-blue-600 font-semibold rounded-xl border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 text-sm lg:text-base px-4 lg:px-6 py-2 lg:py-3"
-            >
-              Gallery
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
+      <div className="flex-1 pt-16 lg:pt-20">
+        <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">
         <div className="grid lg:grid-cols-5 gap-12 lg:gap-8">
           {/* Form Section - 2 columns */}
           <motion.div
@@ -1326,17 +1312,17 @@ export default function GeneratePage() {
               </div>
 
               {/* Sample Generation Button */}
-              <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+              <div className="mb-6 p-4 bg-neutral-50 rounded-xl border border-neutral-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-blue-900 mb-1">Need Inspiration?</h3>
-                    <p className="text-sm text-blue-700">Get a curated political scenario to start with</p>
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-1">Need Inspiration?</h3>
+                    <p className="text-sm text-neutral-700">Get a curated political scenario to start with</p>
                   </div>
                   <button
                     type="button"
                     onClick={handleGenerateSample}
                     disabled={isLoadingSample}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    className="bg-gradient-to-r from-neutral-800 to-neutral-700 hover:from-neutral-900 hover:to-neutral-800 text-white font-semibold rounded-lg px-4 py-2 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                   >
                     {isLoadingSample ? (
                       <>
@@ -1377,7 +1363,7 @@ export default function GeneratePage() {
                 <button
                   type="submit"
                   disabled={isGeneratingQuote || !formData.situation}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full text-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed group"
+                  className="bg-gradient-to-r from-neutral-800 to-neutral-700 hover:from-neutral-900 hover:to-neutral-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full text-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
                   {isGeneratingQuote ? (
                     <>
@@ -1409,7 +1395,7 @@ export default function GeneratePage() {
                               setIsEditingQuote(false)
                             }
                           }}
-                          className="text-sm bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg transition-colors"
+                          className="text-sm bg-gradient-to-r from-neutral-800 to-neutral-700 hover:from-neutral-900 hover:to-neutral-800 text-white px-3 py-1 rounded-lg transition-colors"
                         >
                           {isEditingQuote ? 'Save Changes' : 'Edit Quote'}
                         </button>
@@ -1434,7 +1420,7 @@ export default function GeneratePage() {
                       type="button"
                       onClick={handleGenerateDescription}
                       disabled={isGeneratingDescription || isEditingQuote}
-                      className="bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-gradient-to-r from-neutral-800 to-neutral-700 hover:from-neutral-900 hover:to-neutral-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isGeneratingDescription ? (
                         <>
@@ -1468,7 +1454,7 @@ export default function GeneratePage() {
                               setIsEditingDescription(false)
                             }
                           }}
-                          className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg transition-colors"
+                          className="text-sm bg-gradient-to-r from-neutral-800 to-neutral-700 hover:from-neutral-900 hover:to-neutral-800 text-white px-3 py-1 rounded-lg transition-colors"
                         >
                           {isEditingDescription ? 'Save Changes' : 'Edit Description'}
                         </button>
@@ -1502,7 +1488,7 @@ export default function GeneratePage() {
                       type="button"
                       onClick={handleGenerateComic}
                       disabled={isGenerating || isEditingDescription || !!rateLimitError}
-                      className="bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-gradient-to-r from-neutral-800 to-neutral-700 hover:from-neutral-900 hover:to-neutral-800 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isGenerating ? (
                         <>
@@ -1537,7 +1523,7 @@ export default function GeneratePage() {
               {!generatedComic && !isGenerating && (
                 <div className="aspect-[4/3] bg-gradient-to-br from-slate-50 via-white to-slate-100 rounded-2xl flex items-center justify-center">
                   <div className="text-center">
-                    <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-md">
+                    <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-neutral-800 to-neutral-700 rounded-full mx-auto mb-4 flex items-center justify-center shadow-md">
                       <Sparkles className="w-10 h-10 lg:w-12 lg:h-12 text-white" />
                     </div>
                     <p className="text-neutral-500 font-medium mb-2">Your Comic Will Appear Here</p>
@@ -1551,7 +1537,7 @@ export default function GeneratePage() {
               {isGenerating && (
                 <div className="aspect-[4/3] bg-gradient-to-br from-slate-50 via-white to-slate-100 rounded-2xl flex items-center justify-center">
                   <div className="text-center">
-                    <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center shadow-md animate-pulse">
+                    <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-neutral-800 to-neutral-700 rounded-full mx-auto mb-4 flex items-center justify-center shadow-md animate-pulse">
                       <RefreshCw className="w-10 h-10 lg:w-12 lg:h-12 text-white animate-spin" />
                     </div>
                     <p className="text-neutral-600 font-medium mb-2">AI is Creating Your Comic...</p>
@@ -1626,7 +1612,7 @@ export default function GeneratePage() {
                     <div className="relative" ref={downloadDropdownRef}>
                       <button
                         onClick={() => setShowDownloadDropdown(!showDownloadDropdown)}
-                        className="bg-white hover:bg-neutral-50 text-blue-600 text-sm font-medium rounded-lg border border-blue-200 transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
+                        className="bg-white hover:bg-neutral-50 text-neutral-700 text-sm font-medium rounded-lg border border-neutral-200 transition-all duration-200 shadow-sm hover:shadow-md group py-2 w-full flex items-center justify-center"
                       >
                         <Download className="w-3.5 h-3.5 mr-1.5" />
                         Download
@@ -1750,7 +1736,7 @@ export default function GeneratePage() {
                       setTimeout(() => handleGenerateComic(), 100)
                     }}
                     disabled={isGenerating}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors text-center py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="w-full bg-gradient-to-r from-neutral-800 to-neutral-700 hover:from-neutral-900 hover:to-neutral-800 text-white font-semibold transition-colors text-center py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isGenerating ? (
                       <>
@@ -1768,21 +1754,81 @@ export default function GeneratePage() {
               )}
 
               {/* Quick Tip - Single Simple Guidance */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-xl">
-                <p className="text-sm text-blue-900">
+              <div className="mt-6 p-4 bg-neutral-50 rounded-xl">
+                <p className="text-sm text-neutral-900">
                   💡 <span className="font-semibold">Tip:</span> Describe a frustrating political or news situation - be specific about the contradiction or irony
                 </p>
               </div>
             </div>
           </motion.div>
         </div>
+        </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
 
       {/* Feedback Modal */}
       <FeedbackModal
         isOpen={isFeedbackModalOpen}
         onClose={() => setIsFeedbackModalOpen(false)}
       />
+
+      {/* Sign In Modal */}
+      <AnimatePresence>
+        {showSignInModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowSignInModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowSignInModal(false)}
+                className="absolute top-4 right-4 text-neutral-400 hover:text-neutral-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-neutral-800 to-neutral-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Sparkles className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-neutral-900 mb-2">Sign In Required</h2>
+                <p className="text-neutral-600">
+                  Please sign in to start creating amazing political cartoons with AI
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <SignInButton mode="modal">
+                  <button className="w-full bg-gradient-to-r from-neutral-800 to-neutral-700 hover:from-neutral-900 hover:to-neutral-800 text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-sm hover:shadow-md">
+                    Sign In to Continue
+                  </button>
+                </SignInButton>
+                <button
+                  onClick={() => setShowSignInModal(false)}
+                  className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-medium py-3 px-6 rounded-xl transition-all"
+                >
+                  Maybe Later
+                </button>
+              </div>
+
+              <p className="text-xs text-neutral-500 text-center mt-6">
+                By signing in, you can save your comics and access them anytime
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
