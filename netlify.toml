@@ -40,7 +40,13 @@
     [headers.values]
       Cache-Control = "public, max-age=31536000, immutable"
 
-  # Cache images
+  # Cache sample comics with short duration for updates
+  [[headers]]
+    for = "/samples/*.jpg"
+    [headers.values]
+      Cache-Control = "public, max-age=300"
+
+  # Cache other images
   [[headers]]
     for = "/*.jpg"
     [headers.values]
