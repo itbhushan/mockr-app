@@ -4,13 +4,21 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useUser, UserButton, SignInButton } from '@clerk/nextjs'
-import { Sparkles, Zap, Users, ArrowRight, Menu, X } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { Sparkles, Zap, Users, ArrowRight, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function HomePage() {
   const { isSignedIn, user } = useUser()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  const sampleComics = [
+    '/samples/sample-1.jpg',
+    '/samples/sample-2.jpg',
+    '/samples/sample-3.jpg',
+    '/samples/sample-4.jpg'
+  ]
 
   // Handle scroll for navbar background
   useEffect(() => {
@@ -20,6 +28,27 @@ export default function HomePage() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Auto-slide carousel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % sampleComics.length)
+    }, 4000) // Change slide every 4 seconds
+
+    return () => clearInterval(interval)
+  }, [sampleComics.length])
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % sampleComics.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + sampleComics.length) % sampleComics.length)
+  }
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index)
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -362,8 +391,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Examples Gallery */}
-      <section id="examples" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-neutral-50">
+      {/* Examples Gallery - Auto-Sliding Carousel */}
+      <section id="examples" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-neutral-50 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -379,30 +408,68 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          {/* Grid Layout */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {['/samples/sample-1.jpg', '/samples/sample-2.jpg', '/samples/sample-3.jpg', '/samples/sample-4.jpg'].map((comic, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="group relative rounded-2xl overflow-hidden bg-white border border-neutral-200 hover:border-purple-200 transition-all hover:shadow-xl"
-              >
-                <Image
-                  src={comic}
-                  alt={`Sample ${index + 1}`}
-                  width={400}
-                  height={400}
-                  className="w-full h-auto"
+          {/* Carousel Container */}
+          <div className="relative max-w-4xl mx-auto">
+            {/* Main Carousel */}
+            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-white border border-purple-100 shadow-2xl">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentSlide}
+                  initial={{ opacity: 0, x: 100 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -100 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={sampleComics[currentSlide]}
+                    alt={`Sample ${currentSlide + 1}`}
+                    fill
+                    className="object-contain"
+                    priority={currentSlide === 0}
+                  />
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <div className="text-white font-semibold text-lg sm:text-xl drop-shadow-lg">
+                      AI Generated Cartoon {currentSlide + 1} of {sampleComics.length}
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Navigation Arrows */}
+            <button
+              onClick={prevSlide}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-6 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-purple-600 hover:bg-purple-50 hover:scale-110 z-10"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-6 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-purple-600 hover:bg-purple-50 hover:scale-110 z-10"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+
+            {/* Dot Indicators */}
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mt-6 sm:mt-8">
+              {sampleComics.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`transition-all rounded-full ${
+                    index === currentSlide
+                      ? 'w-8 sm:w-10 h-2 sm:h-2.5 bg-gradient-to-r from-purple-600 to-violet-600'
+                      : 'w-2 sm:w-2.5 h-2 sm:h-2.5 bg-neutral-300 hover:bg-purple-300'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
                 />
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4 sm:p-6">
-                  <div className="text-white font-medium text-sm sm:text-base">AI Generated Cartoon →</div>
-                </div>
-              </motion.div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* CTA */}
