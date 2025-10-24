@@ -1,3 +1,4 @@
+  # Build configuration
   [build]
     command = "npm run build"
     functions = "netlify/functions"
