@@ -195,7 +195,7 @@ export default function GeneratePage() {
       characters: autoFillCharacters(formData.situation),
       setting: autoFillSetting(formData.situation),
       tone: 'satirical',
-      style: 'laxman'
+      style: 'classic'
     }
 
     try {
@@ -248,7 +248,7 @@ export default function GeneratePage() {
           dialogue: data.comic.dialogue,
           situation: data.comic.situation,
           tone: 'satirical',
-          style: 'laxman',
+          style: 'classic',
           createdAt: new Date().toISOString()
         })
 

@@ -360,11 +360,11 @@ export default function HomePage() {
               {
                 step: "02",
                 title: "AI Creates Magic",
-                description: "Watch as FLUX AI generates a witty, editorial-style cartoon in classic black & white with your signature Common Man character.",
+                description: "Watch as our AI generates a witty, editorial-style cartoon in classic black & white with your signature Common Man character.",
                 icon: Wand2,
                 gradient: "from-violet-500 to-purple-500",
                 bgGradient: "from-violet-50 to-purple-50",
-                features: ["FLUX-schnell model", "60-second generation", "Editorial cartoon style"]
+                features: ["Advanced AI model", "60-second generation", "Editorial cartoon style"]
               },
               {
                 step: "03",

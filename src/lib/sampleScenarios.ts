@@ -3,7 +3,7 @@ export interface ComicScenario {
   characters: string
   setting: string
   tone: 'satirical' | 'witty' | 'observational' | 'critical'
-  style: 'laxman' | 'modern' | 'minimalist' | 'detailed'
+  style: 'classic' | 'modern' | 'minimalist' | 'detailed'
   dialogue: string
 }
 
@@ -13,7 +13,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Politician, Common citizen",
     setting: "Expensive store with price tags visible",
     tone: "satirical",
-    style: "laxman",
+    style: "classic",
     dialogue: "Don't worry about rising prices, we feel your pain!"
   },
   {
@@ -21,7 +21,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "World leaders, Environmental activist",
     setting: "Airport with private jets and climate summit banner",
     tone: "critical",
-    style: "laxman",
+    style: "classic",
     dialogue: "We must all make sacrifices to save the planet!"
   },
   {
@@ -37,7 +37,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Health minister, Doctors, Patients",
     setting: "Crowded hospital corridor",
     tone: "critical",
-    style: "laxman",
+    style: "classic",
     dialogue: "See? World-class healthcare for everyone!"
   },
   {
@@ -45,7 +45,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Education minister, Student, Parent",
     setting: "Government office with overseas university brochures",
     tone: "satirical",
-    style: "laxman",
+    style: "classic",
     dialogue: "Our local schools are absolutely the best!"
   },
   {
@@ -61,7 +61,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Politician in car, Metro construction worker",
     setting: "Traffic jam with metro construction in background",
     tone: "witty",
-    style: "laxman",
+    style: "classic",
     dialogue: "The metro will solve all traffic problems!"
   },
   {
@@ -69,7 +69,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Finance minister, Frustrated bank customer",
     setting: "Bank with broken ATM",
     tone: "satirical",
-    style: "laxman",
+    style: "classic",
     dialogue: "Our economy is growing at record pace!"
   },
   {
@@ -85,7 +85,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Opposition leader, Confused voter, Government minister",
     setting: "Election rally podium",
     tone: "observational",
-    style: "laxman",
+    style: "classic",
     dialogue: "We would do exactly the same thing, but better!"
   },
   {
@@ -93,7 +93,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Urban planner, Environmental activist, Construction worker",
     setting: "Construction site with felled trees",
     tone: "critical",
-    style: "laxman",
+    style: "classic",
     dialogue: "More parking means more green transportation!"
   },
   {
@@ -101,7 +101,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Sports minister, Children, Stadium contractor",
     setting: "Broken playground with grand stadium in background",
     tone: "satirical",
-    style: "laxman",
+    style: "classic",
     dialogue: "Sports infrastructure for world-class athletes!"
   },
   {
@@ -109,7 +109,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Anti-corruption activist, Businessman with briefcase, Common man",
     setting: "Government office with transparency slogans on wall",
     tone: "critical",
-    style: "laxman",
+    style: "classic",
     dialogue: "This is for the greater good of society!"
   },
   {
@@ -117,7 +117,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Tax minister, Accountant, Taxpayer",
     setting: "Tax office with paradise papers visible",
     tone: "satirical",
-    style: "laxman",
+    style: "classic",
     dialogue: "Everyone must pay their fair share!"
   },
   {
@@ -125,7 +125,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Defense minister, Arms dealer, Peace activist",
     setting: "Arms exhibition with peace dove logo",
     tone: "critical",
-    style: "laxman",
+    style: "classic",
     dialogue: "We believe in peace through strength!"
   },
   {
@@ -141,7 +141,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Housing minister, Homeless family, Real estate agent",
     setting: "Luxury mansion with affordable housing billboard",
     tone: "satirical",
-    style: "laxman",
+    style: "classic",
     dialogue: "Housing for all is our top priority!"
   },
   {
@@ -149,7 +149,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Employment minister, Job seekers, HR recruiters",
     setting: "Job fair with empty booths and 'No Vacancy' signs",
     tone: "witty",
-    style: "laxman",
+    style: "classic",
     dialogue: "Unlimited opportunities for everyone!"
   },
   {
@@ -157,7 +157,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Transport minister, Road contractor, Frustrated driver",
     setting: "Road with vehicle stuck in large pothole",
     tone: "witty",
-    style: "laxman",
+    style: "classic",
     dialogue: "World-class infrastructure is our commitment!"
   },
   {
@@ -165,7 +165,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Food minister, Protesting farmers, Restaurant owner",
     setting: "5-star restaurant with farmer protests visible outside",
     tone: "critical",
-    style: "laxman",
+    style: "classic",
     dialogue: "We fully support our hardworking farmers!"
   },
   {
@@ -173,7 +173,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Transparency advocate, Corporate lobbyist, Journalist",
     setting: "Dark alley meeting with transparency office in background",
     tone: "satirical",
-    style: "laxman",
+    style: "classic",
     dialogue: "Complete transparency in all our dealings!"
   },
   {
@@ -181,7 +181,7 @@ export const sampleScenarios: ComicScenario[] = [
     characters: "Energy minister, Coal company executive, Environmental scientist",
     setting: "Solar panel exhibition with coal contracts on desk",
     tone: "critical",
-    style: "laxman",
+    style: "classic",
     dialogue: "Clean energy is the future!"
   }
 ]
