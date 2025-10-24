@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useUser, UserButton, SignInButton } from '@clerk/nextjs'
-import { Sparkles, Zap, Users, ArrowRight, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Sparkles, Zap, Users, ArrowRight, Menu, X, ChevronLeft, ChevronRight, PenTool, Wand2, Share2, CheckCircle2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function HomePage() {
@@ -319,70 +319,134 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
+      <section id="how-it-works" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-neutral-50 to-white relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-neutral-200 rounded-full blur-3xl opacity-20" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-neutral-300 rounded-full blur-3xl opacity-20" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
           {/* Section Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12 sm:mb-16"
+            className="text-center mb-16 sm:mb-20"
           >
+            <div className="inline-flex items-center space-x-2 bg-neutral-800 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <Sparkles className="w-4 h-4" />
+              <span>Simple Process</span>
+            </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-neutral-900 mb-4">
-              Three Steps to Viral Satire
+              From Idea to Viral in
+              <span className="block bg-gradient-to-r from-neutral-800 to-neutral-600 bg-clip-text text-transparent mt-2">3 Easy Steps</span>
             </h2>
             <p className="text-lg sm:text-xl text-neutral-600 max-w-2xl mx-auto">
-              Creating political cartoons has never been this easy
+              No design skills needed. Just your wit and our AI.
             </p>
           </motion.div>
 
           {/* Steps Grid */}
-          <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+          <div className="grid md:grid-cols-3 gap-8 lg:gap-10 mb-16">
             {[
               {
                 step: "01",
-                title: "Describe Situation",
-                description: "Enter any political situation or news event you want to satirize",
-                icon: "✍️"
+                title: "Describe Your Scene",
+                description: "Type in any political situation, current event, or social commentary. Our AI understands context and satire.",
+                icon: PenTool,
+                gradient: "from-amber-500 to-orange-500",
+                bgGradient: "from-amber-50 to-orange-50",
+                features: ["Natural language input", "Context-aware AI", "Instant understanding"]
               },
               {
                 step: "02",
-                title: "AI Generates",
-                description: "Our AI creates a witty cartoon in classic editorial style",
-                icon: "✨"
+                title: "AI Creates Magic",
+                description: "Watch as FLUX AI generates a witty, editorial-style cartoon in classic black & white with your signature Common Man character.",
+                icon: Wand2,
+                gradient: "from-violet-500 to-purple-500",
+                bgGradient: "from-violet-50 to-purple-50",
+                features: ["FLUX-schnell model", "60-second generation", "Editorial cartoon style"]
               },
               {
                 step: "03",
                 title: "Share & Go Viral",
-                description: "Download and share on social media with one click",
-                icon: "🚀"
+                description: "Download your masterpiece and share directly to X, LinkedIn, or save for later. Complete with Mockr signature.",
+                icon: Share2,
+                gradient: "from-emerald-500 to-teal-500",
+                bgGradient: "from-emerald-50 to-teal-50",
+                features: ["One-click sharing", "High-res download", "Social media optimized"]
               }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="relative bg-white rounded-2xl p-6 sm:p-8 border border-neutral-100 hover:border-neutral-300 hover:shadow-lg transition-all"
-              >
-                {/* Step Number */}
-                <div className="text-5xl sm:text-6xl lg:text-7xl font-bold text-neutral-100 mb-4">{item.step}</div>
+            ].map((item, index) => {
+              const Icon = item.icon
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.15, duration: 0.5 }}
+                  whileHover={{ y: -8, transition: { duration: 0.2 } }}
+                  className="relative group"
+                >
+                  {/* Card */}
+                  <div className={`relative bg-gradient-to-br ${item.bgGradient} rounded-2xl p-8 border-2 border-neutral-100 group-hover:border-neutral-200 shadow-lg group-hover:shadow-2xl transition-all duration-300 h-full`}>
+                    {/* Step number badge */}
+                    <div className="absolute -top-4 -right-4 w-12 h-12 bg-gradient-to-br from-neutral-800 to-neutral-700 rounded-full flex items-center justify-center shadow-lg">
+                      <span className="text-white font-bold text-lg">{item.step}</span>
+                    </div>
 
-                {/* Icon */}
-                <div className="text-3xl sm:text-4xl mb-4">{item.icon}</div>
+                    {/* Icon with gradient background */}
+                    <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                      <Icon className="w-8 h-8 text-white" strokeWidth={2.5} />
+                    </div>
 
-                {/* Content */}
-                <h3 className="text-xl sm:text-2xl font-semibold text-neutral-900 mb-3">{item.title}</h3>
-                <p className="text-neutral-600 leading-relaxed">{item.description}</p>
+                    {/* Content */}
+                    <h3 className="text-2xl font-bold text-neutral-900 mb-3">{item.title}</h3>
+                    <p className="text-neutral-700 leading-relaxed mb-6">{item.description}</p>
 
-                {/* Connector Line (desktop only) */}
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-neutral-300 to-transparent -ml-8" />
-                )}
-              </motion.div>
-            ))}
+                    {/* Features list */}
+                    <ul className="space-y-2">
+                      {item.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-center text-sm text-neutral-600">
+                          <CheckCircle2 className="w-4 h-4 text-neutral-800 mr-2 flex-shrink-0" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* Connector Arrow (desktop only) */}
+                    {index < 2 && (
+                      <div className="hidden md:block absolute top-1/2 -right-5 lg:-right-6">
+                        <ArrowRight className="w-8 h-8 lg:w-10 lg:h-10 text-neutral-300 group-hover:text-neutral-400 transition-colors" />
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
+
+          {/* CTA Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <div className="bg-gradient-to-r from-neutral-800 to-neutral-700 rounded-2xl p-8 sm:p-12 shadow-2xl">
+              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                Ready to Create Your First Cartoon?
+              </h3>
+              <p className="text-neutral-200 mb-8 max-w-xl mx-auto">
+                Join thousands of creators using Mockr to turn political commentary into shareable art
+              </p>
+              <Link href="/generate">
+                <button className="px-8 py-4 bg-white text-neutral-900 rounded-xl hover:bg-neutral-100 transition-all shadow-lg hover:shadow-xl font-semibold text-lg inline-flex items-center group">
+                  Start Creating Free
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
 
