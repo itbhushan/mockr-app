@@ -45,7 +45,7 @@ export default function PrivacyPage() {
             <ul className="list-disc pl-6 space-y-2">
               <li>Email address</li>
               <li>Name (optional)</li>
-              <li>Authentication credentials (managed securely by Clerk)</li>
+              <li>Authentication credentials (managed securely by our identity provider)</li>
             </ul>
 
             <h3 className="text-xl font-semibold text-neutral-900 mb-3 mt-4">Usage Information</h3>
@@ -91,26 +91,28 @@ export default function PrivacyPage() {
               We implement industry-standard security measures to protect your data:
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Authentication is handled securely through Clerk</li>
-              <li>API requests are encrypted using HTTPS</li>
+              <li>Authentication is handled securely through enterprise-grade identity providers</li>
+              <li>All data transmission is encrypted using HTTPS/TLS protocols</li>
               <li>We do not store generated comic images on our servers</li>
-              <li>Personal information is stored securely and accessed only when necessary</li>
+              <li>Personal information is stored securely with restricted access</li>
+              <li>Regular security audits and monitoring to detect potential threats</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold text-neutral-900 mb-4">Third-Party Services</h2>
             <p>
-              Mockr uses the following third-party services:
+              Mockr partners with trusted third-party service providers to deliver our platform:
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong>Clerk:</strong> For authentication and user management</li>
-              <li><strong>Google Gemini API:</strong> For AI text generation</li>
-              <li><strong>Hugging Face:</strong> For AI image generation</li>
-              <li><strong>Netlify:</strong> For hosting and content delivery</li>
+              <li><strong>Authentication Services:</strong> For secure user login and account management</li>
+              <li><strong>AI Services:</strong> For generating satirical text and cartoon images</li>
+              <li><strong>Cloud Infrastructure:</strong> For reliable hosting and fast content delivery</li>
+              <li><strong>Analytics Services:</strong> For understanding usage patterns and improving our service</li>
             </ul>
             <p>
-              Each of these services has their own privacy policies that govern how they handle your data.
+              These service providers process data on our behalf and are contractually obligated to protect your information.
+              Each service has their own privacy policies that govern how they handle data.
             </p>
           </section>
 
