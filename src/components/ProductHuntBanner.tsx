@@ -12,7 +12,7 @@ export default function ProductHuntBanner() {
   const productHuntURL = process.env.NEXT_PUBLIC_PRODUCT_HUNT_URL || '#'
 
   // Check if banner should be shown
-  useEffect() => {
+  useEffect(() => {
     // Check if user has dismissed the banner
     const dismissed = localStorage.getItem('ph-banner-dismissed')
     if (dismissed) {
