@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import MVPRegistration from '@/components/MVPRegistration'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
+import ProductHuntBanner from '@/components/ProductHuntBanner'
 
 import './globals.css'
 
@@ -87,6 +89,8 @@ import './globals.css'
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         </head>
         <body className={`${inter.className} antialiased bg-neutral-50 text-neutral-900`} suppressHydrationWarning>
+          <GoogleAnalytics />
+          <ProductHuntBanner />
           <div className="min-h-screen flex flex-col">
             <MVPRegistration />
             <main className="flex-1">

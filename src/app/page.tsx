@@ -233,23 +233,16 @@ export default function HomePage() {
                 </a>
               </div>
 
-              {/* Social Proof */}
+              {/* Features */}
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-6 text-sm text-neutral-500">
                 <div className="flex items-center space-x-2">
-                  <div className="flex -space-x-2">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        className="w-8 h-8 rounded-full bg-gradient-to-br from-neutral-400 to-neutral-600 border-2 border-white"
-                      />
-                    ))}
-                  </div>
-                  <span className="font-medium text-neutral-700">1000+ creators</span>
+                  <Sparkles className="w-4 h-4 text-neutral-600" />
+                  <span className="font-medium text-neutral-700">AI-Powered Generation</span>
                 </div>
                 <div className="hidden sm:block h-4 w-px bg-neutral-200" />
                 <div className="flex items-center space-x-1">
                   <Zap className="w-4 h-4 text-amber-500" />
-                  <span>Generated in <span className="font-semibold text-neutral-700">60 seconds</span></span>
+                  <span>Ready in <span className="font-semibold text-neutral-700">60 seconds</span></span>
                 </div>
               </div>
             </motion.div>
@@ -281,7 +274,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Social Proof Section */}
+      {/* Features Highlight Section */}
       <section className="py-8 sm:py-12 bg-neutral-50 border-y border-neutral-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-3 gap-4 sm:gap-8 lg:gap-12">
@@ -291,8 +284,8 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="text-center"
             >
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">10K+</div>
-              <div className="text-xs sm:text-sm text-neutral-600 mt-1">Comics Created</div>
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">AI-Powered</div>
+              <div className="text-xs sm:text-sm text-neutral-600 mt-1">Smart Generation</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -301,8 +294,8 @@ export default function HomePage() {
               transition={{ delay: 0.1 }}
               className="text-center"
             >
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">1K+</div>
-              <div className="text-xs sm:text-sm text-neutral-600 mt-1">Active Users</div>
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">60s</div>
+              <div className="text-xs sm:text-sm text-neutral-600 mt-1">Avg Generation</div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -311,8 +304,8 @@ export default function HomePage() {
               transition={{ delay: 0.2 }}
               className="text-center"
             >
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">60s</div>
-              <div className="text-xs sm:text-sm text-neutral-600 mt-1">Avg Generation</div>
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">10/Day</div>
+              <div className="text-xs sm:text-sm text-neutral-600 mt-1">Free Comics</div>
             </motion.div>
           </div>
         </div>
