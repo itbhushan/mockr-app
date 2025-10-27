@@ -12,6 +12,7 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [currentExampleSlide, setCurrentExampleSlide] = useState(0)
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
 
   const sampleComics = [
@@ -19,6 +20,13 @@ export default function HomePage() {
     '/samples/sample-2.jpg',
     '/samples/sample-3.jpg',
     '/samples/sample-4.jpg'
+  ]
+
+  const exampleComics = [
+    '/examples/example-1.jpg',
+    '/examples/example-2.jpg',
+    '/examples/example-3.jpg',
+    '/examples/example-4.jpg'
   ]
 
   // Handle scroll for navbar background
@@ -30,13 +38,21 @@ export default function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Auto-slide carousel
+  // Auto-slide carousel for hero
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % sampleComics.length)
     }, 4000)
     return () => clearInterval(interval)
   }, [sampleComics.length])
+
+  // Auto-slide carousel for examples
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentExampleSlide((prev) => (prev + 1) % exampleComics.length)
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [exampleComics.length])
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % sampleComics.length)
@@ -48,6 +64,10 @@ export default function HomePage() {
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index)
+  }
+
+  const goToExampleSlide = (index: number) => {
+    setCurrentExampleSlide(index)
   }
 
   const toggleFaq = (index: number) => {
@@ -81,7 +101,7 @@ export default function HomePage() {
     },
     {
       question: "How do I share my comics?",
-      answer: "Every comic has one-click sharing buttons for X (Twitter), LinkedIn, and more. You can also download the image to share anywhere you like."
+      answer: "Every comic has one-click sharing buttons for X (Twitter) and more. You can also download the image to share anywhere you like."
     },
     {
       question: "Is my data private?",
@@ -349,31 +369,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust Badges Section */}
-      <section className="py-12 bg-white border-y border-neutral-100">
+      {/* Trust Badges Section - Colored & Compact */}
+      <section className="py-8 bg-white border-y border-neutral-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-neutral-500 mb-8 font-medium">
+          <p className="text-center text-sm text-neutral-500 mb-6 font-medium">
             Powered by cutting-edge AI technology
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
             {[
-              { icon: Sparkles, label: "Advanced AI" },
-              { icon: Clock, label: "60s Generation" },
-              { icon: Shield, label: "Free to Use" },
-              { icon: ImageIcon, label: "HD Quality" }
+              { icon: Sparkles, label: "Advanced AI", color: "from-purple-500 to-pink-500" },
+              { icon: Clock, label: "60s Generation", color: "from-blue-500 to-cyan-500" },
+              { icon: Shield, label: "Free to Use", color: "from-green-500 to-emerald-500" },
+              { icon: ImageIcon, label: "HD Quality", color: "from-orange-500 to-amber-500" }
             ].map((item, index) => {
               const Icon = item.icon
               return (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex flex-col items-center text-center"
+                  className="flex items-center space-x-2 bg-white"
                 >
-                  <div className="w-12 h-12 bg-neutral-100 rounded-xl flex items-center justify-center mb-3">
-                    <Icon className="w-6 h-6 text-neutral-700" />
+                  <div className={`w-10 h-10 bg-gradient-to-br ${item.color} rounded-lg flex items-center justify-center shadow-md`}>
+                    <Icon className="w-5 h-5 text-white" />
                   </div>
                   <p className="text-sm font-semibold text-neutral-700">{item.label}</p>
                 </motion.div>
@@ -495,7 +515,7 @@ export default function HomePage() {
             <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-white border-2 border-neutral-200 shadow-2xl">
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={currentSlide}
+                  key={currentExampleSlide}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
@@ -503,8 +523,8 @@ export default function HomePage() {
                   className="absolute inset-0 p-8"
                 >
                   <Image
-                    src={sampleComics[currentSlide]}
-                    alt={`Example ${currentSlide + 1}`}
+                    src={exampleComics[currentExampleSlide]}
+                    alt={`Example ${currentExampleSlide + 1}`}
                     fill
                     className="object-contain"
                   />
@@ -514,12 +534,12 @@ export default function HomePage() {
 
             {/* Carousel indicators */}
             <div className="flex items-center justify-center gap-3 mt-8">
-              {sampleComics.map((_, index) => (
+              {exampleComics.map((_, index) => (
                 <button
                   key={index}
-                  onClick={() => goToSlide(index)}
+                  onClick={() => goToExampleSlide(index)}
                   className={`transition-all rounded-full ${
-                    index === currentSlide
+                    index === currentExampleSlide
                       ? 'w-10 h-3 bg-gradient-to-r from-neutral-800 to-neutral-600'
                       : 'w-3 h-3 bg-neutral-300 hover:bg-neutral-400'
                   }`}
@@ -791,9 +811,6 @@ export default function HomePage() {
               <div className="flex space-x-4">
                 <a href="https://x.com/mockr" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
                   𝕏
-                </a>
-                <a href="https://linkedin.com/company/mockr" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
-                  in
                 </a>
               </div>
             </div>
