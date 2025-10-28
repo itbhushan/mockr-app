@@ -21,13 +21,6 @@ export default function HomePage() {
     '/samples/sample-4.jpg'
   ]
 
-  const exampleComics = [
-    '/examples/example-1.jpg',
-    '/examples/example-2.jpg',
-    '/examples/example-3.jpg',
-    '/examples/example-4.jpg'
-  ]
-
   // Handle scroll for navbar background
   useEffect(() => {
     const handleScroll = () => {
@@ -37,7 +30,7 @@ export default function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Auto-slide carousel for hero
+  // Auto-slide carousel
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % sampleComics.length)
@@ -88,7 +81,7 @@ export default function HomePage() {
     },
     {
       question: "How do I share my comics?",
-      answer: "Every comic has one-click sharing buttons for X (Twitter) and more. You can also download the image to share anywhere you like."
+      answer: "Every comic has one-click sharing buttons for X (Twitter), LinkedIn, and more. You can also download the image to share anywhere you like."
     },
     {
       question: "Is my data private?",
@@ -356,31 +349,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust Badges Section - Colored & Compact */}
-      <section className="py-8 bg-white border-y border-neutral-100">
+      {/* Trust Badges Section */}
+      <section className="py-12 bg-white border-y border-neutral-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-neutral-500 mb-6 font-medium">
+          <p className="text-center text-sm text-neutral-500 mb-8 font-medium">
             Powered by cutting-edge AI technology
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { icon: Sparkles, label: "Advanced AI", color: "from-purple-500 to-pink-500" },
-              { icon: Clock, label: "60s Generation", color: "from-blue-500 to-cyan-500" },
-              { icon: Shield, label: "Free to Use", color: "from-green-500 to-emerald-500" },
-              { icon: ImageIcon, label: "HD Quality", color: "from-orange-500 to-amber-500" }
+              { icon: Sparkles, label: "Advanced AI" },
+              { icon: Clock, label: "60s Generation" },
+              { icon: Shield, label: "Free to Use" },
+              { icon: ImageIcon, label: "HD Quality" }
             ].map((item, index) => {
               const Icon = item.icon
               return (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center space-x-2 bg-white"
+                  className="flex flex-col items-center text-center"
                 >
-                  <div className={`w-10 h-10 bg-gradient-to-br ${item.color} rounded-lg flex items-center justify-center shadow-md`}>
-                    <Icon className="w-5 h-5 text-white" />
+                  <div className="w-12 h-12 bg-neutral-100 rounded-xl flex items-center justify-center mb-3">
+                    <Icon className="w-6 h-6 text-neutral-700" />
                   </div>
                   <p className="text-sm font-semibold text-neutral-700">{item.label}</p>
                 </motion.div>
@@ -480,7 +473,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Examples Gallery - Grid Layout */}
+      {/* Examples Gallery with Carousel */}
       <section id="examples" className="py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-neutral-50">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -497,29 +490,42 @@ export default function HomePage() {
             </p>
           </motion.div>
 
-          {/* Grid Container - 2x2 on desktop, 1 column on mobile */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-6xl mx-auto">
-            {exampleComics.map((comic, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="relative group cursor-pointer"
-              >
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-white border-2 border-neutral-200 group-hover:border-neutral-300 shadow-lg group-hover:shadow-2xl transition-all">
+          {/* Carousel Container */}
+          <div className="relative max-w-4xl mx-auto">
+            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-white border-2 border-neutral-200 shadow-2xl">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentSlide}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0 p-8"
+                >
                   <Image
-                    src={comic}
-                    alt={`User created comic ${index + 1}`}
+                    src={sampleComics[currentSlide]}
+                    alt={`Example ${currentSlide + 1}`}
                     fill
-                    className="object-contain p-4 sm:p-6"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-contain"
                   />
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Carousel indicators */}
+            <div className="flex items-center justify-center gap-3 mt-8">
+              {sampleComics.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`transition-all rounded-full ${
+                    index === currentSlide
+                      ? 'w-10 h-3 bg-gradient-to-r from-neutral-800 to-neutral-600'
+                      : 'w-3 h-3 bg-neutral-300 hover:bg-neutral-400'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
 
           {/* View Gallery Link */}
@@ -785,6 +791,9 @@ export default function HomePage() {
               <div className="flex space-x-4">
                 <a href="https://x.com/mockr" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
                   𝕏
+                </a>
+                <a href="https://linkedin.com/company/mockr" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
+                  in
                 </a>
               </div>
             </div>
