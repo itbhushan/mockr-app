@@ -142,11 +142,11 @@ export async function addCommonManToComic(
 
     console.log('[Composite] Common Man overlay complete')
 
-    // Load and process Mockr signature
-    const signaturePath = path.join(process.cwd(), 'public', 'brand', 'mockr-signature.png')
+    // Load and process mockr.art signature
+    const signaturePath = path.join(process.cwd(), 'public', 'brand', 'mockr-art-signature.png')
 
     if (!fs.existsSync(signaturePath)) {
-      console.warn('[Composite] Mockr signature not found at:', signaturePath)
+      console.warn('[Composite] mockr.art signature not found at:', signaturePath)
       // Return comic with Common Man only
       const resultBase64 = `data:image/jpeg;base64,${comicWithCommonMan.toString('base64')}`
       return resultBase64
@@ -197,7 +197,7 @@ export async function addCommonManToComic(
     const signatureMetadata = await sharp(resizedSignature).metadata()
     const signatureHeight = signatureMetadata.height || 0
 
-    console.log('[Composite] Mockr signature dimensions:', `${signatureWidth}x${signatureHeight}`)
+    console.log('[Composite] mockr.art signature dimensions:', `${signatureWidth}x${signatureHeight}`)
 
     // Position signature overlaying bottom-right corner of comic (no white space extension)
     const signatureLeft = baseWidth - signatureWidth - 15 // 15px from right edge
@@ -219,7 +219,7 @@ export async function addCommonManToComic(
       .jpeg({ quality: 95 })
       .toBuffer()
 
-    console.log('[Composite] Mockr signature overlaid on bottom-right corner successfully')
+    console.log('[Composite] mockr.art signature overlaid on bottom-right corner successfully')
 
     // Convert back to base64 data URL
     const resultBase64 = `data:image/jpeg;base64,${compositeImage.toString('base64')}`
