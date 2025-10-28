@@ -783,7 +783,7 @@ export default function HomePage() {
               </p>
               {/* Social Links */}
               <div className="flex space-x-4">
-                <a href="https://x.com/mockr" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
+                <a href="https://x.com/Mockr169417" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
                   𝕏
                 </a>
               </div>

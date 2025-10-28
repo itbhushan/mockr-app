@@ -310,7 +310,7 @@ Proprietary - All rights reserved
 
 **Mockr Team**
 - Website: [mockr-app.netlify.app](https://mockr-app.netlify.app)
-- X (Twitter): [@MockrApp](https://twitter.com/MockrApp) *(coming soon)*
+- X (Twitter): [@Mockr169417](https://x.com/Mockr169417)
 
 ---
 
