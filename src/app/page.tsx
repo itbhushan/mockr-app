@@ -13,6 +13,7 @@ export default function HomePage() {
   const [scrolled, setScrolled] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
+  const [selectedExample, setSelectedExample] = useState<number | null>(null)
 
   const sampleComics = [
     '/samples/sample-1.jpg',
@@ -510,6 +511,7 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
+                onClick={() => setSelectedExample(index)}
                 className="relative group cursor-pointer"
               >
                 {/* Badge with example number */}
@@ -535,6 +537,41 @@ export default function HomePage() {
               </motion.div>
             ))}
           </div>
+
+          {/* Modal for viewing larger image */}
+          <AnimatePresence>
+            {selectedExample !== null && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedExample(null)}
+                className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-pointer"
+              >
+                <motion.div
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0.9 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative max-w-4xl w-full aspect-square cursor-default"
+                >
+                  <Image
+                    src={exampleComics[selectedExample]}
+                    alt={`User created comic ${selectedExample + 1}`}
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                  />
+                  <button
+                    onClick={() => setSelectedExample(null)}
+                    className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all shadow-lg"
+                  >
+                    <X className="w-5 h-5 text-neutral-900" />
+                  </button>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* View Gallery Link */}
           <motion.div
@@ -615,9 +652,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why Mockr Section - Innovative Timeline */}
+      {/* Why Mockr Section - Horizontal Compact */}
       <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -629,29 +666,29 @@ export default function HomePage() {
             </h2>
           </motion.div>
 
-          {/* Horizontal Feature List */}
-          <div className="space-y-3">
+          {/* Horizontal Grid - 2 rows of 3 columns */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { icon: "🎨", title: "Classic Editorial Style", description: "Black & white cartoons inspired by legendary political satirists" },
-              { icon: "⚡", title: "Lightning Fast", description: "From idea to shareable content in under 60 seconds" },
-              { icon: "🤖", title: "AI-Powered Wit", description: "Smart quote generation that understands political context" },
+              { icon: "🎨", title: "Classic Editorial Style", description: "Black & white cartoons inspired by legendary satirists" },
+              { icon: "⚡", title: "Lightning Fast", description: "From idea to shareable in under 60 seconds" },
+              { icon: "🤖", title: "AI-Powered Wit", description: "Smart quote generation understands political context" },
               { icon: "💰", title: "Free to Use", description: "10 comics per day, no credit card required" },
               { icon: "📱", title: "Mobile Friendly", description: "Create and share from any device, anywhere" },
-              { icon: "🎯", title: "Signature Style", description: "Every comic features our iconic Common Man character" }
+              { icon: "🎯", title: "Signature Style", description: "Every comic features iconic Common Man character" }
             ].map((item, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.08 }}
+                transition={{ delay: index * 0.05 }}
                 className="group"
               >
-                <div className="flex items-start gap-4 p-4 rounded-xl bg-white border-l-4 border-neutral-200 hover:border-neutral-800 hover:shadow-md transition-all">
-                  <div className="text-2xl flex-shrink-0 mt-1">{item.icon}</div>
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-white border border-neutral-200 hover:border-neutral-400 hover:shadow-md transition-all h-full">
+                  <div className="text-2xl flex-shrink-0">{item.icon}</div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-neutral-900 mb-1 text-base">{item.title}</h3>
-                    <p className="text-sm text-neutral-600">{item.description}</p>
+                    <h3 className="font-bold text-neutral-900 mb-1 text-sm">{item.title}</h3>
+                    <p className="text-xs text-neutral-600 leading-relaxed">{item.description}</p>
                   </div>
                 </div>
               </motion.div>
