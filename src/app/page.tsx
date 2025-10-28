@@ -480,42 +480,42 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Examples Gallery - Grid Layout */}
-      <section id="examples" className="py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-neutral-50">
-        <div className="max-w-7xl mx-auto">
+      {/* Examples Gallery - Compact Grid */}
+      <section id="examples" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-neutral-50">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-neutral-900 mb-4">
               Real Cartoons Created by Users
             </h2>
-            <p className="text-xl sm:text-2xl text-neutral-600">
+            <p className="text-lg sm:text-xl text-neutral-600">
               See what our community is creating
             </p>
           </motion.div>
 
-          {/* Grid Container - 2x2 on desktop, 1 column on mobile */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-6xl mx-auto">
+          {/* Grid Container - 2x2 on desktop, smaller images */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
             {exampleComics.map((comic, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                whileHover={{ y: -8, scale: 1.02 }}
+                whileHover={{ y: -4, scale: 1.05 }}
                 className="relative group cursor-pointer"
               >
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-white border-2 border-neutral-200 group-hover:border-neutral-300 shadow-lg group-hover:shadow-2xl transition-all">
+                <div className="relative aspect-square rounded-xl overflow-hidden bg-white border-2 border-neutral-200 group-hover:border-neutral-300 shadow-md group-hover:shadow-xl transition-all">
                   <Image
                     src={comic}
                     alt={`User created comic ${index + 1}`}
                     fill
-                    className="object-contain p-4 sm:p-6"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-contain p-3"
+                    sizes="(max-width: 768px) 50vw, 25vw"
                   />
                 </div>
               </motion.div>
@@ -527,11 +527,11 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center mt-12"
+            className="text-center mt-8"
           >
-            <Link href="/gallery" className="inline-flex items-center text-neutral-700 hover:text-neutral-900 font-semibold text-lg group">
+            <Link href="/gallery" className="inline-flex items-center text-neutral-700 hover:text-neutral-900 font-semibold text-base group">
               View Full Gallery
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
         </div>
@@ -601,21 +601,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why Mockr Section */}
-      <section className="py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
-        <div className="max-w-7xl mx-auto">
+      {/* Why Mockr Section - Compact */}
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-neutral-900 mb-4">
               Why Choose Mockr?
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
                 icon: "🎨",
@@ -654,11 +654,11 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-2xl p-8 border border-neutral-200 hover:border-neutral-300 hover:shadow-lg transition-all"
+                className="bg-white rounded-xl p-6 border border-neutral-200 hover:border-neutral-300 hover:shadow-lg transition-all"
               >
-                <div className="text-4xl mb-4">{item.icon}</div>
-                <h3 className="text-xl font-bold text-neutral-900 mb-3">{item.title}</h3>
-                <p className="text-neutral-600 leading-relaxed">{item.description}</p>
+                <div className="text-3xl mb-3">{item.icon}</div>
+                <h3 className="text-lg font-bold text-neutral-900 mb-2">{item.title}</h3>
+                <p className="text-sm text-neutral-600 leading-relaxed">{item.description}</p>
               </motion.div>
             ))}
           </div>

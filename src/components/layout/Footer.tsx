@@ -23,9 +23,6 @@ export default function Footer() {
               <a href="https://x.com/Mockr169417" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
                 𝕏
               </a>
-              <a href="https://linkedin.com/company/mockr" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
-                in
-              </a>
             </div>
           </div>
 
