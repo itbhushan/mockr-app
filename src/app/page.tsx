@@ -480,43 +480,57 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Examples Gallery - Compact Grid */}
+      {/* Examples Gallery - Featured Showcase */}
       <section id="examples" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-neutral-50">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-12"
           >
+            <div className="inline-flex items-center space-x-2 bg-neutral-800 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              <Sparkles className="w-4 h-4" />
+              <span>User Creations</span>
+            </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-neutral-900 mb-4">
               Real Cartoons Created by Users
             </h2>
-            <p className="text-lg sm:text-xl text-neutral-600">
+            <p className="text-lg text-neutral-600">
               See what our community is creating
             </p>
           </motion.div>
 
-          {/* Grid Container - 2x2 on desktop, smaller images */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+          {/* Grid Container - 2x2 with better sizing and hover effects */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
             {exampleComics.map((comic, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                whileHover={{ y: -4, scale: 1.05 }}
                 className="relative group cursor-pointer"
               >
-                <div className="relative aspect-square rounded-xl overflow-hidden bg-white border-2 border-neutral-200 group-hover:border-neutral-300 shadow-md group-hover:shadow-xl transition-all">
+                {/* Badge with example number */}
+                <div className="absolute -top-3 -left-3 z-10 w-10 h-10 bg-gradient-to-br from-neutral-800 to-neutral-700 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <span className="text-white font-bold text-sm">{index + 1}</span>
+                </div>
+
+                {/* Comic container with enhanced styling */}
+                <div className="relative aspect-square rounded-2xl overflow-hidden bg-white border-2 border-neutral-200 group-hover:border-neutral-400 shadow-lg group-hover:shadow-2xl transition-all">
                   <Image
                     src={comic}
                     alt={`User created comic ${index + 1}`}
                     fill
-                    className="object-contain p-3"
-                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="object-contain p-6 group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
+
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-6">
+                    <p className="text-white font-semibold text-sm">Click to view larger</p>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -527,11 +541,11 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center mt-8"
+            className="text-center mt-10"
           >
-            <Link href="/gallery" className="inline-flex items-center text-neutral-700 hover:text-neutral-900 font-semibold text-base group">
+            <Link href="/gallery" className="inline-flex items-center text-neutral-700 hover:text-neutral-900 font-semibold text-lg group">
               View Full Gallery
-              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
         </div>
@@ -601,64 +615,45 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why Mockr Section - Compact */}
-      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
+      {/* Why Mockr Section - Innovative Timeline */}
+      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-10"
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-neutral-900 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 mb-3">
               Why Choose Mockr?
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Horizontal Feature List */}
+          <div className="space-y-3">
             {[
-              {
-                icon: "🎨",
-                title: "Classic Editorial Style",
-                description: "Black & white cartoons inspired by legendary political satirists"
-              },
-              {
-                icon: "⚡",
-                title: "Lightning Fast",
-                description: "From idea to shareable content in under 60 seconds"
-              },
-              {
-                icon: "🤖",
-                title: "AI-Powered Wit",
-                description: "Smart quote generation that understands political context"
-              },
-              {
-                icon: "💰",
-                title: "Free to Use",
-                description: "10 comics per day, no credit card required"
-              },
-              {
-                icon: "📱",
-                title: "Mobile Friendly",
-                description: "Create and share from any device, anywhere"
-              },
-              {
-                icon: "🎯",
-                title: "Signature Style",
-                description: "Every comic features our iconic Common Man character"
-              }
+              { icon: "🎨", title: "Classic Editorial Style", description: "Black & white cartoons inspired by legendary political satirists" },
+              { icon: "⚡", title: "Lightning Fast", description: "From idea to shareable content in under 60 seconds" },
+              { icon: "🤖", title: "AI-Powered Wit", description: "Smart quote generation that understands political context" },
+              { icon: "💰", title: "Free to Use", description: "10 comics per day, no credit card required" },
+              { icon: "📱", title: "Mobile Friendly", description: "Create and share from any device, anywhere" },
+              { icon: "🎯", title: "Signature Style", description: "Every comic features our iconic Common Man character" }
             ].map((item, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-xl p-6 border border-neutral-200 hover:border-neutral-300 hover:shadow-lg transition-all"
+                transition={{ delay: index * 0.08 }}
+                className="group"
               >
-                <div className="text-3xl mb-3">{item.icon}</div>
-                <h3 className="text-lg font-bold text-neutral-900 mb-2">{item.title}</h3>
-                <p className="text-sm text-neutral-600 leading-relaxed">{item.description}</p>
+                <div className="flex items-start gap-4 p-4 rounded-xl bg-white border-l-4 border-neutral-200 hover:border-neutral-800 hover:shadow-md transition-all">
+                  <div className="text-2xl flex-shrink-0 mt-1">{item.icon}</div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-neutral-900 mb-1 text-base">{item.title}</h3>
+                    <p className="text-sm text-neutral-600">{item.description}</p>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
