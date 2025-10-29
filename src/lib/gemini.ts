@@ -11,36 +11,44 @@ export async function generateSatiricalQuote(situation: string): Promise<string>
     const timestamp = Date.now()
     const randomSeed = Math.floor(Math.random() * 1000)
 
-    const prompt = `You are a master political cartoonist creating editorial cartoons. Create a SHARP, WITTY, UNIQUE caption for your editorial cartoon about this political situation:
+    const prompt = `You are an R.K. Laxman-style political cartoonist creating editorial cartoon captions. Create a SHARP, SITUATION-SPECIFIC satirical caption for this EXACT political situation:
 
 SITUATION: ${situation}
 
-[Generation ID: ${timestamp}-${randomSeed}] - Generate a DIFFERENT caption each time, vary your approach and angle.
+[Variation ID: ${timestamp}-${randomSeed}]
 
-REQUIREMENTS for editorial cartoon caption:
-- Single satirical sentence (classic newspaper cartoon caption style)
-- Should expose the SPECIFIC irony/absurdity in this exact situation from a UNIQUE ANGLE
-- Dry, observational wit with biting social commentary
-- Length: 60-120 characters max (newspaper caption length)
-- No quotes needed - this is a caption, not dialogue
-- Reference specific details from the situation
-- IMPORTANT: Use creative wordplay, varied perspectives, different satirical approaches each time
+CRITICAL REQUIREMENTS:
+1. MUST directly reference the SPECIFIC situation above - use exact details from it
+2. Single satirical sentence exposing the irony/hypocrisy in THIS EXACT situation
+3. Length: 50-120 characters (newspaper editorial caption style)
+4. Dry, observational wit - not generic commentary
+5. No quotes around the caption - this is a caption, not dialogue
+6. Each generation must offer a DIFFERENT satirical angle on the same situation
 
-CLASSIC EDITORIAL CARTOON CAPTION EXAMPLES:
+R.K. LAXMAN STYLE CAPTION EXAMPLES (notice how they reference SPECIFIC situation details):
 
 Situation: "Politicians visiting hospitals while cutting healthcare budgets"
-Caption: "Find out whose birth or death anniversary it is today. Mention he was a great patriot and did much to help the poor, etc. and release the statement to the press!"
+Caption: "Wonderful facilities! I must remember to use my private hospital for my next check-up."
 
 Situation: "Government officials stuck in potholes after road inauguration"
-Caption: "Too many enquiry reports, sir. If you remove a few, you can sit on them more comfortably."
+Caption: "Quality control inspection! We're testing durability from the ground level."
 
 Situation: "Ministers attending climate summits via private jets"
-Caption: "They are not coming in because they say it's going to be the same speech and so is taken as heard."
+Caption: "My carbon footprint is offset by the hot air from my speech."
 
 Situation: "Digital arrest scam targeting minister's wife"
-Caption: "Good news, sir! The enquiry report says that no one is responsible in the entire administration for anything!"
+Caption: "Cybersecurity training starts at home, apparently."
 
-Create a satirical caption that captures the absurdity of the specific situation above in classic editorial cartoon observational style:`
+Situation: "Food minister at feast while farmers protest for fair prices"
+Caption: "Solidarity with farmers - I'm personally testing if their produce is worth more."
+
+Situation: "Tax minister explaining tax benefits while hiding money in offshore accounts"
+Caption: "Tax optimization is a skill I'm uniquely qualified to teach."
+
+YOUR TASK:
+Analyze the situation "${situation}" carefully. Identify the KEY IRONY (what's contradictory or absurd about it). Create a caption where the politician/character acknowledges this irony with dry, deadpan humor. The caption MUST reference specific elements from the situation (names, actions, objects, numbers mentioned).
+
+Generate ONE satirical caption now:`
 
     const result = await model.generateContent(prompt)
     const response = await result.response
@@ -80,93 +88,170 @@ Create a satirical caption that captures the absurdity of the specific situation
 function generateFallbackQuote(situation: string): string {
   const situationLower = situation.toLowerCase()
 
-  // R.K. Laxman style captions based on situation - single line observational wit
+  // R.K. Laxman style captions - situation-specific dry wit from politician's perspective
 
   // H-1B/Visa/Immigration
   if (situationLower.includes('h-1b') || situationLower.includes('visa') || situationLower.includes('immigration')) {
     if (situationLower.includes('fee') || situationLower.includes('cost') || situationLower.includes('$')) {
-      return "The American dream now comes with a premium membership fee!"
+      const options = [
+        "Premium visa fees ensure only the most financially committed immigrants!",
+        "We're not raising barriers, we're adding value to the American dream!",
+        "High visa costs - quality control for quality immigrants!"
+      ]
+      return options[Math.floor(Math.random() * options.length)]
     }
-    return "Nothing says 'welcome to America' quite like a financial barrier!"
+    return "Open borders, expensive gates - it's all about balance!"
   }
 
   // Healthcare/medical with budget/cutting
   if (situationLower.includes('healthcare') || situationLower.includes('hospital') || situationLower.includes('medical')) {
     if (situationLower.includes('budget') || situationLower.includes('cut') || situationLower.includes('fund')) {
-      return "Cutting ribbons and cutting budgets - efficiency at its finest!"
+      const options = [
+        "Cutting ribbons and budgets - double efficiency!",
+        "Wonderful facilities! I'll use my private hospital, of course.",
+        "Healthcare for all - photo opportunities included!"
+      ]
+      return options[Math.floor(Math.random() * options.length)]
     }
-    return "Nothing says healthcare reform like a photo opportunity!"
+    return "Nothing says reform like a good ribbon-cutting ceremony!"
   }
 
   // Education with abroad/private schools
   if (situationLower.includes('education') || situationLower.includes('school')) {
     if (situationLower.includes('abroad') || situationLower.includes('private') || situationLower.includes('international')) {
-      return "Local schools are perfect for inauguration ceremonies!"
+      const options = [
+        "Local schools for local kids - mine need international exposure!",
+        "I believe in public education so strongly, I chose private for my children!",
+        "These schools are excellent - for photo ops!"
+      ]
+      return options[Math.floor(Math.random() * options.length)]
     }
-    return "Education investment - one photo-op at a time!"
+    return "Education reform starts with impressive inauguration speeches!"
   }
 
   // Climate with jets/travel
   if (situationLower.includes('climate') || situationLower.includes('environment') || situationLower.includes('green')) {
     if (situationLower.includes('jet') || situationLower.includes('fly') || situationLower.includes('travel')) {
-      return "Flying private to save the planet - irony is truly a renewable resource!"
+      const options = [
+        "My private jet runs on renewable hypocrisy!",
+        "Carbon footprint? More like carbon leadership!",
+        "Flying first class to fight climate change - sacrifice is key!"
+      ]
+      return options[Math.floor(Math.random() * options.length)]
     }
-    return "Going green while burning through carbon credits!"
+    return "Going green - after this red-carpet arrival!"
+  }
+
+  // Tax/Money/Offshore
+  if (situationLower.includes('tax') && (situationLower.includes('offshore') || situationLower.includes('haven') || situationLower.includes('hiding'))) {
+    const options = [
+      "I teach tax optimization from personal experience!",
+      "Fair taxation - I fairly minimize mine!",
+      "Offshore accounts are international investments, technically!"
+    ]
+    return options[Math.floor(Math.random() * options.length)]
+  }
+
+  // Food/Farmers/Agriculture
+  if (situationLower.includes('food') || situationLower.includes('farmer') || situationLower.includes('agriculture')) {
+    if (situationLower.includes('feast') || situationLower.includes('protest') || situationLower.includes('price')) {
+      const options = [
+        "Solidarity with farmers - I'm quality-testing their produce!",
+        "Supporting agriculture through aggressive consumption!",
+        "Someone needs to check if this food is worth fair prices!"
+      ]
+      return options[Math.floor(Math.random() * options.length)]
+    }
+    return "Agricultural reform - one feast at a time!"
   }
 
   // Economy/Growth with contradictory policies
   if (situationLower.includes('growth') || situationLower.includes('economy')) {
     if (situationLower.includes('hurt') || situationLower.includes('harm') || situationLower.includes('damage')) {
-      return "Promoting economic growth through creative mathematics!"
+      const options = [
+        "Economic growth through creative accounting!",
+        "Hurting growth strategically - it's called planning!",
+        "The economy is thriving - in my portfolio!"
+      ]
+      return options[Math.floor(Math.random() * options.length)]
     }
-    return "The economy is doing great - just ask the right people!"
+    return "Economic indicators look great from my tax bracket!"
   }
 
   // Jobs/Employment
   if (situationLower.includes('job') || situationLower.includes('employment') || situationLower.includes('work')) {
-    return "Creating employment opportunities by making them impossible to fill!"
+    const options = [
+      "Job creation - we're creating the application process!",
+      "Employment opportunities for all - terms and conditions apply!",
+      "We're not blocking jobs, we're building character!"
+    ]
+    return options[Math.floor(Math.random() * options.length)]
   }
 
   // Transport/Infrastructure specific scenarios
   if (situationLower.includes('pothole')) {
     const options = [
-      "Quality roads with natural speed control features!",
-      "Every pothole is a reminder of our road-building excellence!",
-      "Testing infrastructure durability from the ground up!"
+      "Quality control - testing roads from ground level!",
+      "Natural speed breakers - innovation in road safety!",
+      "Potholes are feature updates, not bugs!"
     ]
     return options[Math.floor(Math.random() * options.length)]
   }
   else if (situationLower.includes('road') && (situationLower.includes('minister') || situationLower.includes('inaugurating'))) {
     const options = [
-      "Inaugurating today's roads, tomorrow's repair projects!",
-      "Building character-building roads for the public!",
-      "Premium road experience with adventure features!"
+      "Inaugurating today's project, tomorrow's renovation!",
+      "These roads will last years - of repairs!",
+      "Quality roads - just needs a few minor fixes!"
     ]
     return options[Math.floor(Math.random() * options.length)]
   }
   else if (situationLower.includes('transport') || situationLower.includes('traffic')) {
     const options = [
-      "Revolutionary traffic management - making standstill the new fast!",
-      "Transport solutions that really move you... backwards!",
-      "Patience is now officially a public virtue!"
+      "Traffic jams build patience - essential life skills!",
+      "Standstill traffic - more time to appreciate the city!",
+      "Revolutionary transport - going nowhere, faster!"
     ]
     return options[Math.floor(Math.random() * options.length)]
   }
   else if (situationLower.includes('infrastructure') || situationLower.includes('construction')) {
-    return "Building tomorrow's problems with today's budget!"
+    const options = [
+      "Building the future - one budget overrun at a time!",
+      "Infrastructure development - timeline negotiable!",
+      "World-class construction - world-class delays!"
+    ]
+    return options[Math.floor(Math.random() * options.length)]
   }
   else if (situationLower.includes('stuck') || situationLower.includes('trapped')) {
-    return "Leadership means experiencing problems firsthand for better solutions!"
+    return "Hands-on inspection - leadership from ground level!"
   }
   else if (situationLower.includes('inaugurating') || situationLower.includes('opening')) {
-    return "Grand opening ceremonies - where ribbons matter more than results!"
+    return "Ribbons cut, photos taken - mission accomplished!"
   }
-  else if (situationLower.includes('scam') || situationLower.includes('fraud')) {
-    return "Digital literacy programs clearly need more funding!"
+  else if (situationLower.includes('scam') || situationLower.includes('fraud') || situationLower.includes('digital arrest')) {
+    const options = [
+      "Cybersecurity training starts at home, clearly!",
+      "Digital literacy - adding it to next year's budget!",
+      "We're learning from this... expensive lesson!"
+    ]
+    return options[Math.floor(Math.random() * options.length)]
+  }
+  else if (situationLower.includes('corruption') || situationLower.includes('bribe')) {
+    const options = [
+      "Transparency in action - transparently transactional!",
+      "It's not corruption, it's expedited processing!",
+      "Efficiency fees - government innovation!"
+    ]
+    return options[Math.floor(Math.random() * options.length)]
   }
 
-  // Generic but still R.K. Laxman style fallback
-  return "Trust the process and ignore the results - democracy with a warranty!"
+  // Generic but still R.K. Laxman style fallback - dry politician humor
+  const genericOptions = [
+    "Democracy in action - just ignore the contradictions!",
+    "Public service - serving the public my photo opportunities!",
+    "Governance excellence - one ceremony at a time!",
+    "Leadership means never having to say you're accountable!"
+  ]
+  return genericOptions[Math.floor(Math.random() * genericOptions.length)]
 }
 
 export async function generateEnhancedDialogue(
