@@ -99,8 +99,22 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Flash Banner - First 100 Users */}
+      <motion.div
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="fixed top-0 w-full z-[60] bg-gradient-to-r from-orange-500 via-red-500 to-orange-500 animate-pulse"
+      >
+        <div className="max-w-7xl mx-auto px-4 py-2">
+          <p className="text-center text-white font-bold text-sm sm:text-base">
+            🎉 <span className="animate-bounce inline-block">FREE</span> for First 100 Users - 1 Month Limited Access! Join Now! 🚀
+          </p>
+        </div>
+      </motion.div>
+
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      <nav className={`fixed top-10 w-full z-50 transition-all duration-300 ${
         scrolled ? 'bg-white/95 backdrop-blur-lg shadow-sm' : 'bg-white'
       } border-b border-neutral-100`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -228,7 +242,7 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section - Replymer Style */}
-      <section className="pt-32 sm:pt-40 lg:pt-48 pb-20 sm:pb-28 lg:pb-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
+      <section className="pt-36 sm:pt-44 lg:pt-52 pb-20 sm:pb-28 lg:pb-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             {/* Left: Text Content */}
