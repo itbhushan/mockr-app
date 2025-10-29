@@ -216,11 +216,43 @@ export default function HomePage() {
               </a>
               <div className="pt-3 border-t border-neutral-100 space-y-2">
                 {isSignedIn ? (
-                  <Link href="/generate">
-                    <button className="w-full px-5 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm font-semibold">
-                      Create Comic
-                    </button>
-                  </Link>
+                  <>
+                    {/* User Info Display */}
+                    <div className="flex items-center justify-between px-3 py-2 bg-neutral-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-neutral-800 to-neutral-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                          {user?.firstName?.charAt(0) || user?.emailAddresses[0]?.emailAddress?.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-neutral-900">
+                            {user?.firstName || user?.emailAddresses[0]?.emailAddress?.split('@')[0]}
+                          </span>
+                          <span className="text-xs text-neutral-500">
+                            {user?.emailAddresses[0]?.emailAddress}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Link href="/generate">
+                      <button className="w-full px-5 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm font-semibold">
+                        Create Comic
+                      </button>
+                    </Link>
+
+                    {/* UserButton for account management and logout */}
+                    <div className="flex justify-center pt-2">
+                      <UserButton
+                        appearance={{
+                          elements: {
+                            avatarBox: "w-10 h-10",
+                            userButtonPopoverCard: "shadow-lg"
+                          }
+                        }}
+                        afterSignOutUrl="/"
+                      />
+                    </div>
+                  </>
                 ) : (
                   <>
                     <SignInButton mode="modal">
