@@ -103,7 +103,27 @@ import './globals.css'
 
     // Only use ClerkProvider when we have proper keys
     if (hasClerkKey) {
-      return <ClerkProvider>{content}</ClerkProvider>
+      return (
+        <ClerkProvider
+          appearance={{
+            elements: {
+              // Hide "Secured by Clerk" branding footer
+              footer: "hidden",
+              footerAction: "hidden",
+              // Customize modal to look more branded to Mockr
+              modalBackdrop: "bg-black/50 backdrop-blur-sm",
+              card: "shadow-2xl",
+              headerTitle: "text-neutral-900 font-bold",
+              headerSubtitle: "text-neutral-600",
+              socialButtonsBlockButton: "border-neutral-200 hover:bg-neutral-50",
+              formButtonPrimary: "bg-gradient-to-r from-neutral-800 to-neutral-700 hover:from-neutral-900 hover:to-neutral-800",
+              footerActionLink: "text-neutral-700 hover:text-neutral-900"
+            }
+          }}
+        >
+          {content}
+        </ClerkProvider>
+      )
     }
 
     return content
