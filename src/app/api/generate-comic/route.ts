@@ -663,21 +663,21 @@ function optimizePromptForFLUX(description: string): string {
   // 9. LINE QUALITY - Clean confident single lines
   optimizedPrompt += `LINE WORK: Draw with CLEAN, SIMPLE black ink lines. Single confident strokes for outlines. NO sketchy overlapping lines, NO rough pencil texture. Clean simple line art like newspaper editorial cartoons. `
 
-  // 10. BORDER FRAME - Thick black border around panel
-  optimizedPrompt += `BORDER: Surround the entire panel with a THICK BLACK BORDER (15-20px wide solid black rectangle frame on all four sides). This thick frame is essential to the style. `
+  // 10. NO BORDER - Clean frameless design
+  optimizedPrompt += `BORDER: DO NOT add any border, frame, or rectangle around the image. NO thick black borders, NO panel frames, NO box outlines. The cartoon should be frameless with clean edges. `
 
-  // 10. TECHNICAL SPECS - Black and white with light gray shading
-  optimizedPrompt += `TECHNICAL: Black ink lines on white background. Light soft gray wash for shading (NOT heavy hatching). Simple round cartoon faces. Minimal background. Thick black border frame. NO text anywhere. Clean simple style. `
+  // 11. TECHNICAL SPECS - Black and white with light gray shading
+  optimizedPrompt += `TECHNICAL: Black ink lines on white background. Light soft gray wash for shading (NOT heavy hatching). Simple round cartoon faces. Minimal background. NO borders or frames. NO text anywhere. Clean simple frameless style. `
 
-  // 11. FINAL EMPHASIS
-  optimizedPrompt += `STYLE MATCH: The drawing style must look exactly like simple editorial cartoons with: VERY SIMPLE round-faced characters, LIGHT GRAY WASH shading (not heavy crosshatch), MINIMAL background furniture, THICK BLACK BORDER, lots of white empty space, clean confident line work. Match this visual style precisely.`
+  // 12. FINAL EMPHASIS
+  optimizedPrompt += `STYLE MATCH: The drawing style must look exactly like simple editorial cartoons with: VERY SIMPLE round-faced characters, LIGHT GRAY WASH shading (not heavy crosshatch), MINIMAL background furniture, NO BORDERS OR FRAMES, lots of white empty space, clean confident line work, frameless design. Match this visual style precisely.`
 
   console.log('🔧 MOCKR-STYLE PROMPT CREATED')
   console.log('📝 Final prompt length:', optimizedPrompt.length)
   console.log('✅ Simple round-faced characters')
   console.log('✅ Light gray wash shading (no heavy hatching)')
   console.log('✅ Full canvas usage')
-  console.log('✅ Thick black border frame')
+  console.log('✅ No borders or frames - frameless design')
   console.log('✅ Minimal background with max white space')
   console.log('🎯 MOCKR-OPTIMIZED PROMPT:')
   console.log('=====================================')
