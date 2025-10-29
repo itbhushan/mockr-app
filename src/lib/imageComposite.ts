@@ -53,21 +53,22 @@ export async function addCommonManToComic(
   description: string = ''
 ): Promise<string> {
   try {
-    console.log('[Composite] Starting Common Man overlay process...')
+    console.log('[Composite] Starting signature overlay process (Common Man disabled)...')
 
+    // COMMON MAN OVERLAY DISABLED - User feedback: not adding value to every comic
     // Smart expression selection based on comic description
-    const selectedExpression = selectExpressionByContext(description)
-    console.log('[Composite] Selected expression:', selectedExpression, '(based on context)')
+    // const selectedExpression = selectExpressionByContext(description)
+    // console.log('[Composite] Selected expression:', selectedExpression, '(based on context)')
 
     // Path to Common Man with integrated window image
-    const commonManPath = path.join(process.cwd(), 'public', 'common-man-poses', `common-man-window-${selectedExpression}.png`)
+    // const commonManPath = path.join(process.cwd(), 'public', 'common-man-poses', `common-man-window-${selectedExpression}.png`)
 
     // Verify file exists
-    if (!fs.existsSync(commonManPath)) {
-      console.error('[Composite] Common Man image not found at:', commonManPath)
-      console.log('[Composite] Returning original comic without overlay')
-      return baseComicBase64
-    }
+    // if (!fs.existsSync(commonManPath)) {
+    //   console.error('[Composite] Common Man image not found at:', commonManPath)
+    //   console.log('[Composite] Returning original comic without overlay')
+    //   return baseComicBase64
+    // }
 
     // Convert base64 to buffer
     const base64Data = baseComicBase64.includes(',')
@@ -77,7 +78,7 @@ export async function addCommonManToComic(
 
     // Load images
     const baseImage = sharp(baseBuffer)
-    const commonManBuffer = fs.readFileSync(commonManPath)
+    // const commonManBuffer = fs.readFileSync(commonManPath)
 
     // Get dimensions of base image
     const baseMetadata = await baseImage.metadata()
@@ -86,61 +87,65 @@ export async function addCommonManToComic(
 
     console.log('[Composite] Base comic dimensions:', `${baseWidth}x${baseHeight}`)
 
+    // COMMON MAN OVERLAY DISABLED
     // Resize Common Man to 28% of base height (smaller, less intrusive)
-    const commonManHeight = Math.floor(baseHeight * 0.28)
+    // const commonManHeight = Math.floor(baseHeight * 0.28)
 
     // Resize Common Man image - keep original background as-is from PNG files
-    const resizedCommonMan = await sharp(commonManBuffer)
-      .resize({
-        height: commonManHeight,
-        fit: 'contain',
-        background: { r: 255, g: 255, b: 255, alpha: 0 } // Transparent background for resize
-      })
-      .toBuffer()
+    // const resizedCommonMan = await sharp(commonManBuffer)
+    //   .resize({
+    //     height: commonManHeight,
+    //     fit: 'contain',
+    //     background: { r: 255, g: 255, b: 255, alpha: 0 } // Transparent background for resize
+    //   })
+    //   .toBuffer()
 
     // Get resized Common Man dimensions
-    const commonManMetadata = await sharp(resizedCommonMan).metadata()
-    const commonManWidth = commonManMetadata.width || 0
+    // const commonManMetadata = await sharp(resizedCommonMan).metadata()
+    // const commonManWidth = commonManMetadata.width || 0
 
-    console.log('[Composite] Common Man dimensions:', `${commonManWidth}x${commonManHeight}`)
+    // console.log('[Composite] Common Man dimensions:', `${commonManWidth}x${commonManHeight}`)
 
     // Position based on expression:
     // - Neutral: TOP-LEFT corner
     // - Worried & Surprised: TOP-RIGHT corner
-    let left: number
-    let top: number
-    let position: string
+    // let left: number
+    // let top: number
+    // let position: string
 
-    if (selectedExpression === 'neutral') {
-      // TOP-LEFT corner for neutral expression
-      left = 40 // 40px from left edge
-      top = 35 // 35px from top
-      position = 'TOP-LEFT'
-    } else {
-      // TOP-RIGHT corner for worried and surprised expressions
-      left = baseWidth - commonManWidth - 40 // 40px from right edge
-      top = 35 // 35px from top
-      position = 'TOP-RIGHT'
-    }
+    // if (selectedExpression === 'neutral') {
+    //   // TOP-LEFT corner for neutral expression
+    //   left = 40 // 40px from left edge
+    //   top = 35 // 35px from top
+    //   position = 'TOP-LEFT'
+    // } else {
+    //   // TOP-RIGHT corner for worried and surprised expressions
+    //   left = baseWidth - commonManWidth - 40 // 40px from right edge
+    //   top = 35 // 35px from top
+    //   position = 'TOP-RIGHT'
+    // }
 
-    console.log(`[Composite] Positioning Common Man window at ${position} (${selectedExpression} expression)`)
-    console.log('[Composite] Final position:', `left=${left}, top=${top}`)
+    // console.log(`[Composite] Positioning Common Man window at ${position} (${selectedExpression} expression)`)
+    // console.log('[Composite] Final position:', `left=${left}, top=${top}`)
 
-    console.log('[Composite] Applying Common Man window overlay...')
+    // console.log('[Composite] Applying Common Man window overlay...')
 
     // Composite Common Man window onto the base comic as foreground overlay
-    const comicWithCommonMan = await baseImage
-      .composite([
-        {
-          input: resizedCommonMan,
-          left,
-          top,
-          blend: 'over'
-        }
-      ])
-      .toBuffer()
+    // const comicWithCommonMan = await baseImage
+    //   .composite([
+    //     {
+    //       input: resizedCommonMan,
+    //       left,
+    //       top,
+    //       blend: 'over'
+    //     }
+    //   ])
+    //   .toBuffer()
 
-    console.log('[Composite] Common Man overlay complete')
+    // console.log('[Composite] Common Man overlay complete')
+
+    // Skip Common Man overlay - use base image directly
+    const comicWithCommonMan = baseBuffer
 
     // Load and process mockr.art signature (two-color version)
     const signaturePath = path.join(process.cwd(), 'public', 'brand', 'mockr-art-signature-color.png')

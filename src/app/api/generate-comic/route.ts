@@ -479,14 +479,14 @@ async function generateComicWithReplicate(prompt: string): Promise<string | null
       const baseComicDataUrl = `data:image/jpeg;base64,${base64}`
 
       console.log('✅ [Replicate] Base comic generated successfully with FLUX.1-schnell')
-      console.log('🎨 Now adding Common Man overlay with smart positioning...')
+      console.log('🎨 Now adding mockr.art signature watermark...')
 
-      // Apply Common Man composite overlay with context-aware expression and position
-      const finalComicWithCommonMan = await addCommonManToComic(baseComicDataUrl, prompt)
+      // Apply mockr.art signature watermark (without Common Man overlay)
+      const finalComicWithSignature = await addCommonManToComic(baseComicDataUrl, prompt)
 
-      console.log('✅ [Replicate] Final composite comic created successfully')
+      console.log('✅ [Replicate] Final comic with signature created successfully')
 
-      return finalComicWithCommonMan
+      return finalComicWithSignature
 
     } catch (error: any) {
       lastError = error.message
@@ -596,14 +596,14 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
     const baseComicDataUrl = `data:image/jpeg;base64,${base64}`
 
     console.log('✅ [HF] Base comic generated successfully with FLUX.1-schnell')
-    console.log('🎨 Now adding Common Man overlay with smart positioning...')
+    console.log('🎨 Now adding mockr.art signature watermark...')
 
-    // Apply Common Man composite overlay with context-aware expression and position
-    const finalComicWithCommonMan = await addCommonManToComic(baseComicDataUrl, prompt)
+    // Apply mockr.art signature watermark (without Common Man overlay)
+    const finalComicWithSignature = await addCommonManToComic(baseComicDataUrl, prompt)
 
-      console.log('✅ [HF] Final composite comic created successfully')
+      console.log('✅ [HF] Final comic with signature created successfully')
 
-      return finalComicWithCommonMan
+      return finalComicWithSignature
 
     } catch (error: any) {
       lastError = error.message
@@ -645,20 +645,17 @@ function optimizePromptForFLUX(description: string): string {
   // 2. MAIN SCENE
   optimizedPrompt += `SCENE: ${description}. `
 
-  // 3. CRITICAL LAYOUT - Top space for Common Man window, main scene in lower area
-  optimizedPrompt += `LAYOUT: Keep ENTIRE TOP 40% of image EMPTY (plain white background) for character overlay. Position ALL scene elements (characters, furniture, objects) in the BOTTOM 60% only. NO elements should extend into top 40%. `
+  // 3. LAYOUT - Use full canvas
+  optimizedPrompt += `LAYOUT: Use the FULL canvas for the comic scene. Characters and scene elements can use the entire image area. No restrictions on positioning. `
 
   // 4. CHARACTER DESIGN - Extremely simple like the reference images
-  optimizedPrompt += `CHARACTERS: Draw 2-3 simple cartoon characters with VERY SIMPLE round faces (just dots for eyes, tiny curve for nose, small line for mouth). Simple clothing with minimal detail. All characters SHORT and compact, fitting in bottom 60% area. Simple round heads, basic body shapes. `
+  optimizedPrompt += `CHARACTERS: Draw 2-3 simple cartoon characters with VERY SIMPLE round faces (just dots for eyes, tiny curve for nose, small line for mouth). Simple clothing with minimal detail. Simple round heads, basic body shapes. `
 
   // 5. SHADING STYLE - Light gray wash, NOT heavy crosshatching
   optimizedPrompt += `SHADING: Use LIGHT GRAY WASH shading for depth and volume - NOT heavy crosshatching or dense hatching. Apply subtle gray tones on clothing folds, under furniture, floor shadows. Keep it soft and minimal like watercolor wash. NO dense diagonal line hatching. Simple soft gray shading only. `
 
   // 6. SIMPLE BACKGROUND - Minimal furniture and maximum white space
-  optimizedPrompt += `BACKGROUND: EXTREMELY MINIMAL - mostly white empty space. If needed, draw simple basic furniture in bottom 60% only: plain rectangular desk/table (simple lines), basic chair outlines (minimal detail). Absolutely NO windows, NO picture frames on walls, NO wall decorations, NO portraits. Plain empty white walls everywhere, especially entire top 40%. Floor shown with 1-2 simple perspective lines if needed. Maximum white space and emptiness. `
-
-  // 7. TOP AREA PROHIBITION - Must be completely clear
-  optimizedPrompt += `TOP AREA CRITICAL: The entire TOP 40% of image must be COMPLETELY EMPTY with pure white background. NO character heads, NO arms, NO objects, NO furniture, NO windows, NO frames extending into this area. Draw all characters SEATED or SHORT so they stay in bottom 60% only. `
+  optimizedPrompt += `BACKGROUND: EXTREMELY MINIMAL - mostly white empty space. If needed, draw simple basic furniture: plain rectangular desk/table (simple lines), basic chair outlines (minimal detail). Absolutely NO windows, NO picture frames on walls, NO wall decorations, NO portraits. Plain empty white walls. Floor shown with 1-2 simple perspective lines if needed. Maximum white space and emptiness. `
 
   // 8. NO TEXT - Mockr signature added separately
   optimizedPrompt += `TEXT: DO NOT add ANY text, words, signatures, watermarks, labels, or writing ANYWHERE in the image. NO artist signatures, NO "Mockr" text, NO speech bubbles with words, NO labels. Keep image 100% text-free. All branding added separately. `
@@ -669,17 +666,17 @@ function optimizePromptForFLUX(description: string): string {
   // 10. BORDER FRAME - Thick black border around panel
   optimizedPrompt += `BORDER: Surround the entire panel with a THICK BLACK BORDER (15-20px wide solid black rectangle frame on all four sides). This thick frame is essential to the style. `
 
-  // 11. TECHNICAL SPECS - Black and white with light gray shading
-  optimizedPrompt += `TECHNICAL: Black ink lines on white background. Light soft gray wash for shading (NOT heavy hatching). Simple round cartoon faces. Minimal background. Thick black border frame. Characters in bottom 60% only. Top 40% empty white space. NO text anywhere. Clean simple style. `
+  // 10. TECHNICAL SPECS - Black and white with light gray shading
+  optimizedPrompt += `TECHNICAL: Black ink lines on white background. Light soft gray wash for shading (NOT heavy hatching). Simple round cartoon faces. Minimal background. Thick black border frame. NO text anywhere. Clean simple style. `
 
-  // 12. FINAL EMPHASIS
-  optimizedPrompt += `STYLE MATCH: The drawing style must look exactly like simple editorial cartoons with: VERY SIMPLE round-faced characters, LIGHT GRAY WASH shading (not heavy crosshatch), MINIMAL background furniture, THICK BLACK BORDER, lots of white empty space especially in top 40%, characters seated/positioned LOW in bottom 60%, clean confident line work. Match this visual style precisely.`
+  // 11. FINAL EMPHASIS
+  optimizedPrompt += `STYLE MATCH: The drawing style must look exactly like simple editorial cartoons with: VERY SIMPLE round-faced characters, LIGHT GRAY WASH shading (not heavy crosshatch), MINIMAL background furniture, THICK BLACK BORDER, lots of white empty space, clean confident line work. Match this visual style precisely.`
 
   console.log('🔧 MOCKR-STYLE PROMPT CREATED')
   console.log('📝 Final prompt length:', optimizedPrompt.length)
   console.log('✅ Simple round-faced characters')
   console.log('✅ Light gray wash shading (no heavy hatching)')
-  console.log('✅ Top 40% empty for Common Man overlay')
+  console.log('✅ Full canvas usage')
   console.log('✅ Thick black border frame')
   console.log('✅ Minimal background with max white space')
   console.log('🎯 MOCKR-OPTIMIZED PROMPT:')
