@@ -7,17 +7,24 @@ export async function generateSatiricalQuote(situation: string): Promise<string>
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' })
 
-    const prompt = `You are a master political cartoonist creating editorial cartoons. Create a SHARP, WITTY caption for your editorial cartoon about this political situation:
+    // Add timestamp and random seed for variability
+    const timestamp = Date.now()
+    const randomSeed = Math.floor(Math.random() * 1000)
+
+    const prompt = `You are a master political cartoonist creating editorial cartoons. Create a SHARP, WITTY, UNIQUE caption for your editorial cartoon about this political situation:
 
 SITUATION: ${situation}
 
+[Generation ID: ${timestamp}-${randomSeed}] - Generate a DIFFERENT caption each time, vary your approach and angle.
+
 REQUIREMENTS for editorial cartoon caption:
 - Single satirical sentence (classic newspaper cartoon caption style)
-- Should expose the SPECIFIC irony/absurdity in this exact situation
+- Should expose the SPECIFIC irony/absurdity in this exact situation from a UNIQUE ANGLE
 - Dry, observational wit with biting social commentary
 - Length: 60-120 characters max (newspaper caption length)
 - No quotes needed - this is a caption, not dialogue
 - Reference specific details from the situation
+- IMPORTANT: Use creative wordplay, varied perspectives, different satirical approaches each time
 
 CLASSIC EDITORIAL CARTOON CAPTION EXAMPLES:
 
