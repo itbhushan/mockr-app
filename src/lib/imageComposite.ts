@@ -142,11 +142,11 @@ export async function addCommonManToComic(
 
     console.log('[Composite] Common Man overlay complete')
 
-    // Load and process mockr.art signature
-    const signaturePath = path.join(process.cwd(), 'public', 'brand', 'mockr-art-signature.png')
+    // Load and process mockr.art signature (two-color version)
+    const signaturePath = path.join(process.cwd(), 'public', 'brand', 'mockr-art-signature-color.png')
 
     if (!fs.existsSync(signaturePath)) {
-      console.warn('[Composite] mockr.art signature not found at:', signaturePath)
+      console.warn('[Composite] Two-color mockr.art signature not found at:', signaturePath)
       // Return comic with Common Man only
       const resultBase64 = `data:image/jpeg;base64,${comicWithCommonMan.toString('base64')}`
       return resultBase64
@@ -157,7 +157,7 @@ export async function addCommonManToComic(
     // Resize signature to 18% of base width for better visibility and fill space
     const signatureWidth = Math.floor(baseWidth * 0.18)
 
-    // Process signature: remove white/light background and resize
+    // Process two-color signature: keep colors intact, only remove white background
     const resizedSignature = await sharp(signatureBuffer)
       .resize({
         width: signatureWidth,
@@ -168,19 +168,19 @@ export async function addCommonManToComic(
       .raw()
       .toBuffer({ resolveWithObject: true })
       .then(({ data, info }) => {
-        // Remove white/near-white backgrounds from signature
+        // Remove ONLY white/near-white backgrounds, preserve orange and green colors
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i]
           const g = data[i + 1]
           const b = data[i + 2]
 
-          // Conservative background removal - only pure whites
-          if (r > 240 && g > 240 && b > 240) {
+          // More aggressive background removal - only pure whites and very light grays
+          if (r > 245 && g > 245 && b > 245) {
             data[i + 3] = 0 // Make transparent
           }
-          // Fade light grays
-          else if (r > 220 && g > 220 && b > 220) {
-            data[i + 3] = Math.floor(data[i + 3] * 0.5)
+          // Fade very light grays (preserve colors)
+          else if (r > 235 && g > 235 && b > 235) {
+            data[i + 3] = Math.floor(data[i + 3] * 0.3)
           }
         }
 
@@ -197,16 +197,16 @@ export async function addCommonManToComic(
     const signatureMetadata = await sharp(resizedSignature).metadata()
     const signatureHeight = signatureMetadata.height || 0
 
-    console.log('[Composite] mockr.art signature dimensions:', `${signatureWidth}x${signatureHeight}`)
+    console.log('[Composite] Two-color mockr.art signature (orange+green) dimensions:', `${signatureWidth}x${signatureHeight}`)
 
     // Position signature overlaying bottom-right corner of comic (no white space extension)
     const signatureLeft = baseWidth - signatureWidth - 15 // 15px from right edge
     const signatureTop = baseHeight - signatureHeight - 15 // 15px from bottom edge
 
-    console.log('[Composite] Signature position: OVERLAYING BOTTOM-RIGHT CORNER', `left=${signatureLeft}, top=${signatureTop}`)
+    console.log('[Composite] Two-color signature position: OVERLAYING BOTTOM-RIGHT CORNER', `left=${signatureLeft}, top=${signatureTop}`)
     console.log('[Composite] Final image dimensions:', `${baseWidth}x${baseHeight}`)
 
-    // Composite signature directly onto comic (overlaying bottom-right corner)
+    // Composite two-color signature directly onto comic (overlaying bottom-right corner)
     const compositeImage = await sharp(comicWithCommonMan)
       .composite([
         {
@@ -219,7 +219,7 @@ export async function addCommonManToComic(
       .jpeg({ quality: 95 })
       .toBuffer()
 
-    console.log('[Composite] mockr.art signature overlaid on bottom-right corner successfully')
+    console.log('[Composite] Two-color mockr.art signature (orange+green) overlaid successfully')
 
     // Convert back to base64 data URL
     const resultBase64 = `data:image/jpeg;base64,${compositeImage.toString('base64')}`
