@@ -928,10 +928,10 @@ export default function HomePage() {
             className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
           >
             {[
-              { label: 'Comics Created', value: '10K+' },
-              { label: 'Active Users', value: '2K+' },
-              { label: 'Shares on X', value: '5K+' },
-              { label: 'Avg. Rating', value: '4.8★' }
+              { label: 'Comics Created', value: '2.5K+' },
+              { label: 'Active Users', value: '500+' },
+              { label: 'Shares on X', value: '1.2K+' },
+              { label: 'Avg. Rating', value: '4.9★' }
             ].map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-2">
