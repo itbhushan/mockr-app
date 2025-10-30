@@ -6,9 +6,9 @@ export default function Footer() {
   return (
     <footer className="bg-neutral-900 text-neutral-300 pt-12 sm:pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12">
           {/* Brand Column */}
-          <div className="col-span-2">
+          <div>
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-10 h-10 bg-gradient-to-br from-neutral-700 to-neutral-600 rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold text-xl">M</span>
@@ -18,32 +18,31 @@ export default function Footer() {
             <p className="text-neutral-400 mb-6 max-w-sm text-sm sm:text-base">
               Create viral-worthy political cartoons in seconds with AI. No design skills required.
             </p>
-
-            {/* Product Hunt Badge */}
-            <div className="mb-6">
-              <h3 className="text-white font-semibold mb-3 text-sm sm:text-base">Launching on Product Hunt</h3>
-              <a
-                href="https://www.producthunt.com/products/mockr?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-mockr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block hover:opacity-90 transition-opacity"
-              >
-                <img
-                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1031919&theme=light&t=1761834471331"
-                  alt="Mockr - Turn political news into viral cartoons in 60 seconds | Product Hunt"
-                  style={{ width: '250px', height: '54px' }}
-                  width="250"
-                  height="54"
-                />
-              </a>
-            </div>
-
             {/* Social Links */}
             <div className="flex space-x-4">
               <a href="https://x.com/Mockr169417" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
                 𝕏
               </a>
             </div>
+          </div>
+
+          {/* Product Hunt Column */}
+          <div>
+            <h3 className="text-white font-semibold mb-4 text-sm sm:text-base">Launching on Product Hunt</h3>
+            <a
+              href="https://www.producthunt.com/products/mockr?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-mockr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block hover:opacity-90 transition-opacity"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1031919&theme=light&t=1761834471331"
+                alt="Mockr - Turn political news into viral cartoons in 60 seconds | Product Hunt"
+                style={{ width: '250px', height: '54px' }}
+                width="250"
+                height="54"
+              />
+            </a>
           </div>
 
           {/* Product Column */}
