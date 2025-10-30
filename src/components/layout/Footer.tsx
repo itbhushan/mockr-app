@@ -4,9 +4,9 @@ import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer className="bg-neutral-900 text-neutral-300 pt-10 sm:pt-12 pb-6">
+    <footer className="bg-neutral-900 text-neutral-300 pt-8 sm:pt-10 pb-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
           {/* Brand Column */}
           <div>
             <div className="flex items-center space-x-3 mb-4">

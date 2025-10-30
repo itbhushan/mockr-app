@@ -345,9 +345,9 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section - Replymer Style */}
-      <section className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
+      <section className="pt-20 sm:pt-24 lg:pt-28 pb-10 sm:pb-12 lg:pb-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 items-center">
             {/* Left: Text Content */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -362,7 +362,7 @@ export default function HomePage() {
               </div>
 
               {/* Headline - Larger and Bolder */}
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-neutral-900 mb-6 leading-tight">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-neutral-900 mb-4 leading-tight">
                 Turn Political News Into{' '}
                 <span className="bg-gradient-to-r from-neutral-800 to-neutral-600 bg-clip-text text-transparent">
                   Viral Cartoons
@@ -509,20 +509,20 @@ export default function HomePage() {
       </section>
 
       {/* How It Works - Enhanced 4 Steps */}
-      <section id="how-it-works" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-neutral-50">
+      <section id="how-it-works" className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-neutral-50">
         <div className="max-w-7xl mx-auto">
           {/* Section Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-8"
           >
             <div className="inline-flex items-center space-x-2 bg-neutral-800 text-white px-4 py-2 rounded-full text-sm font-semibold mb-6">
               <Sparkles className="w-4 h-4" />
               <span>Simple Process</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-6">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-4">
               From Idea to Viral in{' '}
               <span className="block bg-gradient-to-r from-neutral-800 to-neutral-600 bg-clip-text text-transparent mt-2">
                 4 Easy Steps
@@ -599,7 +599,7 @@ export default function HomePage() {
       </section>
 
       {/* Examples Gallery - Featured Showcase */}
-      <section id="examples" className="py-10 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-neutral-50">
+      <section id="examples" className="py-8 sm:py-10 lg:py-12 px-4 sm:px-6 lg:px-8 bg-neutral-50">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -706,15 +706,15 @@ export default function HomePage() {
       </section>
 
       {/* Who It's For Section */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-10"
+            className="text-center mb-8"
           >
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-6">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-4">
               Perfect For
             </h2>
             <p className="text-xl sm:text-2xl text-neutral-600 max-w-3xl mx-auto">
@@ -770,13 +770,13 @@ export default function HomePage() {
       </section>
 
       {/* Why Mockr Section - Horizontal Compact */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
+      <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-10"
+            className="text-center mb-8"
           >
             <h2 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 mb-3">
               Why Choose Mockr?
@@ -815,15 +815,15 @@ export default function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section id="faq" className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-10"
+            className="text-center mb-8"
           >
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-6">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-4">
               Frequently Asked Questions
             </h2>
             <p className="text-xl text-neutral-600">
@@ -874,7 +874,7 @@ export default function HomePage() {
       </section>
 
       {/* Product Hunt Launch Section */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-neutral-50">
+      <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-neutral-50">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -886,7 +886,7 @@ export default function HomePage() {
               <Megaphone className="w-4 h-4" />
               <span>Launching on Product Hunt</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-6">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-4">
               Launching on Product Hunt{' '}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 November 3rd
@@ -925,7 +925,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
-            className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+            className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
           >
             {[
               { label: 'Comics Created', value: '2.5K+' },
@@ -947,7 +947,7 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-neutral-900 to-neutral-800 relative overflow-hidden">
+      <section className="py-10 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-neutral-900 to-neutral-800 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-neutral-700 rounded-full blur-3xl opacity-20" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-neutral-600 rounded-full blur-3xl opacity-20" />
@@ -989,9 +989,9 @@ export default function HomePage() {
       </section>
 
       {/* Footer - Enhanced */}
-      <footer className="bg-neutral-900 text-neutral-300 pt-12 pb-6">
+      <footer className="bg-neutral-900 text-neutral-300 pt-10 pb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
             {/* Brand Column */}
             <div>
               <div className="flex items-center space-x-3 mb-4">
