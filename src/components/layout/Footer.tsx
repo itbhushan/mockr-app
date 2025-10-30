@@ -47,6 +47,28 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Product Hunt Badge Section */}
+        <div className="mt-8 pt-8 border-t border-neutral-800 flex flex-col sm:flex-row justify-between items-center gap-6">
+          <div className="flex-1">
+            <h3 className="text-white font-semibold mb-3 text-sm sm:text-base text-center sm:text-left">Launching on Product Hunt</h3>
+            <a
+              href="https://www.producthunt.com/products/mockr?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-mockr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block hover:opacity-90 transition-opacity"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1031919&theme=dark&t=1761834471331"
+                alt="Mockr - Turn political news into viral cartoons in 60 seconds | Product Hunt"
+                style={{ width: '250px', height: '54px' }}
+                width="250"
+                height="54"
+                className="mx-auto sm:mx-0"
+              />
+            </a>
+          </div>
+        </div>
+
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-neutral-800 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm text-neutral-500">
           <p>© 2025 Mockr. All rights reserved.</p>

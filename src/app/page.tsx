@@ -14,6 +14,7 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
   const [selectedExample, setSelectedExample] = useState<number | null>(null)
+  const [showPHBanner, setShowPHBanner] = useState(true)
 
   const sampleComics = [
     '/samples/sample-1.jpg',
@@ -45,6 +46,33 @@ export default function HomePage() {
     }, 4000)
     return () => clearInterval(interval)
   }, [sampleComics.length])
+
+  // Product Hunt banner - show for launch week
+  useEffect(() => {
+    // Launch date: November 3, 2025
+    const launchDate = new Date('2025-11-03T00:00:00')
+    const today = new Date()
+
+    // Calculate days since launch
+    const daysSinceLaunch = Math.floor((today.getTime() - launchDate.getTime()) / (1000 * 60 * 60 * 24))
+
+    // Show banner from launch day through 7 days after
+    const shouldShowBanner = daysSinceLaunch >= 0 && daysSinceLaunch <= 7
+
+    // Check if user dismissed banner
+    const dismissed = localStorage.getItem('ph-banner-dismissed')
+
+    if (shouldShowBanner && dismissed !== 'true') {
+      setShowPHBanner(true)
+    } else {
+      setShowPHBanner(false)
+    }
+  }, [])
+
+  const handleDismissPHBanner = () => {
+    setShowPHBanner(false)
+    localStorage.setItem('ph-banner-dismissed', 'true')
+  }
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % sampleComics.length)
@@ -113,8 +141,51 @@ export default function HomePage() {
         </div>
       </motion.div>
 
+      {/* Product Hunt Launch Banner */}
+      <AnimatePresence>
+        {showPHBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+            className="fixed top-10 w-full z-[59] bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 shadow-lg"
+          >
+            <div className="max-w-7xl mx-auto px-4 py-3">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 relative">
+                <span className="text-white font-semibold text-sm sm:text-base text-center sm:text-left">
+                  🚀 Launching on Product Hunt November 3rd! Get notified
+                </span>
+                <a
+                  href={process.env.NEXT_PUBLIC_PRODUCT_HUNT_URL || 'https://www.producthunt.com/products/mockr?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-mockr'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:opacity-90 transition-opacity flex-shrink-0"
+                >
+                  <img
+                    src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1031919&theme=dark&t=1761834471331"
+                    alt="Mockr - Turn political news into viral cartoons in 60 seconds | Product Hunt"
+                    style={{ width: '200px', height: '43px' }}
+                    width="200"
+                    height="43"
+                    className="w-[180px] sm:w-[200px] h-auto"
+                  />
+                </a>
+                <button
+                  onClick={handleDismissPHBanner}
+                  className="absolute top-1 right-2 text-white/80 hover:text-white transition-colors p-1"
+                  aria-label="Dismiss banner"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Navigation */}
-      <nav className={`fixed top-10 w-full z-50 transition-all duration-300 ${
+      <nav className={`fixed ${showPHBanner ? 'top-[88px]' : 'top-10'} w-full z-50 transition-all duration-300 ${
         scrolled ? 'bg-white/95 backdrop-blur-lg shadow-sm' : 'bg-white'
       } border-b border-neutral-100`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -802,6 +873,79 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Product Hunt Launch Section */}
+      <section className="py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-neutral-50">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+              <Megaphone className="w-4 h-4" />
+              <span>Launching on Product Hunt</span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-6">
+              Launching on Product Hunt{' '}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                November 3rd
+              </span>
+            </h2>
+            <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
+              Get notified when we launch and be among the first to support Mockr on Product Hunt!
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="flex justify-center"
+          >
+            <div className="w-full max-w-md">
+              {/* Product Hunt Embed Card */}
+              <iframe
+                style={{ border: 'none' }}
+                src="https://cards.producthunt.com/cards/products/1121622"
+                width="500"
+                height="405"
+                frameBorder="0"
+                scrolling="no"
+                allowFullScreen
+                className="w-full rounded-xl shadow-2xl"
+              />
+            </div>
+          </motion.div>
+
+          {/* Social Proof Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+          >
+            {[
+              { label: 'Comics Created', value: '10K+' },
+              { label: 'Active Users', value: '2K+' },
+              { label: 'Shares on X', value: '5K+' },
+              { label: 'Avg. Rating', value: '4.8★' }
+            ].map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-2">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-neutral-600">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
       {/* Final CTA Section */}
       <section className="py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-neutral-900 to-neutral-800 relative overflow-hidden">
         {/* Background decoration */}
@@ -885,6 +1029,28 @@ export default function HomePage() {
                 <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
                 <li><Link href="/terms" className="hover:text-white transition-colors">Terms</Link></li>
               </ul>
+            </div>
+          </div>
+
+          {/* Product Hunt Badge Section */}
+          <div className="mt-8 pt-8 border-t border-neutral-800 flex flex-col sm:flex-row justify-between items-center gap-6">
+            <div className="flex-1 text-center sm:text-left">
+              <h3 className="text-white font-semibold mb-3 text-sm sm:text-base">Launching on Product Hunt</h3>
+              <a
+                href="https://www.producthunt.com/products/mockr?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-mockr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block hover:opacity-90 transition-opacity"
+              >
+                <img
+                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1031919&theme=dark&t=1761834471331"
+                  alt="Mockr - Turn political news into viral cartoons in 60 seconds | Product Hunt"
+                  style={{ width: '250px', height: '54px' }}
+                  width="250"
+                  height="54"
+                  className="mx-auto sm:mx-0"
+                />
+              </a>
             </div>
           </div>
 
