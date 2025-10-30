@@ -345,9 +345,9 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section - Replymer Style */}
-      <section className="pt-36 sm:pt-44 lg:pt-52 pb-20 sm:pb-28 lg:pb-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
+      <section className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 lg:pb-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left: Text Content */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -509,14 +509,14 @@ export default function HomePage() {
       </section>
 
       {/* How It Works - Enhanced 4 Steps */}
-      <section id="how-it-works" className="py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-neutral-50">
+      <section id="how-it-works" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-neutral-50">
         <div className="max-w-7xl mx-auto">
           {/* Section Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-20"
+            className="text-center mb-12"
           >
             <div className="inline-flex items-center space-x-2 bg-neutral-800 text-white px-4 py-2 rounded-full text-sm font-semibold mb-6">
               <Sparkles className="w-4 h-4" />
@@ -599,7 +599,7 @@ export default function HomePage() {
       </section>
 
       {/* Examples Gallery - Featured Showcase */}
-      <section id="examples" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-neutral-50">
+      <section id="examples" className="py-10 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-neutral-50">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -706,13 +706,13 @@ export default function HomePage() {
       </section>
 
       {/* Who It's For Section */}
-      <section className="py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-10"
           >
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-6">
               Perfect For
@@ -815,13 +815,13 @@ export default function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-white">
+      <section id="faq" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-10"
           >
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-6">
               Frequently Asked Questions
@@ -874,7 +874,7 @@ export default function HomePage() {
       </section>
 
       {/* Product Hunt Launch Section */}
-      <section className="py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-neutral-50">
+      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-neutral-50">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -925,7 +925,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
-            className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
+            className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
           >
             {[
               { label: 'Comics Created', value: '2.5K+' },
@@ -947,7 +947,7 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-20 sm:py-28 lg:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-neutral-900 to-neutral-800 relative overflow-hidden">
+      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-neutral-900 to-neutral-800 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-neutral-700 rounded-full blur-3xl opacity-20" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-neutral-600 rounded-full blur-3xl opacity-20" />
@@ -989,9 +989,9 @@ export default function HomePage() {
       </section>
 
       {/* Footer - Enhanced */}
-      <footer className="bg-neutral-900 text-neutral-300 pt-16 pb-8">
+      <footer className="bg-neutral-900 text-neutral-300 pt-12 pb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             {/* Brand Column */}
             <div>
               <div className="flex items-center space-x-3 mb-4">
