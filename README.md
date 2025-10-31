@@ -309,8 +309,8 @@ Proprietary - All rights reserved
 ## 👨‍💻 Author
 
 **Mockr Team**
-- Website: [mockr-app.netlify.app](https://mockr-app.netlify.app)
-- X (Twitter): [@Mockr169417](https://x.com/Mockr169417)
+- Website: [mockr.art](https://mockr.art)
+- X (Twitter): [@MockrArt](https://x.com/MockrArt)
 
 ---
 
