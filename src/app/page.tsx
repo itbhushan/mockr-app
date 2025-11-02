@@ -49,8 +49,8 @@ export default function HomePage() {
 
   // Product Hunt banner - show for launch week
   useEffect(() => {
-    // Launch date: November 3, 2025
-    const launchDate = new Date('2025-11-03T00:00:00')
+    // Launch date: November 4, 2025
+    const launchDate = new Date('2025-11-04T00:00:00')
     const today = new Date()
 
     // Calculate days since launch
@@ -154,7 +154,7 @@ export default function HomePage() {
             <div className="max-w-7xl mx-auto px-4 py-3">
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 relative">
                 <span className="text-white font-semibold text-sm sm:text-base text-center sm:text-left">
-                  🚀 Launching on Product Hunt November 3rd! Get notified
+                  🚀 Launching on Product Hunt November 4th! Get notified
                 </span>
                 <a
                   href={process.env.NEXT_PUBLIC_PRODUCT_HUNT_URL || 'https://www.producthunt.com/products/mockr?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-mockr'}
