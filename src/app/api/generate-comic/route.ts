@@ -624,7 +624,7 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
 }
 
 function optimizePromptForFLUX(description: string): string {
-  console.log('🔧 CREATING FLUX-OPTIMIZED MOCKR CARTOON PROMPT...')
+  console.log('🔧 CREATING R.K. LAXMAN STYLE CARTOON PROMPT...')
   console.log('📝 Original AI description:', description.substring(0, 300) + '...')
 
   // Add random variation to prevent identical outputs
@@ -639,47 +639,50 @@ function optimizePromptForFLUX(description: string): string {
 
   let optimizedPrompt = ``
 
-  // 1. STYLE FOUNDATION - Match the exact Mockr cartoon style from reference images
-  optimizedPrompt += `Create a single-panel political editorial cartoon in Mockr style with ${variation} (seed: ${randomSeed}). `
+  // 1. STYLE FOUNDATION - R.K. Laxman's iconic Indian editorial cartoon style
+  optimizedPrompt += `Create a single-panel political editorial cartoon in the classic R.K. Laxman style with ${variation} (seed: ${randomSeed}). `
 
   // 2. MAIN SCENE
   optimizedPrompt += `SCENE: ${description}. `
 
-  // 3. LAYOUT - Use full canvas
-  optimizedPrompt += `LAYOUT: Use the FULL canvas for the comic scene. Characters and scene elements can use the entire image area. No restrictions on positioning. `
+  // 3. CHARACTER DESIGN - R.K. Laxman's signature simple characters
+  optimizedPrompt += `CHARACTERS: Draw 2-4 cartoon characters in R.K. Laxman style with simple round faces, dot eyes, small curved noses, expressive mouths. Include the iconic "Common Man" character wearing checkered/plaid shirt and round spectacles. Characters have simple body proportions, clear gestures and poses showing emotions. Other characters: politicians in suits, common citizens in everyday clothes. `
 
-  // 4. CHARACTER DESIGN - Extremely simple like the reference images
-  optimizedPrompt += `CHARACTERS: Draw 2-3 simple cartoon characters with VERY SIMPLE round faces (just dots for eyes, tiny curve for nose, small line for mouth). Simple clothing with minimal detail. Simple round heads, basic body shapes. `
+  // 4. SHADING STYLE - HEAVY CROSSHATCHING (R.K. Laxman's signature technique)
+  optimizedPrompt += `SHADING: Use HEAVY DIAGONAL LINE CROSSHATCHING for all shadows and depth - this is essential to R.K. Laxman style. Draw dense parallel diagonal lines (45-degree angle) for shadows under chairs, on clothing folds, floor shadows, and depth. Add HEAVY HATCHING on striped/checkered clothing patterns. Use thick crosshatch lines for darker areas, lighter hatching for mid-tones. This heavy pen-and-ink hatching is the most important style element. `
 
-  // 5. SHADING STYLE - Light gray wash, NOT heavy crosshatching
-  optimizedPrompt += `SHADING: Use LIGHT GRAY WASH shading for depth and volume - NOT heavy crosshatching or dense hatching. Apply subtle gray tones on clothing folds, under furniture, floor shadows. Keep it soft and minimal like watercolor wash. NO dense diagonal line hatching. Simple soft gray shading only. `
+  // 5. BACKGROUND - Detailed R.K. Laxman environments
+  optimizedPrompt += `BACKGROUND: Draw detailed Indian editorial cartoon backgrounds: indoor scenes with furniture (wooden chairs with crosshatched shadows, desks, tables), outdoor scenes with trees (crosshatched foliage shadows), buildings, streets. Add perspective with floor tiles or ground lines. Include contextual details: office settings with papers on desk, outdoor scenes with simple clouds and trees, government buildings. Use crosshatching for all shadows and depth. `
 
-  // 6. SIMPLE BACKGROUND - Minimal furniture and maximum white space
-  optimizedPrompt += `BACKGROUND: EXTREMELY MINIMAL - mostly white empty space. If needed, draw simple basic furniture: plain rectangular desk/table (simple lines), basic chair outlines (minimal detail). Absolutely NO windows, NO picture frames on walls, NO wall decorations, NO portraits. Plain empty white walls. Floor shown with 1-2 simple perspective lines if needed. Maximum white space and emptiness. `
+  // 6. INK WORK - Classic pen and ink technique
+  optimizedPrompt += `LINE WORK: Clean confident black ink outlines with varied line weights. Thicker lines for main character outlines, thinner lines for details. Add heavy crosshatching with diagonal pen strokes for all shading and texture. `
 
-  // 8. NO TEXT - Mockr signature added separately
-  optimizedPrompt += `TEXT: DO NOT add ANY text, words, signatures, watermarks, labels, or writing ANYWHERE in the image. NO artist signatures, NO "Mockr" text, NO speech bubbles with words, NO labels. Keep image 100% text-free. All branding added separately. `
+  // 7. PATTERNS AND TEXTURES
+  optimizedPrompt += `PATTERNS: Draw the Common Man's iconic checkered/plaid shirt with clear grid pattern. Add striped patterns on chair upholstery (diagonal lines). Use crosshatching patterns on clothing for depth and fabric texture. `
 
-  // 9. LINE QUALITY - Clean confident single lines
-  optimizedPrompt += `LINE WORK: Draw with CLEAN, SIMPLE black ink lines. Single confident strokes for outlines. NO sketchy overlapping lines, NO rough pencil texture. Clean simple line art like newspaper editorial cartoons. `
+  // 8. COMPOSITION - Classic editorial cartoon layout
+  optimizedPrompt += `COMPOSITION: Arrange characters in natural conversational or action poses. Show clear foreground, middle ground, and background depth using crosshatching intensity. Characters should interact with environment and each other. `
 
-  // 10. NO BORDER - Clean frameless design
-  optimizedPrompt += `BORDER: DO NOT add any border, frame, or rectangle around the image. NO thick black borders, NO panel frames, NO box outlines. The cartoon should be frameless with clean edges. `
+  // 9. NO TEXT - Caption added separately
+  optimizedPrompt += `TEXT: DO NOT add ANY text, words, signatures, captions, or labels in the image. NO speech bubbles with words, NO artist signatures. Keep image 100% text-free. `
 
-  // 11. TECHNICAL SPECS - Black and white with light gray shading
-  optimizedPrompt += `TECHNICAL: Black ink lines on white background. Light soft gray wash for shading (NOT heavy hatching). Simple round cartoon faces. Minimal background. NO borders or frames. NO text anywhere. Clean simple frameless style. `
+  // 10. NO BORDER - Frameless design
+  optimizedPrompt += `BORDER: DO NOT add any border or frame around the image. Frameless clean edges. `
 
-  // 12. FINAL EMPHASIS
-  optimizedPrompt += `STYLE MATCH: The drawing style must look exactly like simple editorial cartoons with: VERY SIMPLE round-faced characters, LIGHT GRAY WASH shading (not heavy crosshatch), MINIMAL background furniture, NO BORDERS OR FRAMES, lots of white empty space, clean confident line work, frameless design. Match this visual style precisely.`
+  // 11. TECHNICAL SPECS
+  optimizedPrompt += `TECHNICAL: Black and white pen-and-ink editorial cartoon. Heavy diagonal crosshatching for all shadows and depth. Simple round-faced characters with expressive poses. Detailed backgrounds with furniture and environmental elements. Checkered shirt on Common Man character. Clean black ink outlines with varied line weights. NO borders, NO text. Classic Indian newspaper editorial cartoon style. `
 
-  console.log('🔧 MOCKR-STYLE PROMPT CREATED')
+  // 12. FINAL STYLE EMPHASIS - R.K. Laxman signature elements
+  optimizedPrompt += `STYLE MATCH: This MUST look exactly like R.K. Laxman's classic Indian editorial cartoons: (1) HEAVY diagonal line crosshatching for ALL shadows, (2) Simple round-faced characters with dot eyes, (3) Common Man in checkered shirt with round spectacles, (4) Detailed backgrounds with furniture/trees/buildings, (5) Dense pen-and-ink hatching patterns, (6) Expressive character poses and gestures, (7) No borders or frames, (8) Black and white only, (9) Classic Indian newspaper cartoon style. Match R.K. Laxman's exact visual style with emphasis on heavy crosshatching.`
+
+  console.log('🔧 R.K. LAXMAN STYLE PROMPT CREATED')
   console.log('📝 Final prompt length:', optimizedPrompt.length)
-  console.log('✅ Simple round-faced characters')
-  console.log('✅ Light gray wash shading (no heavy hatching)')
-  console.log('✅ Full canvas usage')
-  console.log('✅ No borders or frames - frameless design')
-  console.log('✅ Minimal background with max white space')
-  console.log('🎯 MOCKR-OPTIMIZED PROMPT:')
+  console.log('✅ Heavy diagonal crosshatching for shadows')
+  console.log('✅ Common Man with checkered shirt and spectacles')
+  console.log('✅ Detailed backgrounds with furniture/environments')
+  console.log('✅ Simple round-faced expressive characters')
+  console.log('✅ R.K. Laxman classic Indian editorial style')
+  console.log('🎯 R.K. LAXMAN OPTIMIZED PROMPT:')
   console.log('=====================================')
   console.log(optimizedPrompt)
   console.log('=====================================')
