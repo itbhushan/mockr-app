@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useUser, UserButton, SignInButton } from '@clerk/nextjs'
-import { Sparkles, Zap, ArrowRight, Menu, X, ChevronLeft, ChevronRight, ChevronDown, PenTool, Wand2, Share2, CheckCircle2, Megaphone, Smartphone, Newspaper, Image as ImageIcon, Clock, Shield } from 'lucide-react'
+import { Sparkles, Zap, ArrowRight, Menu, X, ChevronLeft, ChevronRight, ChevronDown, PenTool, Wand2, Share2, CheckCircle2, Megaphone, Smartphone, Newspaper, Image as ImageIcon, Clock, Shield, Mail } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function HomePage() {
@@ -1008,6 +1008,9 @@ export default function HomePage() {
                 <a href="https://x.com/MockrArt" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
                   𝕏
                 </a>
+                <a href="mailto:support@mockr.art" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors">
+                  <Mail className="w-5 h-5" />
+                </a>
               </div>
             </div>
 
@@ -1047,6 +1050,7 @@ export default function HomePage() {
                 <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
                 <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
                 <li><Link href="/terms" className="hover:text-white transition-colors">Terms</Link></li>
+                <li><a href="mailto:support@mockr.art" className="hover:text-white transition-colors">Support</a></li>
               </ul>
             </div>
           </div>
