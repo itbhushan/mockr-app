@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Mail } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -22,6 +23,9 @@ export default function Footer() {
             <div className="flex space-x-4">
               <a href="https://x.com/MockrArt" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors text-lg">
                 𝕏
+              </a>
+              <a href="mailto:support@mockr.art" className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-700 transition-colors">
+                <Mail className="w-5 h-5" />
               </a>
             </div>
           </div>
