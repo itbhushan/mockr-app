@@ -639,20 +639,20 @@ function optimizePromptForFLUX(description: string): string {
 
   let optimizedPrompt = ``
 
-  // 1. STYLE FOUNDATION - Classic Indian editorial cartoon style
-  optimizedPrompt += `Create a single-panel political editorial cartoon in classic vintage Indian newspaper editorial style with ${variation} (seed: ${randomSeed}). `
+  // 1. STYLE FOUNDATION - R.K. Laxman's iconic style (used internally in prompt for better AI understanding)
+  optimizedPrompt += `Create a single-panel political editorial cartoon in R.K. Laxman style with ${variation} (seed: ${randomSeed}). `
 
   // 2. MAIN SCENE
   optimizedPrompt += `SCENE: ${description}. `
 
-  // 3. CHARACTER DESIGN - Classic editorial cartoon characters
-  optimizedPrompt += `CHARACTERS: Draw 2-4 cartoon characters in classic editorial style with simple round faces, dot eyes, small curved noses, expressive mouths. Include the iconic "Common Man" character wearing checkered/plaid shirt and round spectacles. Characters have simple body proportions, clear gestures and poses showing emotions. Other characters: politicians in suits, common citizens in everyday clothes. `
+  // 3. CHARACTER DESIGN - R.K. Laxman's signature characters
+  optimizedPrompt += `CHARACTERS: Draw 2-4 cartoon characters in R.K. Laxman style with simple round faces, dot eyes, small curved noses, expressive mouths. Include R.K. Laxman's iconic "Common Man" character wearing checkered/plaid shirt and round spectacles. Characters have simple body proportions, clear gestures and poses showing emotions. Other characters: politicians in suits, common citizens in everyday clothes. `
 
-  // 4. SHADING STYLE - HEAVY CROSSHATCHING (vintage editorial technique)
-  optimizedPrompt += `SHADING: Use HEAVY DIAGONAL LINE CROSSHATCHING for all shadows and depth - this is essential to vintage editorial cartoon style. Draw dense parallel diagonal lines (45-degree angle) for shadows under chairs, on clothing folds, floor shadows, and depth. Add HEAVY HATCHING on striped/checkered clothing patterns. Use thick crosshatch lines for darker areas, lighter hatching for mid-tones. This heavy pen-and-ink hatching is the most important style element. `
+  // 4. SHADING STYLE - HEAVY CROSSHATCHING (R.K. Laxman's signature)
+  optimizedPrompt += `SHADING: Use HEAVY DIAGONAL LINE CROSSHATCHING for all shadows and depth - this is R.K. Laxman's signature technique. Draw dense parallel diagonal lines (45-degree angle) for shadows under chairs, on clothing folds, floor shadows, and depth. Add HEAVY HATCHING on striped/checkered clothing patterns. Use thick crosshatch lines for darker areas, lighter hatching for mid-tones. This heavy pen-and-ink hatching is the most important R.K. Laxman style element. `
 
-  // 5. BACKGROUND - Detailed editorial cartoon environments
-  optimizedPrompt += `BACKGROUND: Draw detailed Indian editorial cartoon backgrounds: indoor scenes with furniture (wooden chairs with crosshatched shadows, desks, tables), outdoor scenes with trees (crosshatched foliage shadows), buildings, streets. Add perspective with floor tiles or ground lines. Include contextual details: office settings with papers on desk, outdoor scenes with simple clouds and trees, government buildings. Use crosshatching for all shadows and depth. `
+  // 5. BACKGROUND - R.K. Laxman detailed environments
+  optimizedPrompt += `BACKGROUND: Draw detailed backgrounds in R.K. Laxman style: indoor scenes with furniture (wooden chairs with crosshatched shadows, desks, tables), outdoor scenes with trees (crosshatched foliage shadows), buildings, streets. Add perspective with floor tiles or ground lines. Include contextual details: office settings with papers on desk, outdoor scenes with simple clouds and trees, government buildings. Use heavy crosshatching for all shadows and depth. `
 
   // 6. INK WORK - Classic pen and ink technique
   optimizedPrompt += `LINE WORK: Clean confident black ink outlines with varied line weights. Thicker lines for main character outlines, thinner lines for details. Add heavy crosshatching with diagonal pen strokes for all shading and texture. `
@@ -672,8 +672,8 @@ function optimizePromptForFLUX(description: string): string {
   // 11. TECHNICAL SPECS
   optimizedPrompt += `TECHNICAL: Black and white pen-and-ink editorial cartoon. Heavy diagonal crosshatching for all shadows and depth. Simple round-faced characters with expressive poses. Detailed backgrounds with furniture and environmental elements. Checkered shirt on Common Man character. Clean black ink outlines with varied line weights. NO borders, NO text. Classic Indian newspaper editorial cartoon style. `
 
-  // 12. FINAL STYLE EMPHASIS - Vintage Indian editorial cartoon elements
-  optimizedPrompt += `STYLE MATCH: This MUST look exactly like classic vintage Indian editorial cartoons: (1) HEAVY diagonal line crosshatching for ALL shadows, (2) Simple round-faced characters with dot eyes, (3) Common Man in checkered shirt with round spectacles, (4) Detailed backgrounds with furniture/trees/buildings, (5) Dense pen-and-ink hatching patterns, (6) Expressive character poses and gestures, (7) No borders or frames, (8) Black and white only, (9) Classic Indian newspaper cartoon style. Match this exact visual style with emphasis on heavy crosshatching.`
+  // 12. FINAL STYLE EMPHASIS - R.K. Laxman's exact visual style
+  optimizedPrompt += `STYLE MATCH: This MUST look exactly like R.K. Laxman cartoons: (1) HEAVY diagonal line crosshatching for ALL shadows, (2) Simple round-faced characters with dot eyes, (3) R.K. Laxman's Common Man in checkered shirt with round spectacles, (4) Detailed backgrounds with furniture/trees/buildings, (5) Dense pen-and-ink hatching patterns, (6) Expressive character poses and gestures, (7) No borders or frames, (8) Black and white only, (9) R.K. Laxman's classic Indian newspaper editorial cartoon style. Match R.K. Laxman's exact visual style with heavy crosshatching emphasis.`
 
   console.log('🔧 CLASSIC EDITORIAL STYLE PROMPT CREATED')
   console.log('📝 Final prompt length:', optimizedPrompt.length)
