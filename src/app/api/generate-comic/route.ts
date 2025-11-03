@@ -624,7 +624,7 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
 }
 
 function optimizePromptForFLUX(description: string): string {
-  console.log('🔧 CREATING R.K. LAXMAN STYLE CARTOON PROMPT...')
+  console.log('🔧 CREATING CLASSIC EDITORIAL CARTOON PROMPT...')
   console.log('📝 Original AI description:', description.substring(0, 300) + '...')
 
   // Add random variation to prevent identical outputs
@@ -639,19 +639,19 @@ function optimizePromptForFLUX(description: string): string {
 
   let optimizedPrompt = ``
 
-  // 1. STYLE FOUNDATION - R.K. Laxman's iconic Indian editorial cartoon style
-  optimizedPrompt += `Create a single-panel political editorial cartoon in the classic R.K. Laxman style with ${variation} (seed: ${randomSeed}). `
+  // 1. STYLE FOUNDATION - Classic Indian editorial cartoon style
+  optimizedPrompt += `Create a single-panel political editorial cartoon in classic vintage Indian newspaper editorial style with ${variation} (seed: ${randomSeed}). `
 
   // 2. MAIN SCENE
   optimizedPrompt += `SCENE: ${description}. `
 
-  // 3. CHARACTER DESIGN - R.K. Laxman's signature simple characters
-  optimizedPrompt += `CHARACTERS: Draw 2-4 cartoon characters in R.K. Laxman style with simple round faces, dot eyes, small curved noses, expressive mouths. Include the iconic "Common Man" character wearing checkered/plaid shirt and round spectacles. Characters have simple body proportions, clear gestures and poses showing emotions. Other characters: politicians in suits, common citizens in everyday clothes. `
+  // 3. CHARACTER DESIGN - Classic editorial cartoon characters
+  optimizedPrompt += `CHARACTERS: Draw 2-4 cartoon characters in classic editorial style with simple round faces, dot eyes, small curved noses, expressive mouths. Include the iconic "Common Man" character wearing checkered/plaid shirt and round spectacles. Characters have simple body proportions, clear gestures and poses showing emotions. Other characters: politicians in suits, common citizens in everyday clothes. `
 
-  // 4. SHADING STYLE - HEAVY CROSSHATCHING (R.K. Laxman's signature technique)
-  optimizedPrompt += `SHADING: Use HEAVY DIAGONAL LINE CROSSHATCHING for all shadows and depth - this is essential to R.K. Laxman style. Draw dense parallel diagonal lines (45-degree angle) for shadows under chairs, on clothing folds, floor shadows, and depth. Add HEAVY HATCHING on striped/checkered clothing patterns. Use thick crosshatch lines for darker areas, lighter hatching for mid-tones. This heavy pen-and-ink hatching is the most important style element. `
+  // 4. SHADING STYLE - HEAVY CROSSHATCHING (vintage editorial technique)
+  optimizedPrompt += `SHADING: Use HEAVY DIAGONAL LINE CROSSHATCHING for all shadows and depth - this is essential to vintage editorial cartoon style. Draw dense parallel diagonal lines (45-degree angle) for shadows under chairs, on clothing folds, floor shadows, and depth. Add HEAVY HATCHING on striped/checkered clothing patterns. Use thick crosshatch lines for darker areas, lighter hatching for mid-tones. This heavy pen-and-ink hatching is the most important style element. `
 
-  // 5. BACKGROUND - Detailed R.K. Laxman environments
+  // 5. BACKGROUND - Detailed editorial cartoon environments
   optimizedPrompt += `BACKGROUND: Draw detailed Indian editorial cartoon backgrounds: indoor scenes with furniture (wooden chairs with crosshatched shadows, desks, tables), outdoor scenes with trees (crosshatched foliage shadows), buildings, streets. Add perspective with floor tiles or ground lines. Include contextual details: office settings with papers on desk, outdoor scenes with simple clouds and trees, government buildings. Use crosshatching for all shadows and depth. `
 
   // 6. INK WORK - Classic pen and ink technique
@@ -672,17 +672,17 @@ function optimizePromptForFLUX(description: string): string {
   // 11. TECHNICAL SPECS
   optimizedPrompt += `TECHNICAL: Black and white pen-and-ink editorial cartoon. Heavy diagonal crosshatching for all shadows and depth. Simple round-faced characters with expressive poses. Detailed backgrounds with furniture and environmental elements. Checkered shirt on Common Man character. Clean black ink outlines with varied line weights. NO borders, NO text. Classic Indian newspaper editorial cartoon style. `
 
-  // 12. FINAL STYLE EMPHASIS - R.K. Laxman signature elements
-  optimizedPrompt += `STYLE MATCH: This MUST look exactly like R.K. Laxman's classic Indian editorial cartoons: (1) HEAVY diagonal line crosshatching for ALL shadows, (2) Simple round-faced characters with dot eyes, (3) Common Man in checkered shirt with round spectacles, (4) Detailed backgrounds with furniture/trees/buildings, (5) Dense pen-and-ink hatching patterns, (6) Expressive character poses and gestures, (7) No borders or frames, (8) Black and white only, (9) Classic Indian newspaper cartoon style. Match R.K. Laxman's exact visual style with emphasis on heavy crosshatching.`
+  // 12. FINAL STYLE EMPHASIS - Vintage Indian editorial cartoon elements
+  optimizedPrompt += `STYLE MATCH: This MUST look exactly like classic vintage Indian editorial cartoons: (1) HEAVY diagonal line crosshatching for ALL shadows, (2) Simple round-faced characters with dot eyes, (3) Common Man in checkered shirt with round spectacles, (4) Detailed backgrounds with furniture/trees/buildings, (5) Dense pen-and-ink hatching patterns, (6) Expressive character poses and gestures, (7) No borders or frames, (8) Black and white only, (9) Classic Indian newspaper cartoon style. Match this exact visual style with emphasis on heavy crosshatching.`
 
-  console.log('🔧 R.K. LAXMAN STYLE PROMPT CREATED')
+  console.log('🔧 CLASSIC EDITORIAL STYLE PROMPT CREATED')
   console.log('📝 Final prompt length:', optimizedPrompt.length)
   console.log('✅ Heavy diagonal crosshatching for shadows')
   console.log('✅ Common Man with checkered shirt and spectacles')
   console.log('✅ Detailed backgrounds with furniture/environments')
   console.log('✅ Simple round-faced expressive characters')
-  console.log('✅ R.K. Laxman classic Indian editorial style')
-  console.log('🎯 R.K. LAXMAN OPTIMIZED PROMPT:')
+  console.log('✅ Classic vintage Indian editorial style')
+  console.log('🎯 EDITORIAL CARTOON OPTIMIZED PROMPT:')
   console.log('=====================================')
   console.log(optimizedPrompt)
   console.log('=====================================')

@@ -3,7 +3,7 @@
   ## Project: Mockr - AI-Powered Satirical Political Cartoon Generator
 
   ### Project Overview
-  Mockr is a web-based AI-powered platform that generates witty, satirical political cartoons in black and white caricature style, inspired by R.K. Laxman's artistic approach combined with xkcd's sharp wit. Users can     
+  Mockr is a web-based AI-powered platform that generates witty, satirical political cartoons in black and white caricature style, inspired by classic Indian editorial cartoon art combined with xkcd's sharp wit. Users can
   create shareable content that intelligently critiques politicians, celebrities, and societal issues through consistent, brand-recognizable cartoon format.
 
   ### Project Structure
@@ -123,7 +123,7 @@
 
   Content Philosophy
 
-  - Tone: 60% R.K. Laxman's thoughtful intelligence + 40% xkcd's irreverent wit
+  - Tone: 60% classic editorial cartoon thoughtful intelligence + 40% xkcd's irreverent wit
   - Style: Black and white caricature with consistent character design
   - Focus: Political satire, social commentary, economic critique
   - Safety: Automated content moderation with AI safety filters
