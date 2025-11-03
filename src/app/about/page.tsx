@@ -85,8 +85,8 @@ export default function AboutPage() {
               Have questions, feedback, or suggestions? We&apos;d love to hear from you:
             </p>
             <ul className="list-disc pl-6 space-y-2">
+              <li>Email us: <a href="mailto:support@mockr.art" className="text-neutral-900 hover:underline font-semibold">support@mockr.art</a></li>
               <li>Follow us on X (Twitter): <a href="https://x.com/MockrArt" target="_blank" rel="noopener noreferrer" className="text-neutral-900 hover:underline">@MockrArt</a></li>
-              <li>Connect on LinkedIn: <a href="https://linkedin.com/company/mockr" target="_blank" rel="noopener noreferrer" className="text-neutral-900 hover:underline">Mockr</a></li>
               <li>Use the Feedback button in the app to send us your thoughts</li>
             </ul>
           </section>

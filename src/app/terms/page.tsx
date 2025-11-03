@@ -225,8 +225,9 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-semibold text-neutral-900 mb-4">Contact Information</h2>
             <p>
-              For questions about these Terms of Service, please use the Feedback button in the app or contact us
-              through our social media channels.
+              For questions about these Terms of Service, please contact us at{' '}
+              <a href="mailto:support@mockr.art" className="text-neutral-900 hover:underline font-semibold">support@mockr.art</a>{' '}
+              or use the Feedback button in the app.
             </p>
           </section>
 

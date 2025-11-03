@@ -165,8 +165,9 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-semibold text-neutral-900 mb-4">Contact Us</h2>
             <p>
-              If you have questions about this Privacy Policy or how we handle your data, please use the Feedback
-              button in the app or contact us through our social media channels.
+              If you have questions about this Privacy Policy or how we handle your data, please contact us at{' '}
+              <a href="mailto:support@mockr.art" className="text-neutral-900 hover:underline font-semibold">support@mockr.art</a>{' '}
+              or use the Feedback button in the app.
             </p>
           </section>
 
