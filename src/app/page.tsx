@@ -218,7 +218,7 @@ export default function HomePage() {
               {isSignedIn ? (
                 <>
                   <Link href="/generate">
-                    <button className="px-6 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm hover:shadow-md font-semibold">
+                    <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-sm hover:shadow-md font-semibold">
                       Create Comic
                     </button>
                   </Link>
@@ -238,7 +238,7 @@ export default function HomePage() {
                     </button>
                   </SignInButton>
                   <Link href="/generate">
-                    <button className="px-6 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm hover:shadow-md font-semibold">
+                    <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-sm hover:shadow-md font-semibold">
                       Start Creating Free
                     </button>
                   </Link>
@@ -306,7 +306,7 @@ export default function HomePage() {
                     </div>
 
                     <Link href="/generate">
-                      <button className="w-full px-5 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm font-semibold">
+                      <button className="w-full px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-sm font-semibold">
                         Create Comic
                       </button>
                     </Link>
@@ -332,7 +332,7 @@ export default function HomePage() {
                       </button>
                     </SignInButton>
                     <Link href="/generate">
-                      <button className="w-full px-5 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm font-semibold">
+                      <button className="w-full px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-sm font-semibold">
                         Start Creating Free
                       </button>
                     </Link>
@@ -345,8 +345,12 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section - Replymer Style */}
-      <section className="pt-20 sm:pt-24 lg:pt-28 pb-10 sm:pb-12 lg:pb-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
-        <div className="max-w-7xl mx-auto">
+      <section className="pt-20 sm:pt-24 lg:pt-28 pb-10 sm:pb-12 lg:pb-16 px-4 sm:px-6 lg:px-8 relative bg-white overflow-hidden">
+        {/* Radial gradient background for depth */}
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-50/30 via-transparent to-white" style={{
+          background: 'radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.08), transparent 70%), linear-gradient(to bottom, #fafafa, #ffffff)'
+        }} />
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 items-center">
             {/* Left: Text Content */}
             <motion.div
@@ -356,7 +360,7 @@ export default function HomePage() {
               className="text-center lg:text-left"
             >
               {/* Badge */}
-              <div className="inline-flex items-center space-x-2 bg-neutral-100 text-neutral-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+              <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
                 <Sparkles className="w-4 h-4" />
                 <span>AI-Powered Political Satire</span>
               </div>
@@ -377,7 +381,7 @@ export default function HomePage() {
               {/* CTA Buttons - Larger */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10">
                 <Link href="/generate">
-                  <button className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-xl hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-lg hover:shadow-2xl font-bold text-xl group">
+                  <button className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-2xl font-bold text-xl group">
                     Start Creating Free
                     <ArrowRight className="w-6 h-6 ml-2 inline group-hover:translate-x-1 transition-transform" />
                   </button>
@@ -518,7 +522,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-8"
           >
-            <div className="inline-flex items-center space-x-2 bg-neutral-800 text-white px-4 py-2 rounded-full text-sm font-semibold mb-6">
+            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-6 shadow-lg">
               <Sparkles className="w-4 h-4" />
               <span>Simple Process</span>
             </div>
@@ -576,15 +580,21 @@ export default function HomePage() {
                   whileHover={{ y: -8 }}
                   className="relative group"
                 >
-                  <div className="bg-white rounded-2xl p-8 border-2 border-neutral-100 group-hover:border-neutral-200 shadow-lg group-hover:shadow-2xl transition-all h-full">
+                  <div className="bg-white rounded-2xl p-8 border-2 border-neutral-100 group-hover:border-blue-200 transition-all h-full" style={{
+                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)'
+                  }} onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = '0 10px 60px -10px rgba(0, 0, 0, 0.12)'
+                  }} onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.06)'
+                  }}>
                     {/* Step Badge */}
                     <div className={`inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r ${item.gradient} rounded-xl mb-6 text-white font-bold text-xl shadow-lg`}>
                       {item.step}
                     </div>
 
                     {/* Icon */}
-                    <div className="w-16 h-16 bg-neutral-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                      <Icon className="w-8 h-8 text-neutral-700" strokeWidth={2} />
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                      <Icon className="w-8 h-8 text-blue-600 group-hover:rotate-6 transition-transform duration-300" strokeWidth={2} />
                     </div>
 
                     {/* Content */}
@@ -607,7 +617,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <div className="inline-flex items-center space-x-2 bg-neutral-800 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
+            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 shadow-lg">
               <Sparkles className="w-4 h-4" />
               <span>User Creations</span>
             </div>
@@ -752,10 +762,19 @@ export default function HomePage() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -8 }}
-                  className="bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-100 hover:border-neutral-200 shadow-lg hover:shadow-2xl transition-all"
+                  className="bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-100 hover:border-blue-200 transition-all"
+                  style={{
+                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = '0 10px 60px -10px rgba(0, 0, 0, 0.12)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.06)'
+                  }}
                 >
-                  <div className="w-16 h-16 bg-gradient-to-br from-neutral-800 to-neutral-700 rounded-xl flex items-center justify-center mb-6 shadow-lg">
-                    <Icon className="w-8 h-8 text-white" strokeWidth={2} />
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
+                    <Icon className="w-8 h-8 text-white group-hover:rotate-6 transition-transform duration-300" strokeWidth={2} />
                   </div>
                   <h3 className="text-2xl font-bold text-neutral-900 mb-3">{item.title}</h3>
                   <p className="text-neutral-600 mb-4 leading-relaxed">{item.description}</p>
@@ -873,84 +892,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Product Hunt Launch Section */}
-      <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-neutral-50">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
-              <Megaphone className="w-4 h-4" />
-              <span>Launching on Product Hunt</span>
-            </div>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-4">
-              Launching on Product Hunt{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                November 3rd
-              </span>
-            </h2>
-            <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
-              Get notified when we launch and be among the first to support Mockr on Product Hunt!
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="flex justify-center"
-          >
-            <div className="w-full max-w-md">
-              {/* Product Hunt Embed Card */}
-              <iframe
-                style={{ border: 'none' }}
-                src="https://cards.producthunt.com/cards/products/1121622"
-                width="500"
-                height="405"
-                frameBorder="0"
-                scrolling="no"
-                allowFullScreen
-                className="w-full rounded-xl shadow-2xl"
-              />
-            </div>
-          </motion.div>
-
-          {/* Social Proof Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-            className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
-          >
-            {[
-              { label: 'Comics Created', value: '2.5K+' },
-              { label: 'Active Users', value: '500+' },
-              { label: 'Shares on X', value: '1.2K+' },
-              { label: 'Avg. Rating', value: '4.9★' }
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-neutral-600">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
       {/* Final CTA Section */}
-      <section className="py-10 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-neutral-900 to-neutral-800 relative overflow-hidden">
+      <section className="py-10 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-900 to-indigo-900 relative overflow-hidden">
         {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-neutral-700 rounded-full blur-3xl opacity-20" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-neutral-600 rounded-full blur-3xl opacity-20" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-700 rounded-full blur-3xl opacity-20" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-700 rounded-full blur-3xl opacity-20" />
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div
@@ -967,7 +913,7 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Link href="/generate">
-                <button className="px-10 py-5 bg-white text-neutral-900 rounded-xl hover:bg-neutral-100 transition-all shadow-2xl hover:shadow-3xl font-bold text-xl inline-flex items-center group">
+                <button className="px-10 py-5 bg-white text-blue-700 rounded-xl hover:bg-blue-50 transition-all shadow-2xl hover:shadow-3xl font-bold text-xl inline-flex items-center group border-2 border-blue-100">
                   Start Creating Free
                   <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
                 </button>

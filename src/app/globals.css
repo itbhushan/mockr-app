@@ -5,14 +5,21 @@
   /* Custom CSS Variables for Mockr */
   :root {
     --font-inter: 'Inter', system-ui, sans-serif;
+    /* Shipper.now inspired subtle shadows */
     --shadow-sm: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
     --shadow-md: 0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     --shadow-strong: 0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 2px 10px -2px rgba(0, 0, 0, 0.04);
+    --shadow-subtle: 0 0 40px rgba(0, 0, 0, 0.06);
+    --shadow-elevated: 0 10px 60px -10px rgba(0, 0, 0, 0.12);
+    /* Enhanced gradients with subtle blue-purple accents */
     --gradient-hero: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+    --gradient-cta: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+    --gradient-cta-hover: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
     --gradient-accent: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
     --gradient-subtle: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
     --gradient-feature: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
     --gradient-surface: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    --gradient-badge-blue: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
   }
 
   /* Base Styles */
@@ -64,6 +71,26 @@
 
   .mockr-shadow-strong {
     box-shadow: var(--shadow-strong);
+  }
+
+  .mockr-shadow-subtle {
+    box-shadow: var(--shadow-subtle);
+  }
+
+  .mockr-shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .mockr-gradient-cta {
+    background: var(--gradient-cta);
+  }
+
+  .mockr-gradient-cta:hover {
+    background: var(--gradient-cta-hover);
+  }
+
+  .mockr-gradient-badge-blue {
+    background: var(--gradient-badge-blue);
   }
 
   /* Button Styles */
