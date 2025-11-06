@@ -218,7 +218,7 @@ export default function HomePage() {
               {isSignedIn ? (
                 <>
                   <Link href="/generate">
-                    <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-sm hover:shadow-md font-semibold">
+                    <button className="px-6 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm hover:shadow-md font-semibold">
                       Create Comic
                     </button>
                   </Link>
@@ -238,7 +238,7 @@ export default function HomePage() {
                     </button>
                   </SignInButton>
                   <Link href="/generate">
-                    <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-sm hover:shadow-md font-semibold">
+                    <button className="px-6 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm hover:shadow-md font-semibold">
                       Start Creating Free
                     </button>
                   </Link>
@@ -306,7 +306,7 @@ export default function HomePage() {
                     </div>
 
                     <Link href="/generate">
-                      <button className="w-full px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-sm font-semibold">
+                      <button className="w-full px-5 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm font-semibold">
                         Create Comic
                       </button>
                     </Link>
@@ -332,7 +332,7 @@ export default function HomePage() {
                       </button>
                     </SignInButton>
                     <Link href="/generate">
-                      <button className="w-full px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all shadow-sm font-semibold">
+                      <button className="w-full px-5 py-3 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-lg hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-sm font-semibold">
                         Start Creating Free
                       </button>
                     </Link>
@@ -345,12 +345,8 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section - Replymer Style */}
-      <section className="pt-20 sm:pt-24 lg:pt-28 pb-10 sm:pb-12 lg:pb-16 px-4 sm:px-6 lg:px-8 relative bg-white overflow-hidden">
-        {/* Radial gradient background for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-50/30 via-transparent to-white" style={{
-          background: 'radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.08), transparent 70%), linear-gradient(to bottom, #fafafa, #ffffff)'
-        }} />
-        <div className="max-w-7xl mx-auto relative z-10">
+      <section className="pt-20 sm:pt-24 lg:pt-28 pb-10 sm:pb-12 lg:pb-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-neutral-50 to-white">
+        <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 items-center">
             {/* Left: Text Content */}
             <motion.div
@@ -360,7 +356,7 @@ export default function HomePage() {
               className="text-center lg:text-left"
             >
               {/* Badge */}
-              <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+              <div className="inline-flex items-center space-x-2 bg-neutral-100 text-neutral-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
                 <Sparkles className="w-4 h-4" />
                 <span>AI-Powered Political Satire</span>
               </div>
@@ -381,7 +377,7 @@ export default function HomePage() {
               {/* CTA Buttons - Larger */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10">
                 <Link href="/generate">
-                  <button className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-2xl font-bold text-xl group">
+                  <button className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-xl hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-lg hover:shadow-2xl font-bold text-xl group">
                     Start Creating Free
                     <ArrowRight className="w-6 h-6 ml-2 inline group-hover:translate-x-1 transition-transform" />
                   </button>
@@ -522,7 +518,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-8"
           >
-            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-6 shadow-lg">
+            <div className="inline-flex items-center space-x-2 bg-neutral-800 text-white px-4 py-2 rounded-full text-sm font-semibold mb-6">
               <Sparkles className="w-4 h-4" />
               <span>Simple Process</span>
             </div>
@@ -580,7 +576,7 @@ export default function HomePage() {
                   whileHover={{ y: -8 }}
                   className="relative group"
                 >
-                  <div className="bg-white rounded-2xl p-8 border-2 border-neutral-100 group-hover:border-blue-200 transition-all h-full" style={{
+                  <div className="bg-white rounded-2xl p-8 border-2 border-neutral-100 group-hover:border-neutral-200 transition-all h-full" style={{
                     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)'
                   }} onMouseEnter={(e) => {
                     e.currentTarget.style.boxShadow = '0 10px 60px -10px rgba(0, 0, 0, 0.12)'
@@ -593,8 +589,8 @@ export default function HomePage() {
                     </div>
 
                     {/* Icon */}
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                      <Icon className="w-8 h-8 text-blue-600 group-hover:rotate-6 transition-transform duration-300" strokeWidth={2} />
+                    <div className="w-16 h-16 bg-neutral-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                      <Icon className="w-8 h-8 text-neutral-700 group-hover:rotate-6 transition-transform duration-300" strokeWidth={2} />
                     </div>
 
                     {/* Content */}
@@ -617,7 +613,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 shadow-lg">
+            <div className="inline-flex items-center space-x-2 bg-neutral-800 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
               <Sparkles className="w-4 h-4" />
               <span>User Creations</span>
             </div>
@@ -762,7 +758,7 @@ export default function HomePage() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -8 }}
-                  className="bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-100 hover:border-blue-200 transition-all"
+                  className="bg-neutral-50 rounded-2xl p-8 border-2 border-neutral-100 hover:border-neutral-200 transition-all"
                   style={{
                     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)'
                   }}
@@ -773,7 +769,7 @@ export default function HomePage() {
                     e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.06)'
                   }}
                 >
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center mb-6 shadow-lg">
+                  <div className="w-16 h-16 bg-gradient-to-br from-neutral-800 to-neutral-700 rounded-xl flex items-center justify-center mb-6 shadow-lg">
                     <Icon className="w-8 h-8 text-white group-hover:rotate-6 transition-transform duration-300" strokeWidth={2} />
                   </div>
                   <h3 className="text-2xl font-bold text-neutral-900 mb-3">{item.title}</h3>
@@ -893,10 +889,10 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-10 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-900 to-indigo-900 relative overflow-hidden">
+      <section className="py-10 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-neutral-900 to-neutral-800 relative overflow-hidden">
         {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-700 rounded-full blur-3xl opacity-20" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-700 rounded-full blur-3xl opacity-20" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-neutral-700 rounded-full blur-3xl opacity-20" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-neutral-600 rounded-full blur-3xl opacity-20" />
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div
@@ -913,7 +909,7 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Link href="/generate">
-                <button className="px-10 py-5 bg-white text-blue-700 rounded-xl hover:bg-blue-50 transition-all shadow-2xl hover:shadow-3xl font-bold text-xl inline-flex items-center group border-2 border-blue-100">
+                <button className="px-10 py-5 bg-white text-neutral-900 rounded-xl hover:bg-neutral-100 transition-all shadow-2xl hover:shadow-3xl font-bold text-xl inline-flex items-center group">
                   Start Creating Free
                   <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
                 </button>
