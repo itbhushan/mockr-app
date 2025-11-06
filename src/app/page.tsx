@@ -208,6 +208,9 @@ export default function HomePage() {
               <a href="#examples" className="text-neutral-600 hover:text-neutral-900 transition-colors font-medium">
                 Examples
               </a>
+              <Link href="/pricing" className="text-neutral-600 hover:text-neutral-900 transition-colors font-medium">
+                Pricing
+              </Link>
               <a href="#faq" className="text-neutral-600 hover:text-neutral-900 transition-colors font-medium">
                 FAQ
               </a>
@@ -278,6 +281,13 @@ export default function HomePage() {
               >
                 Examples
               </a>
+              <Link
+                href="/pricing"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-neutral-600 hover:text-neutral-900 transition-colors font-medium"
+              >
+                Pricing
+              </Link>
               <a
                 href="#faq"
                 onClick={() => setMobileMenuOpen(false)}
@@ -981,6 +991,7 @@ export default function HomePage() {
               <ul className="space-y-3">
                 <li><Link href="/generate" className="hover:text-white transition-colors">Create Comic</Link></li>
                 <li><Link href="/gallery" className="hover:text-white transition-colors">Gallery</Link></li>
+                <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                 <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
               </ul>
             </div>

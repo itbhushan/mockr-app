@@ -47,6 +47,9 @@ export default function Header() {
             <Link href="/gallery" className="text-neutral-600 hover:text-neutral-900 transition-colors font-medium">
               Gallery
             </Link>
+            <Link href="/pricing" className="text-neutral-600 hover:text-neutral-900 transition-colors font-medium">
+              Pricing
+            </Link>
           </div>
 
           {/* Desktop Auth Buttons */}
@@ -120,6 +123,13 @@ export default function Header() {
               className="block py-2 text-neutral-600 hover:text-neutral-900 transition-colors font-medium"
             >
               Gallery
+            </Link>
+            <Link
+              href="/pricing"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block py-2 text-neutral-600 hover:text-neutral-900 transition-colors font-medium"
+            >
+              Pricing
             </Link>
             <div className="pt-3 border-t border-neutral-100 space-y-2">
               {isSignedIn ? (

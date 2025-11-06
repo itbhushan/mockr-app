@@ -55,6 +55,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm sm:text-base">
               <li><Link href="/generate" className="hover:text-white transition-colors">Create Comic</Link></li>
               <li><Link href="/gallery" className="hover:text-white transition-colors">Gallery</Link></li>
+              <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
               <li><a href="/#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
             </ul>
           </div>
