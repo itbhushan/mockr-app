@@ -45,6 +45,68 @@ export default function GeneratePage() {
   const downloadDropdownRef = useRef<HTMLDivElement>(null)
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
   const [rateLimitError, setRateLimitError] = useState<string | null>(null)
+  const [showPricingBanner, setShowPricingBanner] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<string>('free')
+
+  // Check if user came from pricing page
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const fromPricing = urlParams.get('from') === 'pricing'
+    const plan = urlParams.get('plan') || 'free'
+
+    if (fromPricing) {
+      setSelectedPlan(plan)
+      setShowPricingBanner(true)
+      // Auto-hide after 10 seconds
+      const timer = setTimeout(() => {
+        setShowPricingBanner(false)
+      }, 10000)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  // Get plan-specific message
+  const getPlanMessage = () => {
+    // Currently showing launch message for all plans until payment gateway is integrated
+    return {
+      title: "You are currently under FREE version due to our LAUNCH",
+      description: "Enjoy unlimited access during our launch period. Payment integration coming in 3-4 weeks!"
+    }
+
+    // TODO: Uncomment this after payment gateway integration (3-4 weeks)
+    // switch (selectedPlan) {
+    //   case 'free':
+    //     return {
+    //       title: "You're currently on the Free Plan!",
+    //       description: "Enjoy 2 free comics to start. No credit card required."
+    //     }
+    //   case 'starter':
+    //     return {
+    //       title: "You've selected the Starter Plan!",
+    //       description: "You'll get 150 comics per month (~5 per day). Perfect for casual satirists."
+    //     }
+    //   case 'pro':
+    //     return {
+    //       title: "You've selected the Pro Plan!",
+    //       description: "You'll get 500 comics per month (~16 per day). Perfect for content creators."
+    //     }
+    //   case 'unlimited':
+    //     return {
+    //       title: "You've selected the Unlimited Plan!",
+    //       description: "Create as many comics as you want. Perfect for power users."
+    //     }
+    //   case 'lifetime':
+    //     return {
+    //       title: "You've selected the Lifetime Deal!",
+    //       description: "Pay once, create unlimited comics forever. No monthly fees, ever."
+    //     }
+    //   default:
+    //     return {
+    //       title: "You're currently on the Free Plan!",
+    //       description: "Enjoy 10 free comics daily during our MVP phase. No credit card required."
+    //     }
+    // }
+  }
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -1280,6 +1342,42 @@ export default function GeneratePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex flex-col">
       {/* Header */}
       <Header />
+
+      {/* Pricing Page Banner */}
+      <AnimatePresence>
+        {showPricingBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-16 lg:top-20 left-0 right-0 z-40 text-white shadow-lg bg-gradient-to-r from-blue-600 to-indigo-600"
+          >
+            <div className="max-w-7xl mx-auto px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Sparkles className="w-5 h-5" />
+                  <div>
+                    <p className="font-semibold text-sm sm:text-base">
+                      {getPlanMessage().title}
+                    </p>
+                    <p className="text-xs sm:text-sm text-blue-100">
+                      {getPlanMessage().description}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowPricingBanner(false)}
+                  className="text-white/80 hover:text-white transition-colors p-1"
+                  aria-label="Close banner"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="flex-1 pt-16 lg:pt-20">
         <div className="max-w-7xl mx-auto px-6 py-12 lg:py-16">

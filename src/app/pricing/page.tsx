@@ -22,7 +22,7 @@ export default function PricingPage() {
       comics: '2 total',
       description: 'Perfect to try it out',
       cta: 'Get Started',
-      ctaLink: '/generate',
+      ctaLink: '/generate?from=pricing&plan=free',
       popular: false
     },
     {
@@ -32,7 +32,7 @@ export default function PricingPage() {
       comicsDetail: '~5 per day',
       description: 'For casual satirists',
       cta: 'Choose Starter',
-      ctaLink: '/generate',
+      ctaLink: '/generate?from=pricing&plan=starter',
       popular: false,
       savings: 'Save $9.89'
     },
@@ -43,7 +43,7 @@ export default function PricingPage() {
       comicsDetail: '~16 per day',
       description: 'For content creators',
       cta: 'Choose Pro',
-      ctaLink: '/generate',
+      ctaLink: '/generate?from=pricing&plan=pro',
       popular: true,
       savings: 'Save $19.89'
     },
@@ -54,7 +54,7 @@ export default function PricingPage() {
       comicsDetail: 'Create as many as you want',
       description: 'For power users',
       cta: 'Choose Unlimited',
-      ctaLink: '/generate',
+      ctaLink: '/generate?from=pricing&plan=unlimited',
       popular: false,
       savings: 'Save $39.89'
     }
@@ -278,7 +278,7 @@ export default function PricingPage() {
                 </p>
               </div>
 
-              <Link href="/generate">
+              <Link href="/generate?from=pricing&plan=lifetime">
                 <button className="bg-white text-amber-600 px-10 py-4 rounded-xl font-bold text-xl hover:bg-amber-50 transition-all shadow-lg hover:shadow-xl">
                   Claim Your Lifetime Access
                 </button>
@@ -429,7 +429,7 @@ export default function PricingPage() {
               Join creators who are turning political news into viral satire
             </p>
 
-            <Link href="/generate">
+            <Link href="/generate?from=pricing">
               <button className="px-10 py-5 bg-white text-neutral-900 rounded-xl hover:bg-neutral-100 transition-all shadow-2xl hover:shadow-3xl font-bold text-xl">
                 Start Creating Free
               </button>
