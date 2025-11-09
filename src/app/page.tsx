@@ -443,22 +443,6 @@ export default function HomePage() {
                   </motion.div>
                 </AnimatePresence>
 
-                {/* Carousel Controls */}
-                <button
-                  onClick={prevSlide}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-neutral-700 hover:scale-110 z-10"
-                  aria-label="Previous"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={nextSlide}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-neutral-700 hover:scale-110 z-10"
-                  aria-label="Next"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-
                 {/* Dot Indicators */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
                   {sampleComics.map((_, index) => (
