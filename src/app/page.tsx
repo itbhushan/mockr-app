@@ -619,42 +619,48 @@ export default function HomePage() {
                 title: "Budget Hypocrisy",
                 description: "Politicians cutting healthcare while posing at hospital openings",
                 emoji: "🏛️",
-                color: "from-blue-600 to-blue-700"
+                color: "from-blue-600 to-blue-700",
+                image: "/examples/politics-budget.jpg"
               },
               {
                 category: "Business",
                 title: "Tech Billionaire Logic",
                 description: "CEOs preaching work-life balance from their private jets",
                 emoji: "💼",
-                color: "from-green-600 to-green-700"
+                color: "from-green-600 to-green-700",
+                image: "/examples/business-ceo.jpg"
               },
               {
                 category: "Entertainment",
                 title: "Celebrity Endorsements",
                 description: "Actors promoting products they'd never actually use",
                 emoji: "🎬",
-                color: "from-purple-600 to-purple-700"
+                color: "from-purple-600 to-purple-700",
+                image: "/examples/entertainment-celebrity.jpg"
               },
               {
                 category: "Sports",
                 title: "Athlete Controversies",
                 description: "Sports stars and their off-field contradictions",
                 emoji: "⚽",
-                color: "from-orange-600 to-orange-700"
+                color: "from-orange-600 to-orange-700",
+                image: "/examples/sports-athlete.jpg"
               },
               {
                 category: "Economy",
                 title: "Financial Advice",
                 description: "Billionaires telling everyone to work harder and save money",
                 emoji: "💰",
-                color: "from-amber-600 to-amber-700"
+                color: "from-amber-600 to-amber-700",
+                image: "/examples/economy-billionaire.jpg"
               },
               {
                 category: "Social",
                 title: "Influencer Culture",
                 description: "Social media personalities vs. reality check moments",
                 emoji: "📱",
-                color: "from-pink-600 to-pink-700"
+                color: "from-pink-600 to-pink-700",
+                image: "/examples/social-influencer.jpg"
               }
             ].map((topic, index) => (
               <motion.div
@@ -672,29 +678,29 @@ export default function HomePage() {
                     <span className="text-2xl">{topic.emoji}</span>
                   </div>
 
+                  {/* Sample Preview - Larger and more prominent */}
+                  <div className="relative aspect-[4/3] bg-neutral-50">
+                    <Image
+                      src={topic.image}
+                      alt={`${topic.category} satire example: ${topic.title}`}
+                      fill
+                      className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  </div>
+
                   {/* Content */}
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-neutral-900 mb-3 group-hover:text-neutral-700 transition-colors">
+                  <div className="p-5">
+                    <h3 className="text-lg font-bold text-neutral-900 mb-2 group-hover:text-neutral-700 transition-colors">
                       {topic.title}
                     </h3>
-                    <p className="text-neutral-600 leading-relaxed mb-6">
+                    <p className="text-neutral-600 text-sm leading-relaxed mb-4">
                       {topic.description}
                     </p>
 
-                    {/* Sample Preview Placeholder */}
-                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200 mb-4">
-                      <Image
-                        src={sampleComics[index % sampleComics.length]}
-                        alt={`${topic.category} satire example`}
-                        fill
-                        className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      />
-                    </div>
-
                     {/* Action Button */}
                     <Link href="/generate">
-                      <button className="w-full px-4 py-3 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 transition-all font-semibold text-sm group-hover:shadow-md">
+                      <button className="w-full px-4 py-2.5 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 transition-all font-semibold text-sm group-hover:shadow-md">
                         Create Similar →
                       </button>
                     </Link>
