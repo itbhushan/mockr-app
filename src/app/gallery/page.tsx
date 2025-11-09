@@ -633,9 +633,21 @@ export default function GalleryPage() {
                         )
                       })()}
                     </div>
+
+                    {/* Download Button - Universal across all platforms */}
+                    <button
+                      onClick={() => handleShare(comic, 'download')}
+                      className="bg-neutral-900 hover:bg-neutral-800 text-white text-sm font-medium rounded-lg px-3 py-2 transition-colors flex items-center"
+                      title="Download as JPG"
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+
+                    {/* Delete Button */}
                     <button
                       onClick={() => deleteComic(comic.id)}
                       className="bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium rounded-lg px-3 py-2 transition-colors"
+                      title="Delete comic"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

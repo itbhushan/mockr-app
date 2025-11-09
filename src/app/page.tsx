@@ -13,7 +13,6 @@ export default function HomePage() {
   const [scrolled, setScrolled] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
-  const [selectedExample, setSelectedExample] = useState<number | null>(null)
   const [showPHBanner, setShowPHBanner] = useState(true)
 
   const sampleComics = [
@@ -21,13 +20,6 @@ export default function HomePage() {
     '/samples/sample-2.jpg',
     '/samples/sample-3.jpg',
     '/samples/sample-4.jpg'
-  ]
-
-  const exampleComics = [
-    '/examples/example-1.jpg',
-    '/examples/example-2.jpg',
-    '/examples/example-3.jpg',
-    '/examples/example-4.jpg'
   ]
 
   // Handle scroll for navbar background
@@ -598,108 +590,135 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Examples Gallery - Featured Showcase */}
-      <section id="examples" className="py-8 sm:py-10 lg:py-12 px-4 sm:px-6 lg:px-8 bg-neutral-50">
-        <div className="max-w-6xl mx-auto">
+      {/* Examples Gallery - Topics You Can Satirize */}
+      <section id="examples" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-neutral-50">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <div className="inline-flex items-center space-x-2 bg-neutral-800 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
+            <div className="inline-flex items-center space-x-2 bg-neutral-800 text-white px-4 py-2 rounded-full text-sm font-semibold mb-6">
               <Sparkles className="w-4 h-4" />
-              <span>User Creations</span>
+              <span>Unlimited Possibilities</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-neutral-900 mb-4">
-              Real Cartoons Created by Users
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-neutral-900 mb-4">
+              What Can You Satirize?
             </h2>
-            <p className="text-lg text-neutral-600">
-              See what our community is creating
+            <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
+              From politics to entertainment, business to sports - turn any hypocrisy into viral cartoons
             </p>
           </motion.div>
 
-          {/* Grid Container - 2x2 with better sizing and hover effects */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-            {exampleComics.map((comic, index) => (
+          {/* Topics Grid - 3 columns on desktop, 2 on tablet, 1 on mobile */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {[
+              {
+                category: "Politics",
+                title: "Budget Hypocrisy",
+                description: "Politicians cutting healthcare while posing at hospital openings",
+                emoji: "🏛️",
+                color: "from-blue-600 to-blue-700"
+              },
+              {
+                category: "Business",
+                title: "Tech Billionaire Logic",
+                description: "CEOs preaching work-life balance from their private jets",
+                emoji: "💼",
+                color: "from-green-600 to-green-700"
+              },
+              {
+                category: "Entertainment",
+                title: "Celebrity Endorsements",
+                description: "Actors promoting products they'd never actually use",
+                emoji: "🎬",
+                color: "from-purple-600 to-purple-700"
+              },
+              {
+                category: "Sports",
+                title: "Athlete Controversies",
+                description: "Sports stars and their off-field contradictions",
+                emoji: "⚽",
+                color: "from-orange-600 to-orange-700"
+              },
+              {
+                category: "Economy",
+                title: "Financial Advice",
+                description: "Billionaires telling everyone to work harder and save money",
+                emoji: "💰",
+                color: "from-amber-600 to-amber-700"
+              },
+              {
+                category: "Social",
+                title: "Influencer Culture",
+                description: "Social media personalities vs. reality check moments",
+                emoji: "📱",
+                color: "from-pink-600 to-pink-700"
+              }
+            ].map((topic, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                onClick={() => setSelectedExample(index)}
-                className="relative group cursor-pointer"
+                className="group"
               >
-                {/* Badge with example number */}
-                <div className="absolute -top-3 -left-3 z-10 w-10 h-10 bg-gradient-to-br from-neutral-800 to-neutral-700 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                  <span className="text-white font-bold text-sm">{index + 1}</span>
-                </div>
+                <div className="bg-white rounded-2xl overflow-hidden border-2 border-neutral-200 hover:border-neutral-400 shadow-lg hover:shadow-2xl transition-all h-full">
+                  {/* Category Badge */}
+                  <div className={`bg-gradient-to-r ${topic.color} px-4 py-3 flex items-center justify-between`}>
+                    <span className="text-white font-bold text-sm uppercase tracking-wide">{topic.category}</span>
+                    <span className="text-2xl">{topic.emoji}</span>
+                  </div>
 
-                {/* Comic container with enhanced styling */}
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-white border-2 border-neutral-200 group-hover:border-neutral-400 shadow-lg group-hover:shadow-2xl transition-all">
-                  <Image
-                    src={comic}
-                    alt={`User created comic ${index + 1}`}
-                    fill
-                    className="object-contain p-6 group-hover:scale-105 transition-transform duration-300"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
+                  {/* Content */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-neutral-900 mb-3 group-hover:text-neutral-700 transition-colors">
+                      {topic.title}
+                    </h3>
+                    <p className="text-neutral-600 leading-relaxed mb-6">
+                      {topic.description}
+                    </p>
 
-                  {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-6">
-                    <p className="text-white font-semibold text-sm">Click to view larger</p>
+                    {/* Sample Preview Placeholder */}
+                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200 mb-4">
+                      <Image
+                        src={sampleComics[index % sampleComics.length]}
+                        alt={`${topic.category} satire example`}
+                        fill
+                        className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    </div>
+
+                    {/* Action Button */}
+                    <Link href="/generate">
+                      <button className="w-full px-4 py-3 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 transition-all font-semibold text-sm group-hover:shadow-md">
+                        Create Similar →
+                      </button>
+                    </Link>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
 
-          {/* Modal for viewing larger image */}
-          <AnimatePresence>
-            {selectedExample !== null && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedExample(null)}
-                className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-pointer"
-              >
-                <motion.div
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0.9 }}
-                  onClick={(e) => e.stopPropagation()}
-                  className="relative max-w-4xl w-full aspect-square cursor-default"
-                >
-                  <Image
-                    src={exampleComics[selectedExample]}
-                    alt={`User created comic ${selectedExample + 1}`}
-                    fill
-                    className="object-contain"
-                    sizes="100vw"
-                  />
-                  <button
-                    onClick={() => setSelectedExample(null)}
-                    className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all shadow-lg"
-                  >
-                    <X className="w-5 h-5 text-neutral-900" />
-                  </button>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* View Gallery Link */}
+          {/* Bottom CTA */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-center mt-10"
+            className="text-center mt-12"
           >
-            <Link href="/gallery" className="inline-flex items-center text-neutral-700 hover:text-neutral-900 font-semibold text-lg group">
-              View Full Gallery
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+            <p className="text-lg text-neutral-600 mb-6">
+              These are just examples. Satirize <span className="font-bold">any</span> public figure or situation.
+            </p>
+            <Link href="/generate">
+              <button className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-neutral-800 to-neutral-700 text-white rounded-xl hover:from-neutral-900 hover:to-neutral-800 transition-all shadow-lg hover:shadow-xl font-bold text-lg group">
+                Start Creating Your Own
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </button>
             </Link>
           </motion.div>
         </div>
