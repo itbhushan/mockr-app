@@ -1305,18 +1305,24 @@ export default function GeneratePage() {
 
       console.log('[Screenshot] Element found, capturing with html2canvas...')
 
-      // Wait for images to load and layout to settle
-      await new Promise(resolve => setTimeout(resolve, 500))
+      // Wait for images to load and text to render properly (matching Gallery timing)
+      await new Promise(resolve => setTimeout(resolve, 800))
 
-      // Capture the element as canvas with high quality
+      // Capture the element as canvas with high quality - MATCHING GALLERY SETTINGS
       const canvas = await html2canvas(element, {
-        backgroundColor: '#ffffff',
-        scale: 2, // High resolution
-        useCORS: true, // Handle cross-origin images
-        logging: false,
+        scale: 2, // High resolution for sharp text
+        useCORS: true,
         allowTaint: true,
-        foreignObjectRendering: false, // Better compatibility
-        imageTimeout: 15000 // Wait for images to load
+        backgroundColor: '#ffffff',
+        logging: false,
+        windowWidth: element.scrollWidth, // Capture full width including any overflow
+        windowHeight: element.scrollHeight, // Capture full height including any overflow
+        scrollX: 0,
+        scrollY: 0,
+        x: 0,
+        y: 0,
+        width: element.scrollWidth,
+        height: element.scrollHeight
       })
 
       console.log('[Screenshot] Canvas captured successfully:', canvas.width, 'x', canvas.height)
@@ -1646,8 +1652,8 @@ export default function GeneratePage() {
 
               {generatedComic && (
                 <div className="space-y-4">
-                  {/* Wrapping div with ID for screenshot capture */}
-                  <div id="comic-preview-capture" className="bg-white rounded-2xl shadow-sm border border-neutral-100">
+                  {/* Wrapping div with ID for screenshot capture - MATCHES GALLERY FORMAT */}
+                  <div id="comic-preview-capture" className="bg-white">
                     {/* Comic Image - Full Size Display */}
                     <div className="w-full bg-white">
                       {generatedComic.imageUrl.startsWith('data:') ? (
@@ -1691,15 +1697,20 @@ export default function GeneratePage() {
                       {/* AI Generated Badge - Removed as all comics are AI-generated */}
                     </div>
 
-                    {/* Comic Details - Compact */}
-                    <div className="px-4 pt-4 pb-8">
-                      <div className="mb-3">
-                        <h3 className="text-sm font-semibold text-neutral-900 mb-2 leading-relaxed">
+                    {/* Comic Details - MATCHES GALLERY FORMAT with full text visibility */}
+                    <div className="px-6 pt-6 pb-8">
+                      <div className="mb-4">
+                        <h3 className="font-semibold text-neutral-900 mb-3 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                           "{generatedComic.dialogue}"
                         </h3>
-                        <p className="text-xs text-neutral-600 leading-relaxed">
+                        <p className="text-sm text-neutral-600 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                           {generatedComic.situation}
                         </p>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-neutral-400 mt-4">
+                        <span className="capitalize">satirical • classic</span>
+                        <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                       </div>
                     </div>
                   </div>

@@ -104,15 +104,23 @@ export default function GalleryPage() {
         return null
       }
 
-      // Wait for images to load
-      await new Promise(resolve => setTimeout(resolve, 500))
+      // Wait for images to load and text to render properly
+      await new Promise(resolve => setTimeout(resolve, 800))
 
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 2, // High resolution for sharp text
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        logging: false
+        logging: false,
+        windowWidth: element.scrollWidth, // Capture full width including any overflow
+        windowHeight: element.scrollHeight, // Capture full height including any overflow
+        scrollX: 0,
+        scrollY: 0,
+        x: 0,
+        y: 0,
+        width: element.scrollWidth,
+        height: element.scrollHeight
       })
 
       return new Promise((resolve) => {
@@ -531,18 +539,18 @@ export default function GalleryPage() {
                   {/* AI Generated Badge - Removed as all comics are AI-generated */}
                 </div>
 
-                {/* Comic Details */}
+                {/* Comic Details - Full text visibility with word wrapping */}
                 <div className="px-6 pt-6 pb-8">
                   <div className="mb-4">
-                    <h3 className="font-semibold text-neutral-900 mb-2 line-clamp-2 leading-relaxed">
+                    <h3 className="font-semibold text-neutral-900 mb-3 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                       "{comic.dialogue}"
                     </h3>
-                    <p className="text-sm text-neutral-600 line-clamp-3 leading-relaxed">
+                    <p className="text-sm text-neutral-600 leading-relaxed" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                       {comic.situation}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-neutral-400">
+                  <div className="flex items-center justify-between text-xs text-neutral-400 mt-4">
                     <span className="capitalize">{comic.tone} • {comic.style}</span>
                     <span>{formatDate(comic.createdAt)}</span>
                   </div>
