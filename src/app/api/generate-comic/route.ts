@@ -424,7 +424,8 @@ async function generateComicWithReplicate(prompt: string): Promise<string | null
               aspect_ratio: '1:1',
               output_format: 'jpg',
               output_quality: 95,
-              num_inference_steps: 4
+              num_inference_steps: 4,
+              negative_prompt: "deformed hands, extra fingers, missing fingers, extra hands, extra arms, extra legs, multiple hands, duplicate limbs, malformed hands, mutated hands, poorly drawn hands, bad anatomy, anatomically incorrect, disfigured, mutation, ugly hands, fused fingers, too many fingers, distorted hands, mangled hands, merged hands, three hands, four hands" // Prevent anatomical errors
             }
           })
         }
@@ -556,7 +557,8 @@ async function generateComicWithHuggingFace(prompt: string): Promise<string | nu
               num_inference_steps: 4, // Schnell optimal (distilled model)
               guidance_scale: 0, // Schnell doesn't use CFG
               width: 1024,
-              height: 1024
+              height: 1024,
+              negative_prompt: "deformed hands, extra fingers, missing fingers, extra hands, extra arms, extra legs, multiple hands, duplicate limbs, malformed hands, mutated hands, poorly drawn hands, bad anatomy, anatomically incorrect, disfigured, mutation, ugly hands, fused fingers, too many fingers, distorted hands, mangled hands, merged hands, three hands, four hands" // Prevent anatomical errors
             }
           })
         }
@@ -647,6 +649,9 @@ function optimizePromptForFLUX(description: string): string {
 
   // 3. CHARACTER DESIGN - R.K. Laxman's signature characters
   optimizedPrompt += `CHARACTERS: Draw 2-4 cartoon characters in R.K. Laxman style with simple round faces, dot eyes, small curved noses, expressive mouths. Include R.K. Laxman's iconic "Common Man" character wearing checkered/plaid shirt and round spectacles. Characters have simple body proportions, clear gestures and poses showing emotions. Other characters: politicians in suits, common citizens in everyday clothes. `
+
+  // 3.5. ANATOMICAL ACCURACY - Critical for preventing deformed body parts
+  optimizedPrompt += `ANATOMY: Each character MUST have exactly 2 hands, 2 arms, 2 legs - count carefully. Hands should be simple cartoon hands with 4-5 fingers each, positioned naturally at sides or in simple gestures. ONE hand visible per arm only. Arms connect properly to shoulders. Legs connect to hips. NO duplicate limbs, NO extra hands, NO malformed hands. Use simple hand poses: hands at sides, hands behind back, simple pointing gesture, or hands in pockets. AVOID complex hand positions or intertwined fingers. Keep anatomy clean and simple. `
 
   // 4. SHADING STYLE - HEAVY CROSSHATCHING (R.K. Laxman's signature)
   optimizedPrompt += `SHADING: Use HEAVY DIAGONAL LINE CROSSHATCHING for all shadows and depth - this is R.K. Laxman's signature technique. Draw dense parallel diagonal lines (45-degree angle) for shadows under chairs, on clothing folds, floor shadows, and depth. Add HEAVY HATCHING on striped/checkered clothing patterns. Use thick crosshatch lines for darker areas, lighter hatching for mid-tones. This heavy pen-and-ink hatching is the most important R.K. Laxman style element. `

@@ -339,8 +339,9 @@ Create a SHORT description (under 400 characters) that shows:
 1. The MAIN ACTION/EVENT from the situation (DO NOT mention Common Man - he will be added separately)
 2. The key irony/contradiction visually represented
 3. Simple, clear scene - focus on the main characters and their actions
+4. Keep character poses SIMPLE - use side profiles, characters with hands behind back, hands at sides, or simple pointing gestures ONLY. AVOID showing multiple hands or complex hand positions
 
-IMPORTANT: Do NOT include "Common Man" in your description. Only describe the main event/action.
+IMPORTANT: Do NOT include "Common Man" in your description. Only describe the main event/action. Keep hand poses extremely simple.
 
 EXAMPLES:
 
