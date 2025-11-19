@@ -479,3 +479,113 @@ function generateFallbackPrompt(
 
   return description
 }
+
+/**
+ * Quality check for generated comic images using Gemini Vision API
+ * Checks for anatomical errors like extra hands, deformed limbs, duplicate body parts
+ * @param imageDataUrl - Base64 data URL of the generated comic image
+ * @returns Object with { passed: boolean, issues: string[], confidence: number }
+ */
+export async function checkComicQuality(imageDataUrl: string): Promise<{
+  passed: boolean
+  issues: string[]
+  confidence: number
+}> {
+  try {
+    console.log('[Quality Check] Starting anatomical accuracy check with Gemini Vision...')
+
+    // Check if API key is available
+    if (!process.env.GOOGLE_GEMINI_API_KEY) {
+      console.warn('[Quality Check] No API key found, skipping quality check')
+      return { passed: true, issues: [], confidence: 0 } // Pass by default if no API key
+    }
+
+    // Use Gemini 2.0 Flash for vision (supports image input)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+
+    // Convert data URL to base64 (remove data:image/jpeg;base64, prefix)
+    const base64Image = imageDataUrl.replace(/^data:image\/[a-z]+;base64,/, '')
+
+    const prompt = `You are a quality control AI for editorial cartoon images. Analyze this cartoon image for ANATOMICAL ERRORS ONLY.
+
+CHECK FOR THESE SPECIFIC ISSUES:
+1. Extra hands (more than 2 hands per character)
+2. Missing hands (characters should have 2 hands unless intentionally hidden)
+3. Extra fingers (more than 5 fingers per hand)
+4. Missing fingers (less than 4 fingers per hand, unless stylized)
+5. Deformed or malformed hands (twisted, mangled, fused fingers)
+6. Extra arms (more than 2 arms per character)
+7. Extra legs (more than 2 legs per character)
+8. Duplicate limbs or body parts
+9. Disconnected limbs (arms/legs not properly connected to body)
+10. Anatomically impossible poses or positions
+
+IMPORTANT RULES:
+- This is a cartoon/caricature style, so some stylization is normal
+- Simple cartoon hands with 4-5 fingers are acceptable
+- Hands behind back or partially hidden are acceptable
+- Focus ONLY on clear anatomical errors, not artistic style
+- Ignore text, speech bubbles, backgrounds, or artistic quality
+- Be strict but reasonable - only flag obvious errors
+
+RESPONSE FORMAT:
+Respond with EXACTLY this JSON structure (no additional text):
+{
+  "passed": true/false,
+  "issues": ["list of specific anatomical errors found"],
+  "confidence": 0.0-1.0
+}
+
+Examples:
+- If image is clean: {"passed": true, "issues": [], "confidence": 0.95}
+- If character has 3 hands: {"passed": false, "issues": ["Character has 3 visible hands instead of 2"], "confidence": 0.9}
+- If fingers are fused: {"passed": false, "issues": ["Character's right hand has fused/merged fingers"], "confidence": 0.85}
+
+Analyze the cartoon now:`
+
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          mimeType: 'image/jpeg',
+          data: base64Image
+        }
+      }
+    ])
+
+    const response = await result.response
+    const text = response.text().trim()
+
+    console.log('[Quality Check] Gemini Vision response:', text)
+
+    // Parse JSON response
+    // Clean up response - remove markdown code blocks if present
+    let cleanedText = text
+      .replace(/```json\n/g, '')
+      .replace(/```\n/g, '')
+      .replace(/```/g, '')
+      .trim()
+
+    const qualityResult = JSON.parse(cleanedText)
+
+    console.log('[Quality Check] Parsed result:', qualityResult)
+    console.log('[Quality Check] Passed:', qualityResult.passed)
+    console.log('[Quality Check] Issues found:', qualityResult.issues.length)
+    if (qualityResult.issues.length > 0) {
+      console.log('[Quality Check] Issues:', qualityResult.issues)
+    }
+    console.log('[Quality Check] Confidence:', qualityResult.confidence)
+
+    return {
+      passed: qualityResult.passed === true,
+      issues: qualityResult.issues || [],
+      confidence: qualityResult.confidence || 0
+    }
+
+  } catch (error) {
+    console.error('[Quality Check] Error during quality check:', error)
+    console.error('[Quality Check] Skipping quality check due to error')
+    // On error, pass the image to avoid blocking user (fail open)
+    return { passed: true, issues: ['Quality check failed - error occurred'], confidence: 0 }
+  }
+}

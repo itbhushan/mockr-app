@@ -1640,12 +1640,13 @@ export default function GeneratePage() {
 
               {isGenerating && (
                 <div className="aspect-[4/3] bg-gradient-to-br from-slate-50 via-white to-slate-100 rounded-2xl flex items-center justify-center">
-                  <div className="text-center">
+                  <div className="text-center px-6">
                     <div className="w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-r from-neutral-800 to-neutral-700 rounded-full mx-auto mb-4 flex items-center justify-center shadow-md animate-pulse">
                       <RefreshCw className="w-10 h-10 lg:w-12 lg:h-12 text-white animate-spin" />
                     </div>
                     <p className="text-neutral-600 font-medium mb-2">AI is Creating Your Comic...</p>
-                    <p className="text-sm lg:text-base leading-relaxed text-neutral-400">This may take a few moments</p>
+                    <p className="text-sm lg:text-base leading-relaxed text-neutral-400 mb-3">Generating image with quality check enabled</p>
+                    <p className="text-xs text-neutral-400 italic">May take 15-30 seconds for best quality</p>
                   </div>
                 </div>
               )}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { generateEnhancedDialogue, generateEnhancedPrompt } from '@/lib/gemini'
+import { generateEnhancedDialogue, generateEnhancedPrompt, checkComicQuality } from '@/lib/gemini'
 import { addCommonManToComic } from '@/lib/imageComposite'
 import { checkDailyLimit, incrementComicCount } from '@/lib/rateLimiting'
 
@@ -57,11 +57,12 @@ export async function POST(request: NextRequest) {
       console.log('⚠️ Using fallback flow: generating dialogue and/or prompt')
     }
 
-    // Try to generate with Hugging Face Pro API
+    // Try to generate with Hugging Face Pro API with quality check and retry logic
     let imageUrl = `/api/placeholder-comic?dialogue=${encodeURIComponent(dialogue)}&situation=${encodeURIComponent(situation)}&description=${encodeURIComponent(prompt)}`
     let aiGenerated = false
+    let qualityCheckResults: { passed: boolean; issues: string[]; confidence: number } | null = null
 
-    console.log('🚀 Attempting AI image generation with Hugging Face Pro API...')
+    console.log('🚀 Attempting AI image generation with quality check enabled...')
     console.log('💬 Generated dialogue:', dialogue)
     console.log('🎭 Applied tone:', tone)
     console.log('📝 Enhanced prompt with Common Man mandate:', prompt.substring(0, 200) + '...')
@@ -69,17 +70,70 @@ export async function POST(request: NextRequest) {
     console.log('🔑 Environment check - HF Token exists:', !!process.env.HUGGINGFACE_API_TOKEN)
     console.log('🔑 Environment check - Replicate Token exists:', !!process.env.REPLICATE_API_TOKEN)
 
-    // Try Hugging Face FLUX-schnell first (Pro subscription - maximize value)
-    let aiImageUrl = await generateComicWithHuggingFace(prompt)
+    // Quality check with retry loop - maximum 3 attempts
+    const MAX_GENERATION_ATTEMPTS = 3
+    let aiImageUrl: string | null = null
+    let attemptNumber = 0
 
-    // Fallback to Replicate FLUX-schnell if HF fails or runs out
-    if (!aiImageUrl) {
-      console.log('⚠️ Hugging Face failed, trying Replicate as fallback...')
-      aiImageUrl = await generateComicWithReplicate(prompt)
+    for (attemptNumber = 1; attemptNumber <= MAX_GENERATION_ATTEMPTS; attemptNumber++) {
+      console.log(`\n${'='.repeat(60)}`)
+      console.log(`🎨 GENERATION ATTEMPT ${attemptNumber}/${MAX_GENERATION_ATTEMPTS}`)
+      console.log(`${'='.repeat(60)}`)
+
+      // Try Hugging Face FLUX-schnell first (Pro subscription - maximize value)
+      aiImageUrl = await generateComicWithHuggingFace(prompt)
+
+      // Fallback to Replicate FLUX-schnell if HF fails or runs out
+      if (!aiImageUrl) {
+        console.log('⚠️ Hugging Face failed, trying Replicate as fallback...')
+        aiImageUrl = await generateComicWithReplicate(prompt)
+      }
+
+      if (!aiImageUrl) {
+        console.log(`❌ Attempt ${attemptNumber}: All AI providers failed`)
+        if (attemptNumber < MAX_GENERATION_ATTEMPTS) {
+          console.log('🔄 Retrying generation...')
+          continue
+        } else {
+          console.log('⚠️ All generation attempts exhausted, using SVG placeholder')
+          break
+        }
+      }
+
+      console.log(`✅ Attempt ${attemptNumber}: Image generated successfully`)
+
+      // Run quality check on generated image
+      console.log(`🔍 Running quality check on attempt ${attemptNumber}...`)
+      qualityCheckResults = await checkComicQuality(aiImageUrl)
+
+      console.log(`📊 Quality Check Results (Attempt ${attemptNumber}):`)
+      console.log(`   - Passed: ${qualityCheckResults.passed}`)
+      console.log(`   - Issues: ${qualityCheckResults.issues.length}`)
+      console.log(`   - Confidence: ${qualityCheckResults.confidence}`)
+      if (qualityCheckResults.issues.length > 0) {
+        console.log(`   - Details: ${qualityCheckResults.issues.join(', ')}`)
+      }
+
+      if (qualityCheckResults.passed) {
+        console.log(`✅ Quality check PASSED on attempt ${attemptNumber}!`)
+        console.log(`🎉 Using this high-quality image`)
+        break
+      } else {
+        console.log(`❌ Quality check FAILED on attempt ${attemptNumber}`)
+        console.log(`🔍 Issues detected: ${qualityCheckResults.issues.join('; ')}`)
+
+        if (attemptNumber < MAX_GENERATION_ATTEMPTS) {
+          console.log(`🔄 Discarding failed image and regenerating... (attempt ${attemptNumber + 1}/${MAX_GENERATION_ATTEMPTS})`)
+          aiImageUrl = null // Discard failed image
+        } else {
+          console.log(`⚠️ Max attempts reached. Using best available image despite quality issues.`)
+          console.log(`📝 Quality issues will be logged for monitoring.`)
+        }
+      }
     }
 
     if (aiImageUrl) {
-      console.log('✅ AI image generation successful!')
+      console.log('✅ Final AI image generation successful!')
       imageUrl = aiImageUrl
       aiGenerated = true
     } else {
@@ -108,7 +162,14 @@ export async function POST(request: NextRequest) {
         tone,
         style,
         userId: userId || null, // Track which user created this comic
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        // Quality check metadata
+        qualityCheck: qualityCheckResults ? {
+          passed: qualityCheckResults.passed,
+          issues: qualityCheckResults.issues,
+          confidence: qualityCheckResults.confidence,
+          attempts: attemptNumber
+        } : null
       }
     }
 
