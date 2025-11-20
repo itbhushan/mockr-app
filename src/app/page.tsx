@@ -124,7 +124,7 @@ export default function HomePage() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
-        className="fixed top-0 w-full z-[60] bg-gradient-to-r from-orange-500 via-red-500 to-orange-500 animate-pulse"
+        className="fixed top-0 w-full z-[60] bg-gradient-to-r from-neutral-800 to-neutral-900 animate-pulse"
       >
         <div className="max-w-7xl mx-auto px-4 py-2">
           <p className="text-center text-white font-bold text-sm sm:text-base">
