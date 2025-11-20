@@ -619,7 +619,7 @@ export default function HomePage() {
                 title: "Budget Hypocrisy",
                 description: "Politicians cutting healthcare while posing at hospital openings",
                 emoji: "🏛️",
-                color: "from-blue-600 to-blue-700",
+                color: "from-neutral-800 to-neutral-900",
                 image: "/examples/politics-budget.jpg"
               },
               {
@@ -627,7 +627,7 @@ export default function HomePage() {
                 title: "Tech Billionaire Logic",
                 description: "CEOs preaching work-life balance from their private jets",
                 emoji: "💼",
-                color: "from-green-600 to-green-700",
+                color: "from-neutral-800 to-neutral-900",
                 image: "/examples/business-ceo.jpg"
               },
               {
@@ -635,7 +635,7 @@ export default function HomePage() {
                 title: "Celebrity Endorsements",
                 description: "Actors promoting products they'd never actually use",
                 emoji: "🎬",
-                color: "from-purple-600 to-purple-700",
+                color: "from-neutral-800 to-neutral-900",
                 image: "/examples/entertainment-celebrity.jpg"
               },
               {
@@ -643,7 +643,7 @@ export default function HomePage() {
                 title: "Athlete Controversies",
                 description: "Sports stars and their off-field contradictions",
                 emoji: "⚽",
-                color: "from-orange-600 to-orange-700",
+                color: "from-neutral-800 to-neutral-900",
                 image: "/examples/sports-athlete.jpg"
               },
               {
@@ -651,7 +651,7 @@ export default function HomePage() {
                 title: "Financial Advice",
                 description: "Billionaires telling everyone to work harder and save money",
                 emoji: "💰",
-                color: "from-amber-600 to-amber-700",
+                color: "from-neutral-800 to-neutral-900",
                 image: "/examples/economy-billionaire.jpg"
               },
               {
@@ -659,7 +659,7 @@ export default function HomePage() {
                 title: "Influencer Culture",
                 description: "Social media personalities vs. reality check moments",
                 emoji: "📱",
-                color: "from-pink-600 to-pink-700",
+                color: "from-neutral-800 to-neutral-900",
                 image: "/examples/social-influencer.jpg"
               }
             ].map((topic, index) => (
